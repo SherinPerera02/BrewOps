@@ -2,11 +2,11 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-green-500 text-white px-8 py-6 flex flex-col md:flex-row justify-between items-center">
+    <footer className="bg-green-700 text-white px-8 py-6 flex flex-col md:flex-row justify-between items-center">
       
       {/* Contact Info */}
       <div className="text-left mb-6 md:mb-0">
-        <h3 className="text-2xl font-bold mb-4">Evergreen Tea Factory</h3>
+        <h3 className="text-2xl font-bold mb-4">Maleesha Tea Factory</h3>
         <div className="text-sm space-y-1">
           <div><strong>Email:</strong> brewopsTea@gmail.com</div>
           <div><strong>Phone:</strong> +94711738453</div>

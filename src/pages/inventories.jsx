@@ -81,8 +81,9 @@ const Home = () => {
   };
 
   return (
+    
     <div className="min-h-screen flex flex-col">
-      
+      <NavigationBar />
       {/* Layout with Sidebar */}
       <div className="flex flex-1">
         {/* Sidebar */}
@@ -90,7 +91,7 @@ const Home = () => {
           <Link to="/HomePage" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
             Home
           </Link>
-          <Link to="/inventorys" className="block px-4 py-2 rounded bg-green-600 text-sm font-medium">
+          <Link to="/inventories" className="block px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">
             Inventory
           </Link>
           <Link to="/waste-management" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
@@ -177,7 +178,7 @@ const Home = () => {
           )}
         </main>
       </div>
-
+      
       <Footer />
     </div>
   );
