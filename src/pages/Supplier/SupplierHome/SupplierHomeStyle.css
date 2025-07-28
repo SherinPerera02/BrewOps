@@ -1,44 +1,96 @@
-
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 16px;
-  }
-  
-  
-  .subnav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #3FC060;
-    padding: 12px 20px;
-    border-radius: 8px;
-  }
-  
-  
-  .subnav a {
-    color: rgb(17, 16, 16);
-    text-decoration: none;
-    margin: 0 12px;
-    font-weight: 500;
-    font-size: 16px;
-    transition: color 0.3s;
-  }
-  
-  
-  .subnav a:hover {
-    
-    padding: auto;
-    border-bottom: 2px solid #0c0d0e;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
 
-  }
+
+.subnav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #3FC060;
+  padding: 12px 20px;
+  border-radius: 8px;
+}
+
+.subnav a {
+  color: rgb(17, 16, 16);
+  text-decoration: none;
+  margin: 0 12px;
+  font-weight: 500;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.subnav a:hover {
+  border-bottom: 2px solid #0c0d0e;
+}
+
+
+.subnav img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+}
+
+
+.body_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px auto;
+  max-width: 1000px;
+  flex-wrap: wrap; 
+}
+
+
+.body_container h1 {
+  font-size: 30px;
+  font-weight: bolder;
+  margin-left: -180px;
   
-  /* Profile image style */
-  .subnav img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid white;
-    cursor: pointer;
-  }
-  
+  color: #333;
+}
+
+.body_function {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+
+.body_function button,
+.body_function a {
+  padding: 10px 16px;
+  font-size: 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.body_function button {
+  background-color: #0f40e1;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.body_function button:hover {
+  background-color: #34a851;
+}
+
+/* Link styles */
+.body_function a {
+  background-color: white;
+  color: #3FC060;
+  border: 2px solid #3FC060;
+}
+
+.body_function a:hover {
+  background-color: #3FC060;
+  color: white;
+}
