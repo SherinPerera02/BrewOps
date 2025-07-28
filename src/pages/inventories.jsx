@@ -9,7 +9,7 @@ import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 
 import Spinner from '../components/spinner';
-import NavigationBar from '../components/navigationBar';
+import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/footer';
 
 const Home = () => {
