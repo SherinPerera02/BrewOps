@@ -16,6 +16,8 @@ function App() {
         <Route path="/inventory/edit/:id" element={<EditInventory />} />
         <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
 
+        
+
       </Routes>
     </BrowserRouter>
   );
