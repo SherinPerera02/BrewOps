@@ -1,4 +1,6 @@
-
+.supplier-home-wrapper{
+  min-height: 100vh;
+}
 .nav {
   background-color: #3FC060;
   padding-bottom: 10px;
@@ -12,7 +14,7 @@
 
 .subnav {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between;.
   align-items: center;
   background-color: #3FC060;
   padding: 12px 20px;

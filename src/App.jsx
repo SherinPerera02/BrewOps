@@ -8,6 +8,7 @@ import DeleteInventory from './pages/deleteInventory';
 
 
 import SupplierHome from './pages/Supplier/SupplierHome/SupplierHome'
+import CreateSupplier from './pages/Supplier/CreateSupplier/CreateSupplier'
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +30,7 @@ function App() {
 
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
+        <Route path ="/CreateSupplier" element={<CreateSupplier />} />
        
 
 
