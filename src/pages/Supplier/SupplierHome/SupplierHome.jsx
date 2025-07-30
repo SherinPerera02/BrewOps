@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 
-import NavigationBar from '../../../components/NavigationBar';
+
 import SupplierSearch from '../../../components/SupplierSearch/SupplierSearch';
 import Footer from '../../../components/Footer';
 import Spinner from '../../../components/Spinner';
+import SupplierNavigation from '../../../components/SupplierNavigation/SupplierNavigation';
 
-import profile from '../../../assets/profile.png';
+
 
 
 import { BsInfoCircle } from 'react-icons/bs';
@@ -144,19 +145,7 @@ export default function SupplierHome() {
     <div className="supplier-home-wrapper">
       
       <div className="nav">
-        <NavigationBar />
-        <nav>
-          <div className="container">
-            <div className="subnav">
-              <Link to="">Home</Link>
-              <Link to="/SupplierHome">Suppliers</Link>
-              <Link to="">Supplier Record</Link>
-              <Link to="">
-                <img src={profile} alt="Profile" />
-              </Link>
-            </div>
-          </div>
-        </nav>
+        <SupplierNavigation />
       </div>
 
     

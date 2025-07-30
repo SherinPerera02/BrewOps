@@ -1,0 +1,64 @@
+
+.body {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .body_container {
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .body_container h1 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .body_function {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  
+  .body_function button,
+  .body_function a {
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+  }
+  
+  .body_function button {
+    background-color: #0f40e1;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .body_function button:hover {
+    background-color: #2a78f0;
+  }
+  
+  .body_function a {
+    background-color: white;
+    color: #3FC060;
+    border: 2px solid #3FC060;
+  }
+  
+  .body_function a:hover {
+    background-color: #3FC060;
+    color: white;
+  }
+
+  .searchbar{
+    margin-bottom: 150px;
+  }
