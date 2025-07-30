@@ -89,4 +89,12 @@
   .submit_btn:hover {
     background-color: #34a851;
   }
+
+  .error {
+    color: red;
+    font-size: 13px;
+    margin-top: -12px;
+    margin-bottom: 10px;
+  }
+  
   
