@@ -1,10 +1,11 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
+import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSupplierRecode';
 
 
 import SupplierHome from './pages/Supplier/SupplierHome/SupplierHome'
@@ -35,6 +36,7 @@ function App() {
         <Route path="/SupplierHome" element={<SupplierHome />} />
         <Route path ="/CreateSupplier" element={<CreateSupplier />} />
         <Route path ='/SupplierRecodeTable' element={<SupplierRecodeTable />} />
+        <Route path ='/SupplierRecodeCreate' element={<CreateSupplierRecode />} />
        
 
 
