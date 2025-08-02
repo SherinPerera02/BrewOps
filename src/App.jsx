@@ -11,6 +11,8 @@ import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSu
 import SupplierHome from './pages/Supplier/SupplierHome/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier/CreateSupplier'
 import SupplierRecodeTable from './pages/Supplier/SupplierRecodeTable/SupplierRecodeTable'
+import ShowSupplier from './pages/Supplier/SupplierRecodeTable/ShowSupplier/ShowSupplier'
+import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode/ShowSupplyRecode';
 
 
 function App() {
@@ -34,9 +36,16 @@ function App() {
 
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
+
+        // Supplier Create
         <Route path ="/CreateSupplier" element={<CreateSupplier />} />
-        <Route path ='/SupplierRecodeTable' element={<SupplierRecodeTable />} />
+        <Route path ="/SupplierShow"  element={<ShowSupplier />} />
         <Route path ='/SupplierRecodeCreate' element={<CreateSupplierRecode />} />
+
+
+      // Supplier Recode Table
+       <Route path ='/SupplierRecodeTable' element={<SupplierRecodeTable />} />
+       <Route path = '/ShowSupplyRecode' element ={<ShowSupplyRecode/>} />
        
 
 

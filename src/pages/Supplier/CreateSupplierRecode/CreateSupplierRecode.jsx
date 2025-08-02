@@ -1,31 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './CreateSupplierRecode.css';
 import NavigationBar from '../../../components/NavigationBar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import leftArrow from '../../../assets/left-arrow.png';
 import Footer from '../../../components/Footer';
 
 export default function CreateSupplierRecode() {
-  const [formData, setFormData] = useState({
-    supplier: '',
-    date: '',
-    quantity: '',
-    unitPrice: '',
-  });
+  const [suppliers, setSuppliers] = useState([
+    { supplierid: 'S001', name: 'Kamal' },
+    { supplierid: 'S002', name: 'Amal' },
+  ]); // Sample data
+
+  const [selectedSupplier, setSelectedSupplier] = useState('');
+  const [date, setDate] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [unitPrice, setUnitPrice] = useState('');
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setDate(getCurrentDate());
+  }, []);
 
   const getCurrentDate = () => {
-    return new Date().toISOString().split('T')[0];
+    const today = new Date();
+    return today.toISOString().split('T')[0];
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const validate = () => {
+    const newErrors = {};
+    if (!selectedSupplier) newErrors.selectedSupplier = 'Supplier is required';
+    if (!date) newErrors.date = 'Date is required';
+    if (!quantity || isNaN(quantity) || Number(quantity) <= 0)
+      newErrors.quantity = 'Quantity must be a valid number greater than 0';
+    if (!unitPrice || isNaN(unitPrice) || Number(unitPrice) <= 0)
+      newErrors.unitPrice = 'Unit Price must be a valid number greater than 0';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSave = (e) => {
     e.preventDefault();
-    console.log('Saved Data:', formData);
-    alert('Supplier record saved (Frontend only)');
+    if (validate()) {
+      const data = {
+        supplier: selectedSupplier,
+        date,
+        quantity,
+        unitPrice,
+      };
+      console.log('Saving data:', data);
+      alert('Supplier record saved successfully!');
+      navigate('/SupplyRecordTable');
+    }
   };
 
   return (
@@ -41,60 +68,60 @@ export default function CreateSupplierRecode() {
 
         <div className="add_details">
           <h1>Add New Record</h1>
-          <form className="details" onSubmit={handleSubmit}>
+          <form className="details" onSubmit={handleSave}>
             <label className="label">Supplier</label>
             <select
               className="input"
-              name="supplier"
-              value={formData.supplier}
-              onChange={handleChange}
-              required
+              value={selectedSupplier}
+              onChange={(e) => setSelectedSupplier(e.target.value)}
             >
               <option value="">Select Supplier</option>
-              <option value="Kamal">Kamal</option>
-              <option value="Amal">Amal</option>
-              <option value="Nimal">Nimal</option>
+              {suppliers.map((s) => (
+                <option key={s.supplierid} value={s.supplierid}>
+                  {s.supplierid} - {s.name}
+                </option>
+              ))}
             </select>
+            {errors.selectedSupplier && <span className="error">{errors.selectedSupplier}</span>}
 
             <label className="label">Date</label>
             <input
               type="date"
-              name="date"
-              value={formData.date}
-              max={getCurrentDate()}
-              onChange={handleChange}
               className="input"
-              required
+              value={date}
+              max={getCurrentDate()}
+              onChange={(e) => setDate(e.target.value)}
             />
+            {errors.date && <span className="error">{errors.date}</span>}
 
             <label className="label">Quantity (Kg)</label>
             <input
               type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
               className="input"
               placeholder="Enter Quantity"
-              required
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
             />
+            {errors.quantity && <span className="error">{errors.quantity}</span>}
 
             <label className="label">Unit Price</label>
             <input
               type="number"
-              name="unitPrice"
-              value={formData.unitPrice}
-              onChange={handleChange}
               className="input"
               placeholder="Enter Unit Price"
-              required
+              value={unitPrice}
+              onChange={(e) => setUnitPrice(e.target.value)}
             />
+            {errors.unitPrice && <span className="error">{errors.unitPrice}</span>}
 
-            <button type="submit" className="submit-btn">Save</button>
+            <button type="submit" className="submit-btn">
+              Save
+            </button>
           </form>
         </div>
       </div>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 }
