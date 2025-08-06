@@ -135,7 +135,7 @@ export default function SupplierRecodeTable() {
                           <BsInfoCircle className="text-2xl text-green-800" />
                         </Link>
                         {item.status === 'Pending' ? (
-                          <Link to={`/supplyrecords/edit/${item._id}`}>
+                          <Link to='/EditSupplierRecode'>
                             <AiOutlineEdit className="text-2xl text-yellow-600" />
                           </Link>
                         ) : (

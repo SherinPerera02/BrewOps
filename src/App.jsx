@@ -8,11 +8,14 @@ import DeleteInventory from './pages/deleteInventory';
 import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSupplierRecode';
 
 
-import SupplierHome from './pages/Supplier/SupplierHome/SupplierHome'
+import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier/CreateSupplier'
 import SupplierRecodeTable from './pages/Supplier/SupplierRecodeTable/SupplierRecodeTable'
 import ShowSupplier from './pages/Supplier/SupplierRecodeTable/ShowSupplier/ShowSupplier'
 import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode/ShowSupplyRecode';
+import EditSupplier from './pages/Supplier/EditSpplier/EditSupplier';
+import EditSupplierRecode from './pages/Supplier/EditSupplierRecode/EditSupplierRecode';
+
 
 
 function App() {
@@ -41,11 +44,15 @@ function App() {
         <Route path ="/CreateSupplier" element={<CreateSupplier />} />
         <Route path ="/SupplierShow"  element={<ShowSupplier />} />
         <Route path ='/SupplierRecodeCreate' element={<CreateSupplierRecode />} />
+        <Route path ="/EditSupplier" element={<EditSupplier/>}/>
 
 
       // Supplier Recode Table
        <Route path ='/SupplierRecodeTable' element={<SupplierRecodeTable />} />
        <Route path = '/ShowSupplyRecode' element ={<ShowSupplyRecode/>} />
+       <Route path ='/EditSupplierRecode' element={<EditSupplierRecode/>}/>
+
+       
        
 
 

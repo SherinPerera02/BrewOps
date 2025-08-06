@@ -1,0 +1,82 @@
+/* Full page background */
+.editdetails {
+    background:url(../../../assets/supplierBg2.avif);
+    min-height: 100vh;
+  }
+  
+  /* Arrow button spacing */
+  .arrow_btn {
+    margin: 80px 0 0 30px;
+  }
+  
+  /* Back arrow icon */
+  .left-arrow-icon {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+  }
+  
+  /* Heading area */
+  .editSupplier_heading {
+    background-color: rgba(179, 174, 174, 0.95);
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 40px 80px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Main heading */
+  .editSupplier_heading h1 {
+    text-align: center;
+    color: #0a0a0a;
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  /* Form fields */
+  .Edit_details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Label styling */
+  .label {
+    margin-top: 12px;
+    font-weight: bold;
+    color: #0d0c0c;
+  }
+  
+  /* Input box styling */
+  .input {
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    transition: border 0.3s;
+  }
+  
+  .input:focus {
+    border-color: #3FC060;
+    outline: none;
+  }
+  
+  /* Submit button */
+  .submit_btn {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #3FC060;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit_btn:hover {
+    background-color: #2faa50;
+  }
+  
