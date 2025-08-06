@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import leftArrow from '../../../assets/left-arrow.png';
 import Spinner from '../../../components/Spinner';
 import Footer from '../../../components/Footer';
+import bgimage from '../../../assets/supplierBg2.avif'
 
 export default function CreateSupplier() {
   const [supplierId, setSupplierId] = useState('');
@@ -15,7 +16,7 @@ export default function CreateSupplier() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Generate random Supplier ID like SID0001
+  // Generate unique Supplier ID
   const generateUniqueSupplierID = () => {
     const randomNumber = Math.floor(Math.random() * 1000) + 1;
     const newID = `SID${randomNumber.toString().padStart(4, '0')}`;
@@ -26,7 +27,7 @@ export default function CreateSupplier() {
     generateUniqueSupplierID();
   }, []);
 
-  // Validation Functions
+  // Validation functions
   const validateName = (value) => {
     if (!value.trim()) return 'Name is required';
     if (value.length < 5 || value.length > 20) return 'Name must be 5–20 characters';
@@ -102,124 +103,131 @@ export default function CreateSupplier() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-cover bg-center"
+      style={{backgroundImage:"URL(${bgimage})"}}>
       <NavigationBar />
 
-      <div className='background'>
-
-      <div className="max-w-3xl mx-auto px-6 py-10">
+      {/* Back arrow */}
+      <div className="absolute top-25 left-6">
         <Link to="/SupplierHome">
-          <img src={leftArrow} alt="Go Back" className="w-6 h-6 mb-4" />
+          <img src={leftArrow} alt="Go Back" className="w-10 h-10 hover:scale-105 transition-transform" />
         </Link>
+      </div>
 
-        {loading && <Spinner />}
+      <div
+      className="max-w-8xl mx-auto mt-5 p-10 rounded-lg shadow-lg bg-cover ng-opacity-80 "
+      style={{ backgroundImage: `url(${bgimage})` }}
+>
 
-        <div className="bg-white p-8 shadow-lg rounded-md">
-          <h1 className="text-2xl font-bold mb-6">Create Supplier</h1>
 
-          <div className="grid grid-cols-1 gap-5">
-            {/* Supplier ID */}
-            <div>
-              <label className="block mb-1 font-medium">Supplier ID</label>
-              <input type="text" className="w-full border px-4 py-2 rounded" value={supplierId} readOnly />
-            </div>
+      {loading && <Spinner />}
 
-            {/* Supplier Name */}
-            <div>
-              <label className="block mb-1 font-medium">Supplier Name</label>
-              <input
-                type="text"
-                name="name"
-                className="w-full border px-4 py-2 rounded"
-                placeholder="Enter Supplier Name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  handleInputChange(e, validateName);
-                }}
-              />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-            </div>
+      {/* Supplier Form */}
+      <div className="max-w-2xl mx-auto mt-5  p-10 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Add New Supplier</h1>
 
-            {/* NIC */}
-            <div>
-              <label className="block mb-1 font-medium">NIC</label>
-              <input
-                type="text"
-                name="NIC"
-                className="w-full border px-4 py-2 rounded"
-                placeholder="Enter NIC (e.g., 123456789V)"
-                value={NIC}
-                onChange={(e) => {
-                  setNIC(e.target.value);
-                  handleInputChange(e, validateNIC);
-                }}
-              />
-              {errors.NIC && <p className="text-red-500 text-sm mt-1">{errors.NIC}</p>}
-            </div>
-
-            {/* Address */}
-            <div>
-              <label className="block mb-1 font-medium">Address</label>
-              <input
-                type="text"
-                name="address"
-                className="w-full border px-4 py-2 rounded"
-                placeholder="Enter Address"
-                value={address}
-                onChange={(e) => {
-                  setAddress(e.target.value);
-                  handleInputChange(e, validateAddress);
-                }}
-              />
-              {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
-            </div>
-
-            {/* Contact */}
-            <div>
-              <label className="block mb-1 font-medium">Contact Number</label>
-              <input
-                type="text"
-                name="contact"
-                className="w-full border px-4 py-2 rounded"
-                placeholder="Enter 10-digit contact number"
-                value={contact}
-                onChange={(e) => {
-                  setContact(e.target.value);
-                  handleInputChange(e, validateContact);
-                }}
-              />
-              {errors.contact && <p className="text-red-500 text-sm mt-1">{errors.contact}</p>}
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block mb-1 font-medium">Email</label>
-              <input
-                type="email"
-                name="email"
-                className="w-full border px-4 py-2 rounded"
-                placeholder="Enter Email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  handleInputChange(e, validateEmail);
-                }}
-              />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-            </div>
-
-            {/* Submit Button */}
-            <div className="text-center mt-6">
-              <button
-                onClick={handleSaveSupplier}
-                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-              >
-                Submit
-              </button>
-            </div>
+        <div className="space-y-4">
+          {/* Supplier ID */}
+          <div>
+            <label className="block font-medium mb-1">Supplier ID</label>
+            <input type="text" className="w-full border border-gray-300 px-4 py-2 rounded" value={supplierId} readOnly />
           </div>
+
+          {/* Name */}
+          <div>
+            <label className="block font-medium mb-1">Supplier Name</label>
+            <input
+              type="text"
+              name="name"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Supplier Name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                handleInputChange(e, validateName);
+              }}
+            />
+            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
           </div>
+
+          {/* NIC */}
+          <div>
+            <label className="block font-medium mb-1">NIC</label>
+            <input
+              type="text"
+              name="NIC"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter NIC (e.g., 123456789V)"
+              value={NIC}
+              onChange={(e) => {
+                setNIC(e.target.value);
+                handleInputChange(e, validateNIC);
+              }}
+            />
+            {errors.NIC && <p className="text-red-500 text-sm">{errors.NIC}</p>}
+          </div>
+
+          {/* Address */}
+          <div>
+            <label className="block font-medium mb-1">Address</label>
+            <input
+              type="text"
+              name="address"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Address"
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                handleInputChange(e, validateAddress);
+              }}
+            />
+            {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+          </div>
+
+          {/* Contact */}
+          <div>
+            <label className="block font-medium mb-1">Contact Number</label>
+            <input
+              type="text"
+              name="contact"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Contact Number"
+              value={contact}
+              onChange={(e) => {
+                setContact(e.target.value);
+                handleInputChange(e, validateContact);
+              }}
+            />
+            {errors.contact && <p className="text-red-500 text-sm">{errors.contact}</p>}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block font-medium mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                handleInputChange(e, validateEmail);
+              }}
+            />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+          </div>
+
+          {/* Submit */}
+          <div className="text-center mt-8">
+            <button
+              onClick={handleSaveSupplier}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
         </div>
       </div>
 
