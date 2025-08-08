@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import Lottie from 'lottie-react';
-import teaLeavesAnimation from '../assets/tea-leaves.json';
+import WhoWeAre from './WhoWeAre';
 
 const HomePage = () => {
   const textRefs = useRef([]);
@@ -11,8 +10,9 @@ const HomePage = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            console.log('Animating:', entry.target); // Debug log
             entry.target.classList.add('animate-fade-in-up');
-            observer.unobserve(entry.target); // Stop observing once animated
+            observer.unobserve(entry.target); 
           }
         });
       },
@@ -20,7 +20,10 @@ const HomePage = () => {
     );
 
     textRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
+      if (ref) {
+        console.log('Observing:', ref); // Debug log
+        observer.observe(ref);
+      }
     });
 
     imageRefs.current.forEach((ref) => {
@@ -32,7 +35,7 @@ const HomePage = () => {
     };
   }, []);
   return (
-    <div className="font-sans">
+    <div className="font-sans bg-green-50">
       {/* Header */}
       <header className="bg-green-600 flex justify-between items-center px-6 py-4 shadow">
         <h1 className="text-2xl font-bold text-white">BrewOps</h1>
@@ -131,7 +134,7 @@ const HomePage = () => {
         .animate-text-fade-in {
           animation: text-fade-in 1s cubic-bezier(0.23, 1, 0.32, 1) both;
         }
-        .delay-100 { animation-delay: 0.1s; }
+        .delay-100 { animation-delay: 0.2s; }
         @keyframes slide-in {
           0% { opacity: 0; transform: translateY(40px); }
           100% { opacity: 1; transform: translateY(0); }
@@ -147,97 +150,30 @@ const HomePage = () => {
       <section className="px-6 py-10 space-y-6">
         
           
-       <div className="text-center py-10">
+       <div ref={(el) => textRefs.current.push(el)} className="text-center py-10">
           <h1 className="text-4xl font-bold mb-6">
             Maleesha Tea – More Than Just a Tea Factory
           </h1>
-          <p className="text-gray-700 mt-2 text-lg max-w-3xl mx-auto">
-            For generations, Maleesha Tea Factory has been at the heart of our community, 
-            working hand in hand with individual tea pluckers and small-scale growers from nearby villages. 
-            Rooted in tradition yet embracing modern processing standards, we ensure that every leaf 
-            reflects the dedication and care of those who harvest it. Beyond producing the finest Ceylon tea, 
-            we provide fair prices, reliable support, and a lifeline for local livelihoods  
-            sustaining families and preserving the proud heritage of Sri Lankan tea. 
+          <p className="text-gray-700 mt-2 text-lg max-w-3xl mx-auto ">
+            For generations, Maleesha Tea Factory has been at the heart of our community,<br />
+            working hand in hand with individual tea pluckers and small-scale growers from nearby villages.<br />
+            Rooted in tradition yet embracing modern processing standards, we ensure that every leaf<br />
+            reflects the dedication and care of those who harvest it.<br />
+            Beyond producing the finest Ceylon tea,<br />
+            we provide fair prices, reliable support and a lifeline for local livelihoods,<br />
+            sustaining families and preserving the proud heritage of Sri Lankan tea.<br />
             Join us in celebrating this timeless craft.
           </p>
-          <button className="mt-6 px-6 py-2 border border-black rounded hover:bg-black hover:text-white transition">
+          <button className="mt-6 px-6 py-2 border font-semibold bg-green-400 border-black rounded hover:bg-black hover:text-white transition cursor-pointer ">
             Read About Us
           </button>
        </div>
 
-              {/* Tea Leaves Animation Section */}
-      <section className="flex justify-center items-center py-10">
-        <div className="w-full max-w-md">
-          <Lottie animationData={teaLeavesAnimation} loop={true} />
-        </div>
+        
       </section>
 
-        <div>
-          <h3
-            className="font-semibold text-lg opacity-0"
-            ref={(el) => (textRefs.current[2] = el)}
-          >
-            Who We Are
-          </h3>
-          <p
-            className="text-gray-700 mt-2 opacity-0"
-            ref={(el) => (textRefs.current[3] = el)}
-          >
-            We combine traditional tea cultivation with smart digital tools to create a smooth and
-            reliable supply chain from field to factory. Our commitment is to quality, community
-            relationships, and modernized factory processes.
-          </p>
-        </div>
-      </section>
-
-      {/* Feature Section */}
-      <section className="px-6 pb-10">
-        <h3 className="font-semibold text-lg mb-6">System Features</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Inventory Card */}
-          <div
-            className="bg-white rounded-xl shadow overflow-hidden transform transition duration-500 hover:scale-105 opacity-0"
-            ref={(el) => (imageRefs.current[0] = el)}
-          >
-            <img
-              src="/public/tea_1.jpg"
-              alt="Inventory Management"
-              className="w-full h-100 object-cover"
-            />
-            <div className="p-4">
-              <h4 className="font-semibold animate-text-fade-in">Inventory Management</h4>
-              <p className="text-gray-600 text-sm animate-text-fade-in delay-100">
-                Efficiently monitor stock levels, record inventory data and make work easier.
-              </p>
-            </div>
-          </div>
-
-          {/* Supplier Card */}
-          <div
-            className="bg-white rounded-xl shadow overflow-hidden transform transition duration-500 hover:scale-105 opacity-0"
-            ref={(el) => (imageRefs.current[1] = el)}
-          >
-            <img
-              src="/public/tea.jpg"
-              alt="Supplier Management"
-              className="w-full h-100 object-cover"
-            />
-            <div className="p-4">
-              <h4 className="font-semibold animate-text-fade-in">Supplier Management</h4>
-              <p className="text-gray-600 text-sm animate-text-fade-in delay-100">
-                Track relationships, ensure quality control, and review delivery history.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* More Details */}
-        <div className="text-center mt-8">
-          <button className="bg-green-400 hover:bg-black text-black hover:text-white font-semibold text-bold px-5 py-2 cursor-pointer rounded transition">
-            More Details
-          </button>
-        </div>
-      </section>
+      {/* Include WhoWeAre Component */}
+      <WhoWeAre />
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-10 px-6">
@@ -264,6 +200,7 @@ const HomePage = () => {
           {/* Links */}
           <div>
             <h4 className="font-semibold mb-2">Experiences</h4>
+            <h4 className="font-semibold mb-2">Tea Tours</h4>
           </div>
           <div>
             <h4 className="font-semibold mb-2">Accommodation</h4>
