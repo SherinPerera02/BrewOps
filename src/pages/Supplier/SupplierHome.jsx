@@ -77,7 +77,7 @@ export default function SupplierHome1() {
               </button>
 
               <Link
-                to="/CreateSupplier"
+                to="/suppliers/create"
                 className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900"
               >
                 <MdOutlineAddBox className="text-xl mr-2" />
@@ -131,10 +131,10 @@ export default function SupplierHome1() {
                               <Link to={`/suppliers/details/${item._id}`} className="text-green-700 text-xl">
                                 <BsInfoCircle />
                               </Link>
-                              <Link to={`/EditSupplier/${item._id}`} className="text-yellow-600 text-xl">
+                              <Link to={`/Suppliers/edit/${item._id}`} className="text-yellow-600 text-xl">
                                 <AiOutlineEdit />
                               </Link>
-                              <Link to={`/suppliers/delete/${item._id}`} className="text-red-600 text-xl">
+                              <Link to={`/Suppliers/delete/${item._id}`} className="text-red-600 text-xl">
                                 <MdOutlineDelete />
                               </Link>
                             </div>
