@@ -63,7 +63,7 @@ export default function WhoWeAre() {
         </div>
 
         {/* Text Content */}
-        <div ref={(el) => textRefs.current.push(el)} className="w-full md:w-1/2 text-center md:text-left opacity-0 transition-opacity duration-2000">
+        <div ref={(el) => textRefs.current.push(el)} className="w-full md:w-1/2 text-center md:text-left opacity-0 transition-opacity duration-4000">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4"> 
             Maleesha Tea Journey
           </h1>
@@ -107,14 +107,8 @@ export default function WhoWeAre() {
             </ul>
           </article>
 
-          <article ref={(el) => textRefs.current.push(el)} className="mb-8 opacity-0">
-            <h2 className="text-2xl font-semibold mb-3">What We Offer</h2>
-            <p className="text-gray-700 text-lg leading-relaxed">
-              Single-estate Ceylon teas, small-batch blends, and supportive sourcing for independent pluckers.
-              Every batch is handled with care so we can deliver a bright, clean cup that reflects the terroir
-              and the hands that harvested it.
-            </p>
-          </article>
+
+          
 
           <div ref={(el) => textRefs.current.push(el)} className="mt-6 opacity-0">
             <a
@@ -133,6 +127,32 @@ export default function WhoWeAre() {
           </div>
         </div>
       </div>
+
+              {/* PHOTO SECTION */}
+          <div
+            ref={(el) => textRefs.current.push(el)}
+            className="md:grid-cols-2 gap-6 mb-8 opacity-0 w-full grid"
+          >
+            <img
+              src="/tea-factory.jpeg"
+              alt="Tea factory"
+              className="w-full h-100 object-cover rounded-lg shadow-md"
+            />
+            <img
+              src="/tea-field.jpg"
+              alt="Tea processing"
+              className="w-full h-100 object-cover rounded-lg shadow-md"
+            />
+          </div>
+
+          <article ref={(el) => textRefs.current.push(el)} className="mb-8 opacity-0">
+            <h2 className="text-2xl font-semibold mb-3">What We Offer</h2>
+            <p className="text-gray-700 text-lg leading-relaxed">
+              Single-estate Ceylon teas, small-batch blends, and supportive sourcing for independent pluckers.
+              Every batch is handled with care so we can deliver a bright, clean cup that reflects the terroir
+              and the hands that harvested it.
+            </p>
+          </article>
 
       {/* MAP SECTION */}
       <div className="mt-16">

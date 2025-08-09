@@ -37,13 +37,13 @@ const HomePage = () => {
   return (
     <div className="font-sans bg-green-50">
       {/* Header */}
-      <header className="bg-green-600 flex justify-between items-center px-6 py-4 shadow">
+      <header className="bg-green-600 flex justify-between items-center px-8 py-4 shadow">
         <h1 className="text-2xl font-bold text-white">BrewOps</h1>
         <nav className="space-x-6 text-white font-medium">
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-          <Link to="/services">Services</Link>
-          <Link to="/contact">Contact</Link>
+          <Link to="/" className="text-white text-md hover:text-green-900 transition">Home</Link>
+          <Link to="/AboutUs" className="text-white text-md hover:text-green-900 transition">About</Link>
+          <Link to="/Service" className="text-white text-md hover:text-green-900 transition">Services</Link>
+          <Link to="/ContactUs" className="text-white text-md hover:text-green-900 transition">Contact</Link>
           <Link
             to="/login"
             className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
@@ -56,11 +56,11 @@ const HomePage = () => {
       {(() => {
         // Array of hero images (update paths as needed)
         const heroImages = [
-          '/public/background.jpg',
-          '/public/tea_1.jpg',
-          '/public/tea.jpg',
-          '/public/pic_01.jpg',
-          '/public/pic_02.jpg',
+          '/background.jpg',
+          '/tea_1.jpg',
+          '/tea.jpg',
+          '/pic_01.jpg',
+          '/pic_02.jpg',
         ];
         const [currentImage, setCurrentImage] = useState(0);
         useEffect(() => {
@@ -115,7 +115,7 @@ const HomePage = () => {
           100% { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-up {
-          animation: fade-in-up 1s cubic-bezier(0.23, 1, 0.32, 1) both;
+          animation: fade-in-up 2s cubic-bezier(0.23, 1, 0.32, 1) both;
         }
         .delay-100 { animation-delay: 0.15s; }
         .delay-200 { animation-delay: 0.3s; }
@@ -132,7 +132,7 @@ const HomePage = () => {
           100% { opacity: 1; transform: translateY(0); }
         }
         .animate-text-fade-in {
-          animation: text-fade-in 1s cubic-bezier(0.23, 1, 0.32, 1) both;
+          animation: text-fade-in 3s cubic-bezier(0.23, 1, 0.32, 1) both;
         }
         .delay-100 { animation-delay: 0.2s; }
         @keyframes slide-in {
@@ -140,7 +140,7 @@ const HomePage = () => {
           100% { opacity: 1; transform: translateY(0); }
         }
         .animate-slide-in {
-          animation: slide-in 1s cubic-bezier(0.23, 1, 0.32, 1) both;
+          animation: slide-in 2s cubic-bezier(0.23, 1, 0.32, 1) both;
         }
         .opacity-0 {
           opacity: 0;
