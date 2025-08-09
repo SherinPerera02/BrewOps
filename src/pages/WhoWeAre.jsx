@@ -113,7 +113,7 @@ export default function WhoWeAre() {
           <div ref={(el) => textRefs.current.push(el)} className="mt-6 opacity-0">
             <a
               href="/contact"
-              className="inline-block font-semibold bg-green-400 px-6 py-2 border border-black rounded hover:bg-black hover:text-white transition"
+              className="inline-block font-semibold bg-green-400 px-6 py-2  rounded-full hover:bg-black hover:text-white transition"
             >
               Connect With Us
             </a>
@@ -182,7 +182,7 @@ export default function WhoWeAre() {
         <p className="text-gray-700 text-lg mb-4">
           Ready to taste Maleesha? Discover our teas, meet our community and experience the heart of Ceylon.
         </p>
-        <a href="/shop" className="inline-block font-semibold px-6 py-2 border bg-green-400 border-black rounded hover:bg-black hover:text-white transition">Visit Us</a>
+        <a href="/shop" className="inline-block font-semibold px-6 py-2 bg-green-400  rounded-full hover:bg-black hover:text-white transition">Visit Us</a>
       </div>
     </section>
   );

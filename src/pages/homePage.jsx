@@ -175,7 +175,7 @@ const HomePage = () => {
             <br />
             Join us in celebrating this timeless craft.
           </p>
-          <button className="mt-6 px-6 py-2 border font-semibold bg-green-400 border-black rounded hover:bg-black hover:text-white transition cursor-pointer ">
+          <button className="mt-6 px-6 py-2 font-semibold bg-green-400 rounded-full hover:bg-black hover:text-white transition cursor-pointer ">
             Read About Us
           </button>
         </div>

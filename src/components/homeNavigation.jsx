@@ -1,43 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const NavigationBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 0);
+    }
+
+    window.addEventListener("scroll", handleScroll);
+    
+    // Cleanup
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="bg-green-950/70 bg-opacity-50 shadow-lg sticky justify-center items-center top-0 z-50">
-      <div className="flex justify-between items-center px-4 py-4">
+    <header
+      className={`sticky top-0 z-50 shadow-lg justify-center items-center transition-colors duration-300
+        ${scrolled ? "bg-green-700/80" : "bg-green-950/70 bg-opacity-50"}
+      `}
+    >
+      <div className="flex justify-between items-center px-4 py-6">
         {/* Logo */}
-        <h1 className="text-2xl font-extrabold text-white tracking-wide transition-transform duration-300 cursor-pointer">
+        <h1 className="text-4xl font-extrabold text-white tracking-wide transition-transform duration-300 cursor-pointer">
           BrewOps
         </h1>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex justify-center items-center flex-grow space-x-16 text-white font-medium">
-            
-
-          <Link
-            to="/"
-            className="hover:text-black transition-colors duration-300"
-          >
+          <Link to="/" className="hover:text-black transition-colors duration-300">
             Home
           </Link>
-          <a
-            href="#who-we-are"
-            className="hover:text-black transition-colors duration-300"
-          >
+          <a href="#who-we-are" className="hover:text-black transition-colors duration-300">
             About
           </a>
-          <Link
-            to="/Service"
-            className="hover:text-black transition-colors duration-300"
-          >
+          <Link to="/Service" className="hover:text-black transition-colors duration-300">
             Services
           </Link>
-          <Link
-            to="/ContactUs"
-            className="hover:text-black transition-colors duration-300"
-          >
+          <Link to="/ContactUs" className="hover:text-black transition-colors duration-300">
             Contact
           </Link>
           <Link

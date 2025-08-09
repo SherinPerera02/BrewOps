@@ -6,7 +6,9 @@ import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
 import WhoWeAre from './pages/WhoWeAre';
-// import LoginPage from './pages/login';
+import LoginPage from './pages/login';
+import AdminDashboard from './pages/adminDashboard';
+import RegisterPage from './pages/register';
 function App() {
   return (
     <BrowserRouter>
@@ -14,7 +16,9 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutUs" element={<WhoWeAre />} />
-        {/* <Route path="/login" element={<LoginPage />} /> */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/inventories" element={<Inventories />} />
         <Route path="/inventory/creates" element={<CreateInventory />} />
         <Route path="/inventory/details/:id" element={<ShowInventory />} />
