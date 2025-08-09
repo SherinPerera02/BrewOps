@@ -123,7 +123,22 @@ export default function WhoWeAre() {
         {/* RIGHT: Animation */}
         <div className="flex justify-center items-center">
           <div className="w-full max-w-md">
-            <Lottie animationData={teaLeavesAnimation} loop={true} />
+            <div
+            ref={(el) => textRefs.current.push(el)}
+            className="md:grid-rows-2 gap-6 mb-8 opacity-0 w-full grid"
+          >
+            <img
+              src="/Opatha-1.jpg"
+              alt="Tea factory"
+              className="w-full h-80 object-cover rounded-lg shadow-md"
+            />
+            <img
+              src="/Opatha-8.jpg"
+              alt="Tea processing"
+              className="w-full h-90 object-cover rounded-lg shadow-md"
+            />
+          </div>
+            
           </div>
         </div>
       </div>
@@ -131,7 +146,7 @@ export default function WhoWeAre() {
               {/* PHOTO SECTION */}
           <div
             ref={(el) => textRefs.current.push(el)}
-            className="md:grid-cols-2 gap-6 mb-8 opacity-0 w-full grid"
+            className="md:grid-cols-2 gap-8 mb-8 opacity-0 w-full grid"
           >
             <img
               src="/tea-factory.jpeg"
