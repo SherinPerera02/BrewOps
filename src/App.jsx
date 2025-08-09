@@ -59,10 +59,10 @@ function App() {
 
       // Supplier Recode Table
        <Route path ='/SupplierRecode' element={<SupplierRecode />} />
-       <Route path = '/ShowSupplyRecode' element ={<ShowSupplyRecode/>} />
-       <Route path ='EditSupplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
-       <Route path='/supplyRecode/create/' element={<CreateSupplyRecode1/>}/>
-       <Route path ='/SupplyRecode/delete' element = {< DeleteSupplyRecode/>}/>
+       <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
+       <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
+       <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
+       <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>
        
 
        

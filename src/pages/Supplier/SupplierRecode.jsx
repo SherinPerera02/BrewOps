@@ -11,13 +11,26 @@ import { MdOutlineDelete, MdOutlineAddBox } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
 export default function SupplierRecode() {
-  const [suppliers, setSuppliers] = useState([]);
+  const [suppliers, setSuppliers] = useState([
+    {
+      _id: 'sample1',
+      supplierName: 'Sample Supplier',
+      supplyDate: '2025-08-09',
+      quantity: 500,
+      unitPrice: 120,
+      cost: 60000,
+      status: 'Pending'
+    }
+  ]); // Sample row
   const [searchInput, setSearchInput] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Uncomment when backend is ready
+    /*
+    setLoading(true);
     axios
-      .get('http://localhost:8080/api/suppliers')
+      .get('http://localhost:8080/api/supplyrecode')
       .then((res) => {
         setSuppliers(res.data);
         setLoading(false);
@@ -26,7 +39,14 @@ export default function SupplierRecode() {
         console.error('Error fetching suppliers:', err);
         setLoading(false);
       });
+    */
   }, []);
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this record?')) {
+      setSuppliers(suppliers.filter((supplier) => supplier._id !== id));
+    }
+  };
 
   const filteredSuppliers = suppliers.filter((supplier) =>
     supplier.supplierName?.toLowerCase().includes(searchInput.toLowerCase())
@@ -42,6 +62,7 @@ export default function SupplierRecode() {
         <SupplierSidebar />
 
         <main className="flex-1 p-6 bg-gray-100">
+          {/* Header and search */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
               Supply Record List
@@ -73,6 +94,7 @@ export default function SupplierRecode() {
             </div>
           </div>
 
+          {/* Table */}
           {loading ? (
             <Spinner />
           ) : (
@@ -110,30 +132,6 @@ export default function SupplierRecode() {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* Example static row */}
-                      <tr className="hover:bg-gray-50 bg-green-50">
-                        <td className="py-4 px-6">Sample Supplier</td>
-                        <td className="py-4 px-6">2025-08-08</td>
-                        <td className="py-4 px-6">500</td>
-                        <td className="py-4 px-6">150</td>
-                        <td className="py-4 px-6">75000</td>
-                        <td className="py-4 px-6">Pending</td>
-                        <td className="py-4 px-6">
-                          <div className="flex gap-4">
-                            <button className="text-green-700 text-xl">
-                              <BsInfoCircle />
-                            </button>
-                            <button className="text-yellow-600 text-xl">
-                              <AiOutlineEdit />
-                            </button>
-                            <button className="text-red-600 text-xl">
-                              <MdOutlineDelete />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-
-                      {/* Dynamic rows from API */}
                       {(filteredSuppliers.length > 0
                         ? filteredSuppliers
                         : suppliers
@@ -149,27 +147,26 @@ export default function SupplierRecode() {
                             <div className="flex gap-4">
                               {/* View */}
                               <Link
-                                to={`/ShowSupplyRecode/${item._id}`}
+                                to={`/supplyRecode/details/${item._id}`}
                                 className="text-green-700 text-xl"
                               >
                                 <BsInfoCircle />
                               </Link>
 
-                              {/* Edit - FIXED URL */}
+                              {/* Edit */}
                               <Link
-                                to={`/EditSupplyRecode/edit/${item._id}`}
+                                to={`/supplyRecode/edit/${item._id}`}
                                 className="text-yellow-600 text-xl"
                               >
                                 <AiOutlineEdit />
                               </Link>
 
                               {/* Delete */}
-                              <Link
-                                to={`/SupplyRecode/delete/${item._id}`}
-                                className="text-red-600 text-xl"
+                              <Link to={"/supplyRecode/delete/${item._id}"}
+                                   className="text-red-600 text-xl"
                               >
                                 <MdOutlineDelete />
-                              </Link>
+                            </Link>
                             </div>
                           </td>
                         </tr>
@@ -182,6 +179,8 @@ export default function SupplierRecode() {
           )}
         </main>
       </div>
+
+      {/* Footer */}
       <div className="mb-10">
         <Footer />
       </div>
