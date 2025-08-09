@@ -9,13 +9,20 @@ import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSu
 
 
 import SupplierHome from './pages/Supplier/SupplierHome'
-import CreateSupplier from './pages/Supplier/CreateSupplier/CreateSupplier'
-import SupplierRecodeTable from './pages/Supplier/SupplierRecodeTable/SupplierRecodeTable'
-import ShowSupplier from './pages/Supplier/SupplierRecodeTable/ShowSupplier/ShowSupplier'
-import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode/ShowSupplyRecode';
-import EditSupplier from './pages/Supplier/EditSpplier/EditSupplier';
-import EditSupplierRecode from './pages/Supplier/EditSupplierRecode/EditSupplierRecode';
+import CreateSupplier from './pages/Supplier/CreateSupplier'
+import SupplierRecode from './pages/Supplier/SupplierRecode';
+import ShowSupplier from './pages/Supplier/ShowSupplier'
+import EditSupplier from './pages/Supplier/EditSupplier';
 import DeleteSuppliers from './pages/Supplier/DeleteSuppliers';
+
+
+import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
+
+import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
+
+
+import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1'
+import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 
 
 
@@ -38,6 +45,7 @@ function App() {
 
 
 
+
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
 
@@ -50,9 +58,12 @@ function App() {
 
 
       // Supplier Recode Table
-       <Route path ='/SupplierRecodeTable' element={<SupplierRecodeTable />} />
+       <Route path ='/SupplierRecode' element={<SupplierRecode />} />
        <Route path = '/ShowSupplyRecode' element ={<ShowSupplyRecode/>} />
-       <Route path ='/EditSupplierRecode' element={<EditSupplierRecode/>}/>
+       <Route path ='EditSupplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
+       <Route path='/supplyRecode/create/' element={<CreateSupplyRecode1/>}/>
+       <Route path ='/SupplyRecode/delete' element = {< DeleteSupplyRecode/>}/>
+       
 
        
        

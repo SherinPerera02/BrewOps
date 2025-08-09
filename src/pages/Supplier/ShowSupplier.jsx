@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import leftArrow from '../../../../assets/left-arrow.png';
-import bgImage from '../../../../assets/supplierBg2.avif';
-import Spinner from '../../../../components/Spinner';
-import NavigationBar from '../../../../components/NavigationBar';
-import Footer from '../../../../components/Footer'
+import leftArrow from '../../assets/left-arrow.png';
+import bgImage from '../../assets/supplierBg2.avif';
+import Spinner from '../../components/Spinner';
+import NavigationBar from '../../components/NavigationBar';
+import Footer from '../../components/Footer'
 
 export default function ShowSupplier() {
   const [supplier, setSupplier] = useState({});

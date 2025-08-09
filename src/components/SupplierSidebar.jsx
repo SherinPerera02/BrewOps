@@ -13,7 +13,7 @@ export default function SupplierSidebar() {
           <Link to="/SupplierHome" className="block hover:bg-gray-700 px-3 py-2 rounded">Supplier</Link>
         </li>
         <li>
-          <Link to="/SupplierRecodeTable" className="block hover:bg-gray-700 px-3 py-2 rounded">Supply Record</Link>
+          <Link to="/SupplierRecode" className="block hover:bg-gray-700 px-3 py-2 rounded">Supply Record</Link>
         </li>
        
       </ul>
