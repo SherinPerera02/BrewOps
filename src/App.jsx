@@ -1,12 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/homePage';
-import NavigationBar from './components/navigationBar';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
 import WhoWeAre from './pages/WhoWeAre';
+// import LoginPage from './pages/login';
 function App() {
   return (
     <BrowserRouter>
@@ -14,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutUs" element={<WhoWeAre />} />
+        {/* <Route path="/login" element={<LoginPage />} /> */}
         <Route path="/inventories" element={<Inventories />} />
         <Route path="/inventory/creates" element={<CreateInventory />} />
         <Route path="/inventory/details/:id" element={<ShowInventory />} />
