@@ -9,20 +9,20 @@ const containerStyle = {
   height: '400px',
 };
 
-const center = {
-  lat: 6.555103856339234,
-  lng: 80.18148954466014,
-};
+// const center = {
+//   lat: 6.555103856339234,
+//   lng: 80.18148954466014,
+// };
 
-function MapComponent() {
-  return (
-    <LoadScript googleMapsApiKey="YOUR_API_KEY">
-      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={15}>
-        <Marker position={center} />
-      </GoogleMap>
-    </LoadScript>
-  );
-}
+// function MapComponent() {
+//   return (
+//     <LoadScript googleMapsApiKey="YOUR_API_KEY">
+//       <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={15}>
+//         <Marker position={center} />
+//       </GoogleMap>
+//     </LoadScript>
+//   );
+// }
 
 export default function WhoWeAre() {
   const textRefs = useRef([]);
@@ -154,13 +154,13 @@ export default function WhoWeAre() {
             </p>
           </article>
 
-      {/* MAP SECTION */}
+      {/* MAP SECTION
       <div className="mt-16">
         <h2 className="text-3xl font-semibold text-center mb-8">Locate us on the map</h2>
         <div className="rounded-lg overflow-hidden shadow-lg">
           <MapComponent />
         </div>
-      </div>
+      </div> */}
 
       {/* FOOTER CTA */}
       <div ref={(el) => textRefs.current.push(el)} className="text-center mt-12 opacity-0">

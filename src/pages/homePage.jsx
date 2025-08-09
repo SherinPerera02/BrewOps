@@ -41,12 +41,12 @@ const HomePage = () => {
         <h1 className="text-2xl font-bold text-white">BrewOps</h1>
         <nav className="space-x-6 text-white font-medium">
           <Link to="/" className="text-white text-md hover:text-green-900 transition">Home</Link>
-          <Link to="/AboutUs" className="text-white text-md hover:text-green-900 transition">About</Link>
+          <a href="#who-we-are" className="text-white text-md hover:text-green-900 transition">About</a>
           <Link to="/Service" className="text-white text-md hover:text-green-900 transition">Services</Link>
           <Link to="/ContactUs" className="text-white text-md hover:text-green-900 transition">Contact</Link>
           <Link
             to="/login"
-            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+            className="bg-black text-white px-4 py-2 rounded hover:bg-green-800 transition"
           >
             Log In
           </Link>
@@ -172,8 +172,10 @@ const HomePage = () => {
         
       </section>
 
-      {/* Include WhoWeAre Component */}
-      <WhoWeAre />
+      <section id="who-we-are">
+        <WhoWeAre />
+      </section>
+
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-10 px-6">
