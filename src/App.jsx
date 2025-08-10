@@ -1,6 +1,6 @@
 import HomePage from './pages/homePage';
 import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
-import NavigationBar from './components/NavigationBar';
+import NavigationBar from './components/navigationBar';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
@@ -57,7 +57,7 @@ function App() {
        <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
->
+
       </Routes>
     </BrowserRouter>
   );
