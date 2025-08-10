@@ -29,22 +29,24 @@ const NavigationBar = () => {
         </h1>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex justify-center items-center flex-grow space-x-16 text-white font-medium">
-          <Link to="/" className="hover:text-black transition-colors duration-300">
-            Home
-          </Link>
-          <a href="#who-we-are" className="hover:text-black transition-colors duration-300">
-            About
-          </a>
-          <Link to="/Service" className="hover:text-black transition-colors duration-300">
-            Services
-          </Link>
-          <Link to="/ContactUs" className="hover:text-black transition-colors duration-300">
-            Contact
-          </Link>
+        <nav className="flex items-center justify-center flex-grow space-x-16 text-white font-medium">
+          <div className="flex space-x-12 border border-white rounded-full px-6 py-2">
+              <Link to="/" className="hover:text-black transition-colors duration-300">
+                Home
+              </Link>
+              <a href="#who-we-are" className="hover:text-black transition-colors duration-300">
+                About
+              </a>
+              <Link to="/Service" className="hover:text-black transition-colors duration-300">
+                Services
+              </Link>
+              <Link to="/ContactUs" className="hover:text-black transition-colors duration-300">
+                Contact
+              </Link>
+            </div>
           <Link
             to="/login"
-            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-green-500 hover:text-black transition-colors duration-300"
+            className="bg-black text-white px-4 py-2 rounded-full hover:bg-green-500 hover:text-black transition-colors duration-300"
           >
             Log In
           </Link>

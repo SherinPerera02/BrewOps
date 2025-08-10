@@ -5,66 +5,130 @@ import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import loginAnimation from "../assets/login.json";
 import Lottie from "lottie-react";
+import Spinner from "../components/spinner";
+import { jwtDecode } from "jwt-decode";
+import React, { useEffect } from "react";
 
 export default function LoginPage() {
+  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(true);
   const navigate = useNavigate();
+ 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser({ name: decoded.name, role: decoded.role });
+      } catch {
+        setUser(null);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    // Simulate loading delay (e.g., fetching config, preloading images)
+    const timer = setTimeout(() => {
+      setLoadingPage(false);
+    }, 800); // 1.5 sec delay
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loadingPage) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-white">
+        <Spinner />
+      </div>
+    );
+  }
 
   async function handleLogin() {
-    try {
-      const response = await axios.post(
-        import.meta.env.VITE_BACKEND_URL + "/api/users/login",
-        {
-          email,
-          password,
-        }
-      );
-
-      toast.success("Login Successful");
-      localStorage.setItem("token", response.data.token);
-
-      if (rememberMe) {
-        localStorage.setItem("rememberEmail", email);
-      } else {
-        localStorage.removeItem("rememberEmail");
+  try {
+    const response = await axios.post(
+      import.meta.env.VITE_BACKEND_URL + "/api/users/login",
+      {
+        email,
+        password,
       }
+    );
 
-      if (response.data.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
-    } catch (e) {
-      toast.error(e.response?.data?.message || "Login failed");
+    toast.success("Login Successful");
+
+    // Save token
+    const token = response.data.token;
+    localStorage.setItem("token", token);
+
+    // Decode token to get user info
+    const decoded = jwt_decode(token);
+    setUser({ name: decoded.name, role: decoded.role });
+
+    // Remember Me handling
+    if (rememberMe) {
+      localStorage.setItem("rememberEmail", email);
+    } else {
+      localStorage.removeItem("rememberEmail");
     }
+
+    // Redirect based on role
+    if (decoded.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+  } catch (e) {
+    toast.error(e.response?.data?.message || "Login failed");
   }
+}
+
+// Inside your login logic
+const userData = { name: "Admin User", role: "admin" };
+localStorage.setItem("user", JSON.stringify(userData));
 
   function handleGoogleSignIn() {
     toast("Google Sign-In not yet connected!", { icon: "🔗" });
     // In real setup, redirect to Google OAuth URL
   }
 
+  async function onSubmitLogin(email, password) {
+  const response = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await response.json();
+
+  if (response.ok && data.token) {
+    props.onLogin(data.token);  // Pass token back to App to decode and set user
+  } else {
+    alert(data.message || "Login failed");
+  }
+}
+
+
   return (
-    <div className="w-full h-screen bg-[url('/login3.jpg')] bg-center bg-cover flex justify-evenly items-center">
+    
+    <div className="w-full h-screen bg-green-50 bg-center bg-cover flex justify-evenly items-center">
       <div className="w-full h-full flex justify-center items-center">
         <div className="w-[1300px] h-[600px] backdrop-blur-sm rounded-[20px] shadow-xl flex overflow-hidden">
 
           {/* Left half */}
          
-            <div className="w-1/2 h-full flex flex-col items-center text-center p-8">
-            <h1 className="text-5xl font-bold text-white mt-10">
+            <div className="w-1/2 h-full flex flex-col items-center text-center bg-white p-8">
+            <h1 className="text-5xl font-bold text-green-600 mt-10">
                 Welcome Back !
             </h1>
 
-            <p className="text-md text-white mt-4">
+            <p className="text-md text-green-600 mt-4">
                 Don't have an account yet?{" "}
                 <br />
                 <a href="/register">
                 <button
                     type="button"
-                    className="mt-2 px-4 py-1 text-md rounded-full border border-white bg-transparent hover:bg-white text-white hover:text-black font-semibold transition"
+                    className="mt-2 px-4 py-1 text-md rounded-full border border-green-600 bg-transparent hover:bg-black text-green-600 hover:text-white hover:border-black cursor-pointer font-semibold transition"
                 >
                     Register here
                 </button>
@@ -78,7 +142,7 @@ export default function LoginPage() {
             </div>
 
           {/* Right half */}
-          <div className="w-1/2 h-full bg-black/70 flex flex-col justify-center items-center p-6">
+          <div className="w-1/2 h-full bg-green-900 flex flex-col justify-center items-center p-6">
             <h1 className="text-[#22cf2b] text-4xl font-bold mb-6">Sign In</h1>
 
             <input
@@ -153,3 +217,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
