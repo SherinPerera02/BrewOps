@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavigationBar from '../../components/NavigationBar';
-import SupplierSidebar from '../../components/SupplierSidebar';
+import Sidebar from '../../components/SupplierSidebar'; // or a relevant Sidebar component
 import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';
 
@@ -10,46 +10,46 @@ import { AiOutlineEdit } from 'react-icons/ai';
 import { MdOutlineDelete, MdOutlineAddBox } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
-export default function SupplierRecode() {
-  const [suppliers, setSuppliers] = useState([
+export default function ProductRecord() {
+  const [products, setProducts] = useState([
     {
-      _id: 'sample1',
-      supplierName: 'Sample Supplier',
-      supplyDate: '2025-08-09',
-      quantity: 500,
-      unitPrice: 120,
-      cost: 60000,
-      status: 'Pending'
+      _id: 'prod1',
+      productName: 'Sample Product',
+      manufactureDate: '2025-07-01',
+      quantityInStock: 150,
+      unitPrice: 250,
+      totalValue: 37500,
+      status: 'Available'
     }
-  ]); // Sample row
+  ]); // Sample data row
   const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Uncomment when backend is ready
+    // Uncomment and replace with your API when backend ready
     /*
     setLoading(true);
     axios
-      .get('http://localhost:8080/api/supplyrecode')
+      .get('http://localhost:8080/api/products')
       .then((res) => {
-        setSuppliers(res.data);
+        setProducts(res.data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Error fetching suppliers:', err);
+        console.error('Error fetching products:', err);
         setLoading(false);
       });
     */
   }, []);
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this record?')) {
-      setSuppliers(suppliers.filter((supplier) => supplier._id !== id));
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      setProducts(products.filter((product) => product._id !== id));
     }
   };
 
-  const filteredSuppliers = suppliers.filter((supplier) =>
-    supplier.supplierName?.toLowerCase().includes(searchInput.toLowerCase())
+  const filteredProducts = products.filter((product) =>
+    product.productName?.toLowerCase().includes(searchInput.toLowerCase())
   );
 
   return (
@@ -59,18 +59,18 @@ export default function SupplierRecode() {
       </header>
 
       <div className="flex flex-1">
-        <SupplierSidebar />
+        <Sidebar /> {/* Reuse supplier sidebar or create your own */}
 
         <main className="flex-1 p-6 bg-gray-100">
           {/* Header and search */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-              Supply Record List
+              Product Record List
             </h1>
             <div className="flex flex-wrap items-center gap-4">
               <input
                 type="text"
-                placeholder="Search Supplier Name"
+                placeholder="Search Product Name"
                 className="border border-gray-300 px-4 py-2 rounded"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
@@ -85,7 +85,7 @@ export default function SupplierRecode() {
               </button>
 
               <Link
-                to="/supplyRecode/create"
+                to="/products/create"
                 className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900"
               >
                 <MdOutlineAddBox className="text-xl mr-2" />
@@ -99,7 +99,7 @@ export default function SupplierRecode() {
             <Spinner />
           ) : (
             <>
-              {searchInput.trim() !== '' && filteredSuppliers.length === 0 ? (
+              {searchInput.trim() !== '' && filteredProducts.length === 0 ? (
                 <p className="text-center text-red-500 mt-6">
                   No results found.
                 </p>
@@ -109,19 +109,19 @@ export default function SupplierRecode() {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
-                          Supplier
+                          Product
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
-                          Supply Date
+                          Manufacture Date
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
-                          Quantity (Kg)
+                          Quantity in Stock
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
                           Unit Price (Rs.)
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
-                          Cost (Rs.)
+                          Total Value (Rs.)
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
                           Status
@@ -132,22 +132,22 @@ export default function SupplierRecode() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(filteredSuppliers.length > 0
-                        ? filteredSuppliers
-                        : suppliers
+                      {(filteredProducts.length > 0
+                        ? filteredProducts
+                        : products
                       ).map((item) => (
                         <tr key={item._id} className="hover:bg-gray-100">
-                          <td className="py-4 px-6">{item.supplierName}</td>
-                          <td className="py-4 px-6">{item.supplyDate}</td>
-                          <td className="py-4 px-6">{item.quantity}</td>
+                          <td className="py-4 px-6">{item.productName}</td>
+                          <td className="py-4 px-6">{item.manufactureDate}</td>
+                          <td className="py-4 px-6">{item.quantityInStock}</td>
                           <td className="py-4 px-6">{item.unitPrice}</td>
-                          <td className="py-4 px-6">{item.cost}</td>
+                          <td className="py-4 px-6">{item.totalValue}</td>
                           <td className="py-4 px-6">{item.status}</td>
                           <td className="py-4 px-6">
                             <div className="flex gap-4">
                               {/* View */}
                               <Link
-                                to={`/supplyRecode/details/${item._id}`}
+                                to={`/products/details/${item._id}`}
                                 className="text-green-700 text-xl"
                               >
                                 <BsInfoCircle />
@@ -155,18 +155,19 @@ export default function SupplierRecode() {
 
                               {/* Edit */}
                               <Link
-                                to={`/supplyRecode/edit/${item._id}`}
+                                to={`/products/edit/${item._id}`}
                                 className="text-yellow-600 text-xl"
                               >
                                 <AiOutlineEdit />
                               </Link>
 
                               {/* Delete */}
-                              <Link to={"/supplyRecode/delete/${item._id}"}
-                                   className="text-red-600 text-xl"
+                              <button
+                                onClick={() => handleDelete(item._id)}
+                                className="text-red-600 text-xl"
                               >
                                 <MdOutlineDelete />
-                            </Link>
+                              </button>
                             </div>
                           </td>
                         </tr>

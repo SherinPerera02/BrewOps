@@ -85,8 +85,10 @@ export default function DeleteSuppliers() {
         </div>
         )}
 
+    <div className="mt-33">
+    <Footer />
+    </div>
     
-        <Footer />
     </div>
     
     
