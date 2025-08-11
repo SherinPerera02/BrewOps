@@ -25,6 +25,8 @@ import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1'
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 import ContactUs from './pages/ContactUs';
 
+import Profile from './pages/Supplier/Profile'
+
 
 
 function App() {
@@ -71,7 +73,7 @@ function App() {
 
        
        
-
+      <Route path="/profile" element={<Profile/>}/>
 
         
 
