@@ -5,6 +5,15 @@ import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
+import SupplyRecordTable from './pages/Rawleaves';
+import RetrieveTeaLeavesEntries from './pages/Rawtealeaves';
+import CreateTeaLeavesEntry from './pages/Rawtealeavescreate';
+import DeleteTeaLeavesEntry from './pages/Rawtealeavesdelete';
+import UpdateTeaLeavesEntry from './pages/Rawtealeavesupdate';
+
+
+
+
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +24,15 @@ function App() {
         <Route path="/inventory/details/:id" element={<ShowInventory />} />
         <Route path="/inventory/edit/:id" element={<EditInventory />} />
         <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
+
+        <Route path="/Rawleaves" element={<SupplyRecordTable />} />
+        <Route path="/Rawtealeaves" element={<RetrieveTeaLeavesEntries />} />
+        <Route path="/Rawtealeavescreate" element={<CreateTeaLeavesEntry />} />
+        <Route path="/Rawtealeavesdelete/:id" element={<DeleteTeaLeavesEntry />} />
+        <Route path="/Rawtealeavesupdate/:id" element={<UpdateTeaLeavesEntry />} />
+
+
+
 
       </Routes>
     </BrowserRouter>
