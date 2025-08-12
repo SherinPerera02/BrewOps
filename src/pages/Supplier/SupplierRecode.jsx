@@ -65,7 +65,7 @@ export default function ProductRecord() {
           {/* Header and search */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-              Product Record List
+              supply Record List
             </h1>
             <div className="flex flex-wrap items-center gap-4">
               <input
@@ -109,7 +109,7 @@ export default function ProductRecord() {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
-                          Product
+                          supllier
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black">
                           Manufacture Date
@@ -147,7 +147,7 @@ export default function ProductRecord() {
                             <div className="flex gap-4">
                               {/* View */}
                               <Link
-                                to={`/products/details/${item._id}`}
+                                to={`/supplyRecode/details/${item._id}`}
                                 className="text-green-700 text-xl"
                               >
                                 <BsInfoCircle />
@@ -155,19 +155,19 @@ export default function ProductRecord() {
 
                               {/* Edit */}
                               <Link
-                                to={`/products/edit/${item._id}`}
+                                to={`/supplyRecode/edit/${item._id}`}
                                 className="text-yellow-600 text-xl"
                               >
                                 <AiOutlineEdit />
                               </Link>
 
                               {/* Delete */}
-                              <button
-                                onClick={() => handleDelete(item._id)}
+                              <Link 
+                                to={'/SupplyRecode/delete/${item._id}'}
                                 className="text-red-600 text-xl"
                               >
                                 <MdOutlineDelete />
-                              </button>
+                              </Link>
                             </div>
                           </td>
                         </tr>

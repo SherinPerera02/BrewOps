@@ -1,9 +1,60 @@
-import React from 'react';
+import React, { useState } from 'react';
 import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/Footer';
 import { MdEmail, MdFacebook, MdLocationOn, MdPhone } from 'react-icons/md';
 
 export default function ContactUs() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSuccessMsg("");
+    setErrorMsg("");
+
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.message) {
+      setErrorMsg("Please fill in all required fields (Name, Email, Message).");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Change this URL to your actual backend endpoint for contact messages
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message.");
+      }
+
+      setSuccessMsg("Message sent successfully!");
+      setFormData({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      setErrorMsg(error.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <NavigationBar />
@@ -44,31 +95,40 @@ export default function ContactUs() {
             </div>
           </div>
 
-          {/* Contact  Section */}
+          {/* Contact Section */}
           <div className="bg-white shadow-lg rounded-xl p-8">
             <h2 className="text-2xl font-bold text-green-800 mb-4">
               Send Us a Message
             </h2>
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Name
+                  Your Name <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
                   placeholder="Enter your name"
+                  required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  Email <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
                   placeholder="Enter your email"
+                  required
                 />
               </div>
 
@@ -78,6 +138,9 @@ export default function ContactUs() {
                 </label>
                 <input
                   type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
                   placeholder="Enter your phone number"
                 />
@@ -85,19 +148,34 @@ export default function ContactUs() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Message
+                  Message <span className="text-red-600">*</span>
                 </label>
                 <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 h-28 resize-none focus:ring-2 focus:ring-green-500 focus:outline-none"
                   placeholder="Write your message here..."
+                  required
                 ></textarea>
               </div>
 
+              {errorMsg && (
+                <p className="text-red-600 font-semibold">{errorMsg}</p>
+              )}
+
+              {successMsg && (
+                <p className="text-green-600 font-semibold">{successMsg}</p>
+              )}
+
               <button
                 type="submit"
-                className="w-full bg-green-700 text-white py-2 px-4 rounded-lg hover:bg-green-900 transition duration-300"
+                disabled={loading}
+                className={`w-full py-2 px-4 rounded-lg text-white ${
+                  loading ? "bg-green-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-900"
+                } transition duration-300`}
               >
-                Send Message
+                {loading ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>

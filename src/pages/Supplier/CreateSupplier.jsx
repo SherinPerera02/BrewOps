@@ -103,8 +103,7 @@ export default function CreateSupplier() {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center"
-      style={{backgroundImage:"URL(${bgimage})"}}>
+    <div className="min-h-screen bg-cover bg-center">
       <NavigationBar />
 
       {/* Back arrow */}

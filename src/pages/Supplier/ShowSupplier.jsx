@@ -28,7 +28,7 @@ export default function ShowSupplier() {
   return (
     <div
       className="min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      
     >
       <NavigationBar />
 
@@ -44,7 +44,7 @@ export default function ShowSupplier() {
         {loading ? (
           <Spinner />
         ) : (
-          <div className="bg-white bg-opacity-95 p-10 rounded-xl shadow-lg w-[90%] max-w-2xl mb-20">
+          <div className="bg-gray-200/90 bg-opacity-95 p-10 rounded-xl shadow-lg w-[90%] max-w-2xl mb-20">
             <h1 className="text-3xl font-bold text-center text-gray-800 border-b-2 border-green-500 pb-2 mb-6">
               Supplier Details
             </h1>

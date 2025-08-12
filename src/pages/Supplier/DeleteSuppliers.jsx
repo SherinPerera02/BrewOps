@@ -9,13 +9,13 @@ import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';
 
 export default function DeleteSuppliers() {
-  const { id } = useParams(); // URL එකෙන් ID එක ගන්නවා
+  const { id } = useParams(); 
   const navigate = useNavigate();
 
   const [supplier, setSupplier] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Supplier එක fetch කරන්න
+  // Supplier fetch 
   useEffect(() => {
     axios.get(`http://localhost:8080/api/suppliers/${id}`)
       .then((res) => {
@@ -28,7 +28,7 @@ export default function DeleteSuppliers() {
       });
   }, [id]);
 
-  // Delete confirm button එක click කරොත්
+  // Delete confirm button 
   const handleDelete = () => {
     axios.delete(`http://localhost:8080/api/suppliers/${id}`)
       .then(() => {
@@ -42,7 +42,7 @@ export default function DeleteSuppliers() {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${bgImage})` }}>
+    <div className="min-h-screen bg-cover bg-center" >
       <NavigationBar />
 
       {/* Back Button */}
