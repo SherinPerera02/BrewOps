@@ -52,6 +52,7 @@ export default function ProductRecord() {
     product.productName?.toLowerCase().includes(searchInput.toLowerCase())
   );
 
+  
   return (
     <div className="flex flex-col min-h-screen">
       <header>
@@ -80,12 +81,12 @@ export default function ProductRecord() {
                 Search
               </button>
 
-              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900">
+              <button Link to="" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900">
                 Generate Report
               </button>
 
               <Link
-                to="/products/create"
+                to="/supplyRecode/create"
                 className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900"
               >
                 <MdOutlineAddBox className="text-xl mr-2" />

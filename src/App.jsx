@@ -17,13 +17,11 @@ import DeleteSuppliers from './pages/Supplier/DeleteSuppliers';
 
 
 import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
-
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
-
-
 import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1'
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 import ContactUs from './pages/ContactUs';
+
 
 import Profile from './pages/Supplier/Profile'
 
@@ -69,6 +67,7 @@ function App() {
        <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>
+       
        
 
        

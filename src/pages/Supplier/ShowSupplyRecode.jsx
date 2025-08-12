@@ -5,7 +5,6 @@ import Spinner from '../../components/Spinner';
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
 import leftArrow from '../../assets/left-arrow.png';
-import bgImage from '../../assets/supplierBg2.avif';
 
 export default function ShowSupplyRecode() {
   const [supplyrecode, setSupplyRecode] = useState({});
@@ -27,10 +26,7 @@ export default function ShowSupplyRecode() {
   }, [id]);
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
-    >
+    <div className="min-h-screen bg-cover bg-center">
       {/* Navigation */}
       <NavigationBar />
 

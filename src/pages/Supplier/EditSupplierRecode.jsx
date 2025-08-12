@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
 import leftArrow from '../../assets/left-arrow.png';
-import bgImage from '../../assets/supplierBg2.avif';
+
 
 export default function EditSupplierRecode() {
   return (
     <div
       className="min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      
     >
       {/* Navigation Bar */}
       <NavigationBar />
