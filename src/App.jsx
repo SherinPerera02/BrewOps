@@ -1,6 +1,6 @@
 import HomePage from './pages/homePage';
 import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
-import NavigationBar from './components/navigationBar';
+import NavigationBar from './components/NavigationBar';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
@@ -35,6 +35,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/admin" element={<AdminDashboard />} />
+       
         <Route path="/inventories" element={<Inventories />} />
         <Route path="/inventory/creates" element={<CreateInventory />} />
         <Route path="/inventory/details/:id" element={<ShowInventory />} />
@@ -51,12 +52,12 @@ function App() {
         <Route path="/Suppliers/delete/:id" element={<DeleteSuppliers/>}/>
 
 
-      // Supplier Recode Table
-       <Route path ='/SupplierRecode' element={<SupplierRecode />} />
-       <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
-       <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
-       <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
-       <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
+        // Supplier Recode Table
+        <Route path ='/SupplierRecode' element={<SupplierRecode />} />
+        <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
+        <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
+        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
+        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
 
       </Routes>
     </BrowserRouter>

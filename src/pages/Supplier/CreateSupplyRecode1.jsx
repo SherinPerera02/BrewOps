@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/spinner';
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
 import bgImage from '../../assets/supplierBg2.avif';

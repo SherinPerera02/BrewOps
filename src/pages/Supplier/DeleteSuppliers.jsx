@@ -6,7 +6,7 @@ import bgImage from '../../assets/supplierBg2.avif';
 import NavigationBar from '../../components/NavigationBar';
 import leftArrow from '../../assets/left-arrow.png';
 import Footer from '../../components/Footer';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/spinner';
 
 export default function DeleteSuppliers() {
   const { id } = useParams(); // URL එකෙන් ID එක ගන්නවා

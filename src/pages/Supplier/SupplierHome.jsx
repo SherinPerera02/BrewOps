@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import NavigationBar from '../../components/NavigationBar';
 import SupplierSidebar from '../../components/SupplierSidebar';
-import Footer from '../../components/footer';
 import { Link } from 'react-router-dom';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import Spinner from '../../components/spinner';
+import Footer from '../../components/Footer';
 
 export default function SupplierHome1() {
   const [suppliers, setSuppliers] = useState([]);
@@ -14,7 +14,7 @@ export default function SupplierHome1() {
   const [searchInput, setSearchInput] = useState('');
   const [filteredSuppliers, setFilteredSuppliers] = useState([]);
 
-  // 👉 Load one example supplier
+
   useEffect(() => {
     setLoading(true);
     const demoSupplier = [
@@ -31,7 +31,7 @@ export default function SupplierHome1() {
     setLoading(false);
   }, []);
 
-  // 👉 Filter suppliers by name
+
   useEffect(() => {
     if (searchInput.trim() === '') {
       setFilteredSuppliers([]);

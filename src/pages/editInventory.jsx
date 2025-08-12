@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import BackButton from '../components/backButton';
 import Spinner from '../components/spinner';
-import NavigationBar from '../components/navigationBar';
+import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/footer';
 
 const EditInventory = () => {
@@ -73,7 +73,7 @@ const EditInventory = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
-      <div className="flex-1 p-4 bg-gray-100">
+      <div className="flex-1 p-4 bg-green-50">
         <BackButton />
         <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
           <h1 className="text-center text-2xl font-bold mb-6 text-gray-800">Edit Inventory</h1>

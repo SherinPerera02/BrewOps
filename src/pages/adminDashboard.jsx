@@ -1,10 +1,12 @@
 import React from 'react';
-import NavigationBar from '../components/navigationBar';
+import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/Footer';
-import DashboardCard from '../components/DashboardCard';
-import { FaBoxOpen, FaLeaf, FaBox, FaIndustry } from 'react-icons/fa';
-import ProductionChart from '../components/ProductionChart';
-import InventoryTable from '../components/InventoryTable';
+import DashboardCard from '../components/dashboardCard';
+import { FaBoxOpen, FaLeaf, FaBox, FaIndustry, FaTruckLoading } from 'react-icons/fa';
+import ProductionChart from '../components/productionChart';
+import InventoryTable from '../components/inventoryTable';
+import SupplierChart from '../components/supplierChart';
+import SupplierTable from '../components/supplierTable';
 
 const AdminDashboard = () => {
   return (
@@ -13,7 +15,7 @@ const AdminDashboard = () => {
 
       <main className="flex-grow px-6 py-8 space-y-8">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <DashboardCard 
             title="Inventory Batches" 
             value="42" 
@@ -38,12 +40,24 @@ const AdminDashboard = () => {
             icon={FaIndustry} 
             color="bg-green-100" 
           />
+          <DashboardCard 
+            title="Total Leaves Received" 
+            value="3,200 kg" 
+            icon={FaTruckLoading} 
+            color="bg-green-100" 
+          />
         </div>
 
-        {/* Charts & Inventory */}
+        {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProductionChart />
           <InventoryTable />
+        </div>
+
+        {/* Supplier Stats */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <SupplierChart />
+          <SupplierTable />
         </div>
       </main>
 
