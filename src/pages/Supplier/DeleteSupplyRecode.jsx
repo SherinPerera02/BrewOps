@@ -44,27 +44,23 @@ export default function DeleteSupplyRecode() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center"
-      
-    >
+    <div className="min-h-screen bg-cover bg-center bg-gray-50">
       {/* Navigation */}
       <NavigationBar />
 
       {/* Back Button */}
+      <div className='bg-green-50'>
       <div className="absolute top-24 left-6">
         <Link to="/SupplierRecode">
-          <img
-            src={leftArrow}
-            alt="Go Back"
-            className="w-10 h-10 hover:scale-105 transition-transform"
+          <img src={leftArrow} alt="Go Back"
+               className="w-10 h-10 hover:scale-105 transition-transform"
           />
         </Link>
       </div>
 
       {/* Content */}
       <div className="flex items-center justify-center px-4 py-16">
-        <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-xl px-10 py-12 w-full max-w-xl">
+        <div className="bg-white backdrop-blur-sm shadow-lg rounded-xl px-10 py-12 w-full max-w-xl">
           {loading ? (
             <Spinner />
           ) : (
@@ -97,6 +93,7 @@ export default function DeleteSupplyRecode() {
             </>
           )}
         </div>
+      </div>
       </div>
 
       <div className='mt-20'>

@@ -33,17 +33,15 @@ export default function ShowSupplyRecode() {
       {/* Back Button */}
       <div className="absolute top-24 left-6">
         <Link to="/SupplierRecode">
-          <img
-            src={leftArrow}
-            alt="Go Back"
-            className="w-10 h-10 hover:scale-105 transition-transform"
+          <img src={leftArrow} alt="Go Back"
+               className="w-10 h-10 hover:scale-105 transition-transform"
           />
         </Link>
       </div>
 
       {/* Content */}
       <div className="flex items-center justify-center px-4 py-16">
-        <div className="bg-gray-200/90 backdrop-blur-sm shadow-lg rounded-xl px-10 py-12 w-full max-w-2xl">
+        <div className="bg-white backdrop-blur-sm shadow-lg rounded-xl px-10 py-12 w-full max-w-2xl">
           {loading ? (
             <Spinner />
           ) : (

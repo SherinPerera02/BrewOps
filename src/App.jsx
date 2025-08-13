@@ -23,6 +23,7 @@ import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 import ContactUs from './pages/ContactUs';
 
 
+
 import Profile from './pages/Supplier/Profile'
 
 
@@ -67,6 +68,7 @@ function App() {
        <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>
+       
        
        
 
