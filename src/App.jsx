@@ -6,6 +6,13 @@ import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
+
+import SupplyRecordTable from './pages/Rawleaves';
+import RetrieveTeaLeavesEntries from './pages/Rawtealeaves';
+import CreateTeaLeavesEntry from './pages/Rawtealeavescreate';
+import DeleteTeaLeavesEntry from './pages/Rawtealeavesdelete';
+import UpdateTeaLeavesEntry from './pages/Rawtealeavesupdate';
+
 import WhoWeAre from './pages/WhoWeAre';
 import LoginPage from './pages/login';
 import AdminDashboard from './pages/adminDashboard';
@@ -17,8 +24,7 @@ import CreateSupplier from './pages/Supplier/CreateSupplier'
 import SupplierRecode from './pages/Supplier/SupplierRecode';
 import ShowSupplier from './pages/Supplier/ShowSupplier'
 import EditSupplier from './pages/Supplier/EditSupplier';
-import DeleteSuppliers from './pages/Supplier/DeleteSuppliers';
-
+import DeleteSuppliers from './pages/Supplier/DeleteSuppliers'
 
 import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
@@ -58,6 +64,12 @@ function App() {
         <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
         <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
         <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
+
+        <Route path="/Rawleaves" element={<SupplyRecordTable />} />
+        <Route path="/Rawtealeaves" element={<RetrieveTeaLeavesEntries />} />
+        <Route path="/Rawtealeavescreate" element={<CreateTeaLeavesEntry />} />
+        <Route path="/Rawtealeavesdelete/:id" element={<DeleteTeaLeavesEntry />} />
+        <Route path="/Rawtealeavesupdate/:id" element={<UpdateTeaLeavesEntry />} />
 
       </Routes>
     </BrowserRouter>
