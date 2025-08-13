@@ -7,6 +7,7 @@ import 'jspdf-autotable';
 import NavigationBar from '../components/navigationBar';
 import Footer from '../components/Footer';
 import InventorySidebar from '../components/inventorySidebar';
+import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 const SupplyRecordTable = () => {
     const [supplyrecords, setSupplyRecords] = useState([]);
@@ -18,8 +19,7 @@ const SupplyRecordTable = () => {
         const savedQuantity = localStorage.getItem('teaLeavesQuantity');
         return savedQuantity ? Number(savedQuantity) : 0;
     });
-    const [manualDecreaseAmount, setManualDecreaseAmount] = useState(0);
-    const [manualIncreaseAmount, setManualIncreaseAmount] = useState(0);
+    const [manualAmount, setManualAmount] = useState(0);
     const tableRef = useRef();
 
     useEffect(() => {
@@ -103,22 +103,22 @@ const SupplyRecordTable = () => {
         } 
     };
 
+    const handleManualIncrease = () => {
+        const newQuantity = teaLeavesQuantity + manualAmount;
+        setTeaLeavesQuantity(newQuantity);
+        localStorage.setItem('teaLeavesQuantity', newQuantity);
+        setManualAmount(0);
+    };
+
     const handleManualDecrease = () => {
-        if (manualDecreaseAmount <= teaLeavesQuantity) {
-            const newQuantity = teaLeavesQuantity - manualDecreaseAmount;
+        if (manualAmount <= teaLeavesQuantity) {
+            const newQuantity = teaLeavesQuantity - manualAmount;
             setTeaLeavesQuantity(newQuantity);
             localStorage.setItem('teaLeavesQuantity', newQuantity);
-            setManualDecreaseAmount(0);
+            setManualAmount(0);
         } else {
             alert('Cannot decrease more than current quantity');
         }
-    };
-
-    const handleManualIncrease = () => {
-        const newQuantity = teaLeavesQuantity + manualIncreaseAmount;
-        setTeaLeavesQuantity(newQuantity);
-        localStorage.setItem('teaLeavesQuantity', newQuantity);
-        setManualIncreaseAmount(0);
     };
 
 
@@ -130,12 +130,11 @@ const SupplyRecordTable = () => {
                     <Link to="/HomePage" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">Home</Link>
                     <Link to="/inventories" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">Inventory</Link>
                     <Link to="/waste-management" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">Waste Management</Link>
-                    <Link to="/Pendingshipmentss" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">Pending Shipments</Link>
                     <Link to="/Irawleaves" className="block px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">Raw Leaves Management</Link>
                 </aside>
                 <main className="flex-1 p-8 overflow-auto">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                        <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Supply Record Table</h1>
+                    <div className="bg-white shadow-md rounded-lg overflow-hidden mb-8 p-8">
+                        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Supplier Records Table</h1>
                         <div className="flex flex-wrap items-center gap-4">
                             <input
                                 type="text"
@@ -147,27 +146,15 @@ const SupplyRecordTable = () => {
                             <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900">
                                 Search
                             </button>
-                            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" onClick={handleManualDecrease}>
-                                Decrease
-                            </button>
+                            <label className="text-gray-600 ml-2 mr-2" htmlFor="teaLeavesQuantityInput">Tea Leaves Quantity:</label>
                             <input
+                                id="teaLeavesQuantityInput"
                                 type="number"
-                                className="border border-gray-300 px-2 py-1 rounded"
-                                value={manualDecreaseAmount}
-                                onChange={(e) => setManualDecreaseAmount(parseInt(e.target.value))}
-                                style={{ width: '80px' }}
+                                className="border border-gray-300 px-2 py-1 rounded w-24"
+                                value={teaLeavesQuantity}
+                                onChange={e => setTeaLeavesQuantity(Number(e.target.value))}
+                                disabled={loading}
                             />
-                            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" onClick={handleManualIncrease}>
-                                Increase
-                            </button>
-                            <input
-                                type="number"
-                                className="border border-gray-300 px-2 py-1 rounded"
-                                value={manualIncreaseAmount}
-                                onChange={(e) => setManualIncreaseAmount(parseInt(e.target.value))}
-                                style={{ width: '80px' }}
-                            />
-                            <span className="text-gray-600 ml-2">Tea Leaves Quantity: {loading ? 'Loading...' : teaLeavesQuantity}</span>
                             <Link to="/Rawtealeaves2" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Send to Production</Link>
                         </div>
                     </div>
