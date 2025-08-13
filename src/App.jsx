@@ -18,7 +18,6 @@ import LoginPage from './pages/login';
 import AdminDashboard from './pages/adminDashboard';
 import RegisterPage from './pages/register';
 
-import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSupplierRecode';
 import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier'
 import SupplierRecode from './pages/Supplier/SupplierRecode';
@@ -53,7 +52,7 @@ function App() {
         // Supplier Create
         <Route path ="/suppliers/create" element={<CreateSupplier />} />
         <Route path ="/suppliers/details/:id"  element={<ShowSupplier />} />
-        <Route path ='/SupplierRecodeCreate' element={<CreateSupplierRecode />} />
+        <Route path ='/SupplierRecodeCreate' element={<CreateSupplyRecode1 />} />
         <Route path ="/Suppliers/edit/:id" element={<EditSupplier/>}/>
         <Route path="/Suppliers/delete/:id" element={<DeleteSuppliers/>}/>
 
