@@ -5,7 +5,7 @@ import axios from 'axios';
 import bgImage from '../../assets/supplierBg2.avif';
 import NavigationBar from '../../components/navigationBar';
 import leftArrow from '../../assets/left-arrow.png';
-import Footer from '../../components/Footer';
+import Footer from '../../components/footer';
 import Spinner from '../../components/spinner';
 
 export default function DeleteSuppliers() {
@@ -42,7 +42,7 @@ export default function DeleteSuppliers() {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${bgImage})` }}>
+    <div className="min-h-screen bg-cover bg-center" >
       <NavigationBar />
 
       {/* Back Button */}

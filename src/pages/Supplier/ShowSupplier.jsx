@@ -5,7 +5,7 @@ import leftArrow from '../../assets/left-arrow.png';
 import bgImage from '../../assets/supplierBg2.avif';
 import Spinner from '../../components/spinner';
 import NavigationBar from '../../components/navigationBar';
-import Footer from '../../components/Footer'
+import Footer from '../../components/footer'
 
 export default function ShowSupplier() {
   const [supplier, setSupplier] = useState({});

@@ -3,7 +3,7 @@ import NavigationBar from '../../components/navigationBar';
 import { Link } from 'react-router-dom';
 import leftArrow from '../../assets/left-arrow.png';
 import Spinner from '../../components/spinner';
-import Footer from '../../components/Footer';
+import Footer from '../../components/footer';
 import bgimage from '../../assets/supplierBg2.avif'
 
 export default function CreateSupplier() {

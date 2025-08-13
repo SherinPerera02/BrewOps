@@ -63,8 +63,7 @@ const DeleteInventory = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
-      <div className="flex-1 bg-gray-50 p-4">
-        <BackButton />
+      <div className="flex-1 p-4">ay      <BackButton />
 
         {loading && <Spinner />}
 

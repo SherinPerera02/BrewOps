@@ -116,7 +116,7 @@ const CreateInventory = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
-      <div className='flex-1 container bg-gray-50 mx-auto px-4'>
+      <div className='flex-1 container mx-auaypx-4'>
         <BackButton />
         <h1 className='text-2xl my-4 text-center font-bold'>Create Inventory</h1>
 

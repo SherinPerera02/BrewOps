@@ -41,9 +41,9 @@ const ShowInventory = () => {
   }, [id]);
 
   return (
-    <div className="min-h-screen  flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <NavigationBar />
-      <div className="flex-1 p-6 bg-gray-50">
+      <div className="flex-1 p-6 bg-graay00">
         <BackButton />
         {loading ? (
           <Spinner />
