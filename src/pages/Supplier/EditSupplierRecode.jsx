@@ -7,10 +7,7 @@ import leftArrow from '../../assets/left-arrow.png';
 
 export default function EditSupplierRecode() {
   return (
-    <div
-      className="min-h-screen bg-cover bg-center"
-      
-    >
+    <div className="min-h-screen bg-cover bg-center bg-green-50">
       {/* Navigation Bar */}
       <NavigationBar />
 
@@ -26,8 +23,8 @@ export default function EditSupplierRecode() {
       </div>
 
       {/* Main Form Card */}
-      <div className="flex items-center justify-center px-4 py-16">
-        <div className="bg-gray-200/90 backdrop-blur-sm shadow-lg rounded-xl px-10 py-12 w-full max-w-2xl">
+      <div className="flex items-center justify-center px-4 py-16 ">
+        <div className="bg-white backdrop-blur-sm shadow-lg rounded-xl px-10 py-12 w-full max-w-2xl">
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
             Update Supplier Record
           </h1>

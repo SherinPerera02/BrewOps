@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import leftArrow from '../../assets/left-arrow.png';
-import bgImage from '../../assets/supplierBg2.avif';
+
 import Spinner from '../../components/Spinner';
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer'
@@ -33,6 +33,7 @@ export default function ShowSupplier() {
       <NavigationBar />
 
       {/* Back Arrow */}
+      <div className='bg-green-50'>
       <div className="absolute top-25 left-6">
               <Link to="/SupplierHome">
                 <img src={leftArrow} alt="Go Back" className="w-10 h-10 hover:scale-105 transition-transform" />
@@ -40,16 +41,16 @@ export default function ShowSupplier() {
             </div>
 
       {/* Content */}
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-12 ">
         {loading ? (
           <Spinner />
         ) : (
-          <div className="bg-gray-200/90 bg-opacity-95 p-10 rounded-xl shadow-lg w-[90%] max-w-2xl mb-20">
+          <div className="bg-white bg-opacity-95 p-10 rounded-xl shadow-lg w-[90%] max-w-2xl mb-20">
             <h1 className="text-3xl font-bold text-center text-gray-800 border-b-2 border-green-500 pb-2 mb-6">
               Supplier Details
             </h1>
 
-            <div className="text-lg text-gray-700 space-y-3">
+            <div className="text-lg text-gray-700 space-y-3 ">
               <p><strong className="text-black">Supplier ID:</strong> {supplier.id}</p>
               <p><strong className="text-black">Name:</strong> {supplier.name}</p>
               <p><strong className="text-black">Contact:</strong> {supplier.contact}</p>
@@ -60,6 +61,7 @@ export default function ShowSupplier() {
             </div>
           </div>
         )}
+      </div>
       </div>
 
       <Footer/>

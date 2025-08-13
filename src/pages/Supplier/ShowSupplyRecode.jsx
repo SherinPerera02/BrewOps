@@ -26,7 +26,7 @@ export default function ShowSupplyRecode() {
   }, [id]);
 
   return (
-    <div className="min-h-screen bg-cover bg-center">
+    <div className="min-h-screen bg-cover bg-center bg-green-50">
       {/* Navigation */}
       <NavigationBar />
 
@@ -49,6 +49,7 @@ export default function ShowSupplyRecode() {
               <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
                 Supplier Record Details
               </h1>
+              
 
               <div className="space-y-4">
                 <p>

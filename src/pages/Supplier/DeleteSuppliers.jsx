@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-import bgImage from '../../assets/supplierBg2.avif';
+
 import NavigationBar from '../../components/NavigationBar';
 import leftArrow from '../../assets/left-arrow.png';
 import Footer from '../../components/Footer';
@@ -42,11 +42,12 @@ export default function DeleteSuppliers() {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center" >
+    <div className="min-h-screen bg-cover bg-center bg-green-50" >
       <NavigationBar />
 
       {/* Back Button */}
-      <div className="absolute top-25 left-6">
+      
+        <div className="absolute top-25 left-6">
             <Link to="/SupplierHome">
             <img src={leftArrow} alt="Go Back" className="w-10 h-10 hover:scale-105 transition-transform" />
             </Link>
@@ -56,7 +57,7 @@ export default function DeleteSuppliers() {
             <Spinner/>
         ):(
 
-        <div className="max-w-xl mx-auto mt-20 mb-10 bg-gray-200/90 rounded-xl shadow-lg px-10 py-12">
+        <div className="max-w-xl mx-auto mt-20 mb-10 bg-white rounded-xl shadow-lg px-10 py-12">
           <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Delete Supplier</h1>
 
           <p className="text-lg text-center text-gray-700 mb-8">
@@ -84,6 +85,8 @@ export default function DeleteSuppliers() {
 
         </div>
         )}
+
+        
 
     <div className="mt-33">
     <Footer />

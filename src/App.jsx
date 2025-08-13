@@ -6,7 +6,7 @@ import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
-import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSupplierRecode';
+
 
 
 import SupplierHome from './pages/Supplier/SupplierHome'
@@ -19,7 +19,7 @@ import DeleteSuppliers from './pages/Supplier/DeleteSuppliers';
 
 import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
-import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1'
+import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1';
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 
 
@@ -40,7 +40,7 @@ function App() {
         // Supplier Create
         <Route path ="/suppliers/create" element={<CreateSupplier />} />
         <Route path ="/suppliers/details/:id"  element={<ShowSupplier />} />
-        <Route path ='/SupplierRecodeCreate' element={<CreateSupplierRecode1 />} />
+        <Route path ='/SupplierRecodeCreate' element={<CreateSupplyRecode1 />} />
         <Route path ="/Suppliers/edit/:id" element={<EditSupplier/>}/>
         <Route path="/Suppliers/delete/:id" element={<DeleteSuppliers/>}/>
 

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import leftArrow from '../../assets/left-arrow.png';
 import Spinner from '../../components/Spinner';
 import Footer from '../../components/Footer';
-import bgimage from '../../assets/supplierBg2.avif'
+
 
 export default function CreateSupplier() {
   const [supplierId, setSupplierId] = useState('');
@@ -103,9 +103,10 @@ export default function CreateSupplier() {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center">
+    <div className="min-h-screen bg-cover bg-center ">
       <NavigationBar />
-
+      <div className='bg-green-50'>
+        
       {/* Back arrow */}
       <div className="absolute top-25 left-6">
         <Link to="/SupplierHome">
@@ -113,19 +114,16 @@ export default function CreateSupplier() {
         </Link>
       </div>
 
-      <div
-      className="max-w-8xl mx-auto mt-5 p-10 rounded-lg shadow-lg bg-cover ng-opacity-80 "
-      style={{ backgroundImage: `url(${bgimage})` }}
->
+      <div className="max-w-8xl mx-auto mt-5 p-10 rounded-lg shadow-lg bg-cover ng-opacity-80  ">
 
 
-      {loading && <Spinner />}
+        {loading && <Spinner />}
 
-      {/* Supplier Form */}
-      <div className="max-w-2xl mx-auto mt-5  p-10 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Add New Supplier</h1>
+        {/* Supplier Form */}
+        <div className="max-w-2xl mx-auto mt-5  p-10 rounded-lg shadow-lg bg-white">
+          <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Add New Supplier</h1>
 
-        <div className="space-y-4">
+        < div className="space-y-4">
           {/* Supplier ID */}
           <div>
             <label className="block font-medium mb-1">Supplier ID</label>
@@ -221,14 +219,15 @@ export default function CreateSupplier() {
           <div className="text-center mt-8">
             <button
               onClick={handleSaveSupplier}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded"
-            >
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded">
               Submit
             </button>
           </div>
         </div>
-        </div>
       </div>
+      </div>
+      </div>
+      
 
       <Footer />
     </div>
