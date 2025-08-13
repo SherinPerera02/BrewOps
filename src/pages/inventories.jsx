@@ -8,9 +8,22 @@ import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 
+
 import Spinner from '../components/spinner';
 import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/footer';
+import { Bar, Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Home = () => {
   const [originalInventory, setOriginalInventory] = useState([]);
@@ -80,8 +93,56 @@ const Home = () => {
     }
   };
 
+
+  // Chart type state
+  const [chartType, setChartType] = useState('bar');
+
+  // Prepare data for the chart (quantity per batchid)
+  const chartData = {
+    labels: inventory.map(item => item.batchid),
+    datasets: [
+      {
+        label: 'Quantity',
+        data: inventory.map(item => item.quantity),
+        backgroundColor: 'rgba(34,197,94,0.7)',
+        borderColor: 'rgba(34,197,94,1)',
+        borderWidth: 2,
+        hoverBackgroundColor: 'rgba(34,197,94,1)',
+        hoverBorderColor: 'rgba(21,128,61,1)',
+        pointBackgroundColor: 'rgba(34,197,94,1)',
+        pointBorderColor: '#fff',
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: true, position: 'top' },
+      title: { display: true, text: 'Inventory Quantity per Batch' },
+      tooltip: {
+        enabled: true,
+        mode: 'index',
+        intersect: false,
+        callbacks: {
+          label: function(context) {
+            return `Quantity: ${context.parsed.y}`;
+          }
+        }
+      },
+    },
+    hover: { mode: 'nearest', intersect: true },
+    scales: {
+      y: { beginAtZero: true },
+    },
+    animation: {
+      duration: 800,
+      easing: 'easeOutQuart',
+    },
+  };
+
   return (
-    
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
       {/* Layout with Sidebar */}
@@ -176,9 +237,29 @@ const Home = () => {
               </table>
             </div>
           )}
+
+          {/* Interactive Chart at the end of the page */}
+          <div className="mt-12 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+            <div className="mb-4 flex items-center gap-4">
+              <label htmlFor="chartType" className="font-medium">Chart Type:</label>
+              <select
+                id="chartType"
+                value={chartType}
+                onChange={e => setChartType(e.target.value)}
+                className="border border-gray-300 rounded px-2 py-1"
+              >
+                <option value="bar">Bar</option>
+                <option value="line">Line</option>
+              </select>
+            </div>
+            {chartType === 'bar' ? (
+              <Bar data={chartData} options={chartOptions} />
+            ) : (
+              <Line data={chartData} options={chartOptions} />
+            )}
+          </div>
         </main>
       </div>
-      
       <Footer />
     </div>
   );

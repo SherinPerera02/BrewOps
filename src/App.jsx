@@ -1,3 +1,4 @@
+import HomePage from './pages/homePage';
 import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
 import Inventories from './pages/inventories';
@@ -5,7 +6,7 @@ import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
-import CreateSupplierRecode1 from './pages/Supplier/CreateSupplyRecode1';
+import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSupplierRecode';
 
 
 import SupplierHome from './pages/Supplier/SupplierHome'
@@ -20,11 +21,6 @@ import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
 import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1'
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
-import ContactUs from './pages/ContactUs';
-
-
-
-import Profile from './pages/Supplier/Profile'
 
 
 
@@ -33,24 +29,11 @@ function App() {
     <BrowserRouter>
       
       <Routes>
-        <Route path="/Contact" element={<ContactUs/>}/>
-
-
         <Route path="/inventories" element={<Inventories />} />
         <Route path="/inventory/creates" element={<CreateInventory />} />
         <Route path="/inventory/details/:id" element={<ShowInventory />} />
         <Route path="/inventory/edit/:id" element={<EditInventory />} />
         <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
-
-
-
-
-
-
-
-
-
-
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
 
@@ -69,12 +52,10 @@ function App() {
        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>
        
-       
-       
 
        
        
-      <Route path="/profile" element={<Profile/>}/>
+
 
         
 
