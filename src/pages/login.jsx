@@ -6,7 +6,7 @@ import { FcGoogle } from "react-icons/fc";
 import loginAnimation from "../assets/login.json";
 import Lottie from "lottie-react";
 import Spinner from "../components/spinner";
-import { jwtDecode } from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import React, { useEffect } from "react";
 
 export default function LoginPage() {
