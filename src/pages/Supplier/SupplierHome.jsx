@@ -6,7 +6,7 @@ import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import Spinner from '../../components/spinner';
-import Footer from '../../components/footer';
+import Footer from '../../components/Footer';
 
 export default function SupplierHome1() {
   const [suppliers, setSuppliers] = useState([]);

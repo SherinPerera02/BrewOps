@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import BackButton from '../components/backButton';
 import Spinner from '../components/spinner';
 import NavigationBar from '../components/navigationBar';
-import Footer from '../components/footer';
+import Footer from '../components/Footer';
 
 const ShowInventory = () => {
   const [inventory, setInventory] = useState({});

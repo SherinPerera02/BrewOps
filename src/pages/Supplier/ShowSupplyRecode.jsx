@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Spinner from '../../components/spinner';
 import NavigationBar from '../../components/navigationBar';
-import Footer from '../../components/footer';
+import Footer from '../../components/Footer';
 import leftArrow from '../../assets/left-arrow.png';
 import bgImage from '../../assets/supplierBg2.avif';
 

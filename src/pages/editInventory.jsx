@@ -5,7 +5,7 @@ import axios from 'axios';
 import BackButton from '../components/backButton';
 import Spinner from '../components/spinner';
 import NavigationBar from '../components/navigationBar';
-import Footer from '../components/footer';
+import Footer from '../components/Footer';
 
 const EditInventory = () => {
   const [batchId, setBatchId] = useState('');

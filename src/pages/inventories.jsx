@@ -11,7 +11,7 @@ import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 
 import Spinner from '../components/spinner';
 import NavigationBar from '../components/navigationBar';
-import Footer from '../components/footer';
+import Footer from '../components/Footer';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,

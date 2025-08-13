@@ -1,7 +1,7 @@
 import React from 'react';
 import NavigationBar from '../components/navigationBar';
 import NavigationPanel from '../components/navigationPanel';
-import Footer from '../components/footer';
+import Footer from '../components/Footer';
 import DashboardCard from '../components/dashboardCard';
 import { FaBoxOpen, FaLeaf, FaBox, FaIndustry, FaTruckLoading } from 'react-icons/fa';
 import ProductionChart from '../components/productionChart';

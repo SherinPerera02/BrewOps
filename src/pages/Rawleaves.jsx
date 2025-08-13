@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import NavigationBar from '../components/navigationBar';
-import Footer from '../components/footer';
+import Footer from '../components/Footer';
 import InventorySidebar from '../components/inventorySidebar';
 
 const SupplyRecordTable = () => {
