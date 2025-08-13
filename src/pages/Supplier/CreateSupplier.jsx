@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import { Link } from 'react-router-dom';
 import leftArrow from '../../assets/left-arrow.png';
 import Spinner from '../../components/spinner';

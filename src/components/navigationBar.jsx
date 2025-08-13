@@ -52,53 +52,8 @@ const NavigationBar = ({ user, onLogout }) => {
         </Link>
       </div>
 
-      {/* Profile Icon */}
-      <FaUserCircle
-        className="text-white text-3xl cursor-pointer hover:text-green-900 transition"
-        onClick={() => setSidebarOpen(true)}
-      />
-
-      {/* Floating Sidebar */}
-      {sidebarOpen && (
-        <div className="fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-6 z-50 transform transition-transform duration-300 flex flex-col">
-          {/* Close Button */}
-          <div className="flex justify-end">
-            <FaTimes
-              className="text-gray-600 text-2xl cursor-pointer hover:text-red-600 transition"
-              onClick={() => setSidebarOpen(false)}
-            />
-          </div>
-
-          {/* Profile Info */}
-          <div className="mt-6 flex-grow">
-            <h2 className="text-xl font-bold text-gray-800">{user?.name || "Guest"}</h2>
-            <p className="text-gray-500 capitalize">{user?.role || "visitor"}</p>
-            <hr className="my-4" />
-
-            <nav className="space-y-4">
-              {menuItems.map(({ label, to }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className="block text-gray-700 hover:text-green-600 transition"
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="mt-auto flex items-center text-red-600 hover:text-red-800 transition font-semibold space-x-2"
-          >
-            <FaSignOutAlt />
-            <span>Logout</span>
-          </button>
-        </div>
-      )}
+     
+      
     </nav>
   );
 };

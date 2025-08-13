@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import SupplierSidebar from '../../components/SupplierSidebar';
 import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';

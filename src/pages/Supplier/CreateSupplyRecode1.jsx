@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/spinner';
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import Footer from '../../components/Footer';
 import bgImage from '../../assets/supplierBg2.avif';
 import leftArrow from '../../assets/left-arrow.png';

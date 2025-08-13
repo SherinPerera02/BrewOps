@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import Footer from '../../components/footer';
 import leftArrow from '../../assets/left-arrow.png';
 import bgImage from '../../assets/supplierBg2.avif';

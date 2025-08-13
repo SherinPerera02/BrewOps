@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BackButton from '../components/backButton';
 import Spinner from '../components/spinner';
-import NavigationBar from '../components/NavigationBar';
+import NavigationBar from '../components/navigationBar';
 import Footer from '../components/footer';
 
 const ShowInventory = () => {
@@ -43,7 +43,7 @@ const ShowInventory = () => {
   return (
     <div className="min-h-screen  flex flex-col">
       <NavigationBar />
-      <div className="flex-1 p-6 bg-green-50">
+      <div className="flex-1 p-6 bg-gray-50">
         <BackButton />
         {loading ? (
           <Spinner />

@@ -6,29 +6,15 @@ import { FcGoogle } from "react-icons/fc";
 import loginAnimation from "../assets/login.json";
 import Lottie from "lottie-react";
 import Spinner from "../components/spinner";
-import { jwtDecode } from "jwt-decode";
 import React, { useEffect } from "react";
 
 export default function LoginPage() {
-  const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loadingPage, setLoadingPage] = useState(true);
   const navigate = useNavigate();
  
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser({ name: decoded.name, role: decoded.role });
-      } catch {
-        setUser(null);
-      }
-    }
-  }, []);
-
   useEffect(() => {
     // Simulate loading delay (e.g., fetching config, preloading images)
     const timer = setTimeout(() => {
@@ -46,100 +32,66 @@ export default function LoginPage() {
   }
 
   async function handleLogin() {
-  try {
-    const response = await axios.post(
-      import.meta.env.VITE_BACKEND_URL + "/api/users/login",
-      {
-        email,
-        password,
-      }
-    );
+    try {
+      const response = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + "/api/users/login",
+        {
+          email,
+          password,
+        }
+      );
 
-    toast.success("Login Successful");
+      toast.success("Login Successful");
 
-    // Save token
-    const token = response.data.token;
-    localStorage.setItem("token", token);
+      // Save token
+      const token = response.data.token;
+      console.log("Token:", token); // Debugging log
+      localStorage.setItem("token", token);
+      console.log(email,password)
 
-    // Decode token to get user info
-    const decoded = jwt_decode(token);
-    setUser({ name: decoded.name, role: decoded.role });
-
-    // Remember Me handling
-    if (rememberMe) {
-      localStorage.setItem("rememberEmail", email);
-    } else {
-      localStorage.removeItem("rememberEmail");
-    }
-
-    // Redirect based on role
-    if (decoded.role === "admin") {
+      
       navigate("/admin");
-    } else {
-      navigate("/");
+    } catch (e) {
+      console.error("Login error:", e);
+      toast.error(e.response?.data?.message || "Login failed");
+      console.log("Login error:", e); // Debugging log
     }
-  } catch (e) {
-    toast.error(e.response?.data?.message || "Login failed");
   }
-}
-
-// Inside your login logic
-const userData = { name: "Admin User", role: "admin" };
-localStorage.setItem("user", JSON.stringify(userData));
 
   function handleGoogleSignIn() {
     toast("Google Sign-In not yet connected!", { icon: "🔗" });
     // In real setup, redirect to Google OAuth URL
   }
 
-  async function onSubmitLogin(email, password) {
-  const response = await fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-
-  const data = await response.json();
-
-  if (response.ok && data.token) {
-    props.onLogin(data.token);  // Pass token back to App to decode and set user
-  } else {
-    alert(data.message || "Login failed");
-  }
-}
-
-
   return (
-    
     <div className="w-full h-screen bg-green-50 bg-center bg-cover flex justify-evenly items-center">
       <div className="w-full h-full flex justify-center items-center">
         <div className="w-[1300px] h-[600px] backdrop-blur-sm rounded-[20px] shadow-xl flex overflow-hidden">
 
           {/* Left half */}
-         
-            <div className="w-1/2 h-full flex flex-col items-center text-center bg-white p-8">
+          <div className="w-1/2 h-full flex flex-col items-center text-center bg-white p-8">
             <h1 className="text-5xl font-bold text-green-600 mt-10">
-                Welcome Back !
+              Welcome Back !
             </h1>
 
             <p className="text-md text-green-600 mt-4">
-                Don't have an account yet?{" "}
-                <br />
-                <a href="/register">
+              Don't have an account yet?{" "}
+              <br />
+              <a href="/register">
                 <button
-                    type="button"
-                    className="mt-2 px-4 py-1 text-md rounded-full border border-green-600 bg-transparent hover:bg-black text-green-600 hover:text-white hover:border-black cursor-pointer font-semibold transition"
+                  type="button"
+                  className="mt-2 px-4 py-1 text-md rounded-full border border-green-600 bg-transparent hover:bg-black text-green-600 hover:text-white hover:border-black cursor-pointer font-semibold transition"
                 >
-                    Register here
+                  Register here
                 </button>
-                </a>
+              </a>
             </p>
 
             {/* Animation below register */}
             <div className="w-full max-w-[300px] mt-6">
-                <Lottie animationData={loginAnimation} loop={true} />
+              <Lottie animationData={loginAnimation} loop={true} />
             </div>
-            </div>
+          </div>
 
           {/* Right half */}
           <div className="w-1/2 h-full bg-green-900 flex flex-col justify-center items-center p-6">
@@ -172,12 +124,12 @@ localStorage.setItem("user", JSON.stringify(userData));
 
                   style={{
                     backgroundImage: rememberMe
-                        ? "url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22white%22><path d=%22M7.629 15.314L3.314 11l1.414-1.414L7.629 12.486l7.643-7.643 1.414 1.414z%22/></svg>')"
-                        : "none",
+                      ? "url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22white%22><path d=%22M7.629 15.314L3.314 11l1.414-1.414L7.629 12.486l7.643-7.643 1.414 1.414z%22/></svg>')"
+                      : "none",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
                     backgroundSize: "70%",
-                    }}
+                  }}
                 />
                 <span>Remember Me</span>
               </label>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './CreateSupplierRecode.css';
-import NavigationBar from '../../../components/NavigationBar';
+import NavigationBar from '../../../components/navigationBar';
 import { Link, useNavigate } from 'react-router-dom';
 import leftArrow from '../../../assets/left-arrow.png';
 import Footer from '../../../components/Footer';
