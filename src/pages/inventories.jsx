@@ -9,8 +9,9 @@ import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 
 
-import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar';
+
+import Spinner from '../components/spinner';
+import NavigationBar from '../components/navigationBar';
 import Footer from '../components/Footer';
 import { Bar, Line } from 'react-chartjs-2';
 import {
@@ -149,9 +150,7 @@ const Home = () => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside className="bg-gray-800 text-white w-64 h-screen p-6 space-y-4 sticky top-0">
-          <Link to="/HomePage" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            Home
-          </Link>
+          
           <Link to="/inventories" className="block px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">
             Inventory
           </Link>

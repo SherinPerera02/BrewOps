@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BackButton from '../components/backButton';
-import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar';
+
+import Spinner from '../components/spinner';
+import NavigationBar from '../components/navigationBar';
+
 import Footer from '../components/Footer';
 
 const ShowInventory = () => {
@@ -43,7 +45,7 @@ const ShowInventory = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
-      <div className="flex-1 p-6 bg-gray-100">
+      <div className="flex-1 p-6 bg-graay00">
         <BackButton />
         {loading ? (
           <Spinner />

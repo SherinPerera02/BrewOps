@@ -5,12 +5,31 @@ import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import loginAnimation from "../assets/login.json";
 import Lottie from "lottie-react";
+import Spinner from "../components/spinner";
+import React, { useEffect } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(true);
   const navigate = useNavigate();
+ 
+  useEffect(() => {
+    // Simulate loading delay (e.g., fetching config, preloading images)
+    const timer = setTimeout(() => {
+      setLoadingPage(false);
+    }, 800); // 1.5 sec delay
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loadingPage) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-white">
+        <Spinner />
+      </div>
+    );
+  }
 
   async function handleLogin() {
     try {
@@ -23,21 +42,19 @@ export default function LoginPage() {
       );
 
       toast.success("Login Successful");
-      localStorage.setItem("token", response.data.token);
 
-      if (rememberMe) {
-        localStorage.setItem("rememberEmail", email);
-      } else {
-        localStorage.removeItem("rememberEmail");
-      }
+      // Save token
+      const token = response.data.token;
+      console.log("Token:", token); // Debugging log
+      localStorage.setItem("token", token);
+      console.log(email,password)
 
-      if (response.data.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      
+      navigate("/admin");
     } catch (e) {
+      console.error("Login error:", e);
       toast.error(e.response?.data?.message || "Login failed");
+      console.log("Login error:", e); // Debugging log
     }
   }
 
@@ -47,38 +64,37 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full h-screen bg-[url('/login3.jpg')] bg-center bg-cover flex justify-evenly items-center">
+    <div className="w-full h-screen bg-green-50 bg-center bg-cover flex justify-evenly items-center">
       <div className="w-full h-full flex justify-center items-center">
         <div className="w-[1300px] h-[600px] backdrop-blur-sm rounded-[20px] shadow-xl flex overflow-hidden">
 
           {/* Left half */}
-         
-            <div className="w-1/2 h-full flex flex-col items-center text-center p-8">
-            <h1 className="text-5xl font-bold text-white mt-10">
-                Welcome Back !
+          <div className="w-1/2 h-full flex flex-col items-center text-center bg-white p-8">
+            <h1 className="text-5xl font-bold text-green-600 mt-10">
+              Welcome Back !
             </h1>
 
-            <p className="text-md text-white mt-4">
-                Don't have an account yet?{" "}
-                <br />
-                <a href="/register">
+            <p className="text-md text-green-600 mt-4">
+              Don't have an account yet?{" "}
+              <br />
+              <a href="/register">
                 <button
-                    type="button"
-                    className="mt-2 px-4 py-1 text-md rounded-full border border-white bg-transparent hover:bg-white text-white hover:text-black font-semibold transition"
+                  type="button"
+                  className="mt-2 px-4 py-1 text-md rounded-full border border-green-600 bg-transparent hover:bg-black text-green-600 hover:text-white hover:border-black cursor-pointer font-semibold transition"
                 >
-                    Register here
+                  Register here
                 </button>
-                </a>
+              </a>
             </p>
 
             {/* Animation below register */}
             <div className="w-full max-w-[300px] mt-6">
-                <Lottie animationData={loginAnimation} loop={true} />
+              <Lottie animationData={loginAnimation} loop={true} />
             </div>
-            </div>
+          </div>
 
           {/* Right half */}
-          <div className="w-1/2 h-full bg-black/70 flex flex-col justify-center items-center p-6">
+          <div className="w-1/2 h-full bg-green-900 flex flex-col justify-center items-center p-6">
             <h1 className="text-[#22cf2b] text-4xl font-bold mb-6">Sign In</h1>
 
             <input
@@ -108,12 +124,12 @@ export default function LoginPage() {
 
                   style={{
                     backgroundImage: rememberMe
-                        ? "url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22white%22><path d=%22M7.629 15.314L3.314 11l1.414-1.414L7.629 12.486l7.643-7.643 1.414 1.414z%22/></svg>')"
-                        : "none",
+                      ? "url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22white%22><path d=%22M7.629 15.314L3.314 11l1.414-1.414L7.629 12.486l7.643-7.643 1.414 1.414z%22/></svg>')"
+                      : "none",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
                     backgroundSize: "70%",
-                    }}
+                  }}
                 />
                 <span>Remember Me</span>
               </label>
@@ -153,3 +169,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+

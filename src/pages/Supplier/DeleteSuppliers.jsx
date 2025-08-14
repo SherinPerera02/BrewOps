@@ -3,10 +3,11 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
-import NavigationBar from '../../components/NavigationBar';
+
+import NavigationBar from '../../components/navigationBar'
 import leftArrow from '../../assets/left-arrow.png';
 import Footer from '../../components/Footer';
-import Spinner from '../../components/Spinner';
+import Spinner from '../../components/spinner';
 
 export default function DeleteSuppliers() {
   const { id } = useParams(); 
@@ -42,7 +43,9 @@ export default function DeleteSuppliers() {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-green-50" >
+
+    <div className="min-h-screen bg-cover bg-center" >
+
       <NavigationBar />
 
       {/* Back Button */}

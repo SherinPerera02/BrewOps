@@ -3,8 +3,10 @@ import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import leftArrow from '../../assets/left-arrow.png';
 
-import Spinner from '../../components/Spinner';
-import NavigationBar from '../../components/NavigationBar';
+import bgImage from '../../assets/supplierBg2.avif';
+import Spinner from '../../components/spinner';
+import NavigationBar from '../../components/navigationBar';
+
 import Footer from '../../components/Footer'
 
 export default function ShowSupplier() {

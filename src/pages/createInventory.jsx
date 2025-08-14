@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import BackButton from '../components/backButton';
-import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar';
+
+import Spinner from '../components/spinner';
+import NavigationBar from '../components/navigationBar';
+
 import Footer from '../components/Footer';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -116,7 +118,7 @@ const CreateInventory = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
-      <div className='flex-1 container mx-auto px-4'>
+      <div className='flex-1 container mx-auaypx-4'>
         <BackButton />
         <h1 className='text-2xl my-4 text-center font-bold'>Create Inventory</h1>
 

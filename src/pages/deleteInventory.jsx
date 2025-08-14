@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import BackButton from '../components/backButton';
-import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar';
+
+import Spinner from '../components/spinner';
+import NavigationBar from '../components/navigationBar';
+
 import Footer from '../components/Footer';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -63,8 +65,7 @@ const DeleteInventory = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
-      <div className="flex-1 p-4">
-        <BackButton />
+      <div className="flex-1 p-4">     <BackButton />
 
         {loading && <Spinner />}
 

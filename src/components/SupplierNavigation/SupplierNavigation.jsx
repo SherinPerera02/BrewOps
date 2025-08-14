@@ -1,5 +1,5 @@
 import React from 'react'
-import NavigationBar from '../NavigationBar'
+import NavigationBar from '../navigationBar'
 import { Link } from 'react-router-dom';
 import profile from '../../assets/profile.png'
 
