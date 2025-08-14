@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import NavigationBar from "../../components/NavigationBar";
+import NavigationBar from "../../components/navigationBar";
 import SupplierSidebar from "../../components/SupplierSidebar";
 import Footer from "../../components/Footer";
-import Spinner from "../../components/Spinner";
+import Spinner from "../../components/spinner";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
