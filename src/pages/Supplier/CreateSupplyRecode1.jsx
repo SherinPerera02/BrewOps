@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
-import bgImage from '../../assets/supplierBg2.avif';
 import leftArrow from '../../assets/left-arrow.png';
 import { Link } from 'react-router-dom';
 

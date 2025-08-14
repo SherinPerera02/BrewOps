@@ -5,7 +5,7 @@ import Spinner from '../../components/Spinner';
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
 import leftArrow from '../../assets/left-arrow.png';
-import bgImage from '../../assets/supplierBg2.avif';
+
 
 export default function DeleteSupplyRecode() {
   const { id } = useParams();

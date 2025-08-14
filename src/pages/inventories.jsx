@@ -9,9 +9,9 @@ import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 
 
-import Spinner from '../components/spinner';
+import Spinner from '../components/Spinner';
 import NavigationBar from '../components/NavigationBar';
-import Footer from '../components/footer';
+import Footer from '../components/Footer';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,

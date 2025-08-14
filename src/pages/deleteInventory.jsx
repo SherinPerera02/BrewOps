@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import BackButton from '../components/backButton';
-import Spinner from '../components/spinner';
-import NavigationBar from '../components/navigationBar';
-import Footer from '../components/footer';
+import Spinner from '../components/Spinner';
+import NavigationBar from '../components/NavigationBar';
+import Footer from '../components/Footer';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 

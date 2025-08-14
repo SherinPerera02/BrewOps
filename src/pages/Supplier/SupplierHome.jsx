@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import NavigationBar from '../../components/NavigationBar';
 import SupplierSidebar from '../../components/SupplierSidebar';
-import Footer from '../../components/footer';
+import Footer from '../../components/Footer';
 import { Link } from 'react-router-dom';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
-import Spinner from '../../components/spinner';
+import Spinner from '../../components/Spinner';
 
 export default function SupplierHome1() {
   const [suppliers, setSuppliers] = useState([]);

@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import BackButton from '../components/backButton';
-import Spinner from '../components/spinner';
-import NavigationBar from '../components/navigationBar';
-import Footer from '../components/footer';
+import Spinner from '../components/Spinner';
+import NavigationBar from '../components/NavigationBar';
+import Footer from '../components/Footer';
 
 const EditInventory = () => {
   const [batchId, setBatchId] = useState('');
