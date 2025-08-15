@@ -54,7 +54,7 @@ export default function StaffDashboardNav() {
           {/* Dropdown Menu */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded shadow-lg z-50 ring-1 ring-gray-200">
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 transition-colors">My Profile</a>
+              <a href="/staff/profile" className="block px-4 py-2 hover:bg-gray-100 transition-colors">My Profile</a>
               <a href="#" className="block px-4 py-2 hover:bg-gray-100 transition-colors">Settings</a>
               <a href="/login" className="block px-4 py-2 hover:bg-gray-100 transition-colors">Logout</a>
             </div>

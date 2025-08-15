@@ -23,6 +23,7 @@ import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
 import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1';
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
+import StaffProfile from './pages/Supplier/StaffProfile';
 
 
 
@@ -44,6 +45,7 @@ function App() {
 
 
         <Route path ="/staff" element={<StaffDashboard/>}/>
+        <Route path = '/staff/profile' element = {<StaffProfile/>}/>
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
 
