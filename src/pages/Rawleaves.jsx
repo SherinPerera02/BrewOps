@@ -4,7 +4,7 @@ import Spinner from '../components/spinner';
 import { Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import NavigationBar from '../components/navigationBar';
+import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/Footer';
 import InventorySidebar from '../components/inventorySidebar';
 

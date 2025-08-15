@@ -1,5 +1,5 @@
 import React from 'react';
-import NavigationBar from '../components/navigationBar';
+import NavigationBar from '../components/NavigationBar';
 import NavigationPanel from '../components/navigationPanel';
 import Footer from '../components/Footer';
 import DashboardCard from '../components/dashboardCard';

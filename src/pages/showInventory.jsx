@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BackButton from '../components/backButton';
 import Spinner from '../components/spinner';
-import NavigationBar from '../components/navigationBar';
+import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/Footer';
 
 const ShowInventory = () => {

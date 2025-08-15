@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle, FaTimes, FaSignOutAlt } from "react-icons/fa";
+import { FaUserCircle, FaTimes, FaSignOutAlt, FaBell, FaEnvelope } from "react-icons/fa";
 
 const NavigationBar = ({ user, onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,25 +35,14 @@ const NavigationBar = ({ user, onLogout }) => {
       <div className="flex items-center">
         <h1 className="text-white text-3xl font-bold">BrewOps</h1>
       </div>
-
-      {/* Navigation Links */}
-      <div className="flex space-x-6">
-        <Link to="/" className="text-white text-lg hover:text-green-900 transition">
-          Home
-        </Link>
-        <Link to="/AboutUs" className="text-white text-lg hover:text-green-900 transition">
-          About
-        </Link>
-        <Link to="/Service" className="text-white text-lg hover:text-green-900 transition">
-          Services
-        </Link>
-        <Link to="/ContactUs" className="text-white text-lg hover:text-green-900 transition">
-          Contact
-        </Link>
-      </div>
-
-     
       
+
+      {/* Icons */}
+      <div className="flex items-center space-x-4">
+        <FaBell className="text-white text-2xl cursor-pointer hover:text-green-300" />
+        <FaEnvelope className="text-white text-2xl cursor-pointer hover:text-green-300" />
+        <FaUserCircle className="text-white text-2xl cursor-pointer hover:text-green-300" />
+      </div>
     </nav>
   );
 };

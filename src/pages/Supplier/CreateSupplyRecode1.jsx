@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/spinner';
-import NavigationBar from '../../components/navigationBar';
+import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
 import bgImage from '../../assets/supplierBg2.avif';
 import leftArrow from '../../assets/left-arrow.png';
@@ -81,7 +81,7 @@ export default function CreateSupplyRecord() {
       </div>
 
       {/* Form Container */}
-      <div className="max-w-3xl mx-auto mt-28 mb-16 bg-gray-200/90 rounded-xl shadow-lg px-10 py-12 mb-20">
+      <div className="max-w-3xl mx-auto mt-28 bg-gray-200/90 rounded-xl shadow-lg px-10 py-12 mb-20">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Create Supply Record
         </h1>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import NavigationBar from '../../components/navigationBar';
+import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
 import leftArrow from '../../assets/left-arrow.png';
 import bgImage from '../../assets/supplierBg2.avif';

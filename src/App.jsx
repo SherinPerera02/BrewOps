@@ -1,6 +1,6 @@
 import HomePage from './pages/homePage';
 import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
-import NavigationBar from './components/navigationBar';
+import NavigationBar from './components/NavigationBar';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
@@ -30,6 +30,8 @@ import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
 import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1'
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
+
+import SupplierDashboard from './pages/supplierDashboard';
 
 function App() {
   return (
@@ -70,6 +72,8 @@ function App() {
         <Route path="/Rawtealeavescreate" element={<CreateTeaLeavesEntry />} />
         <Route path="/Rawtealeavesdelete/:id" element={<DeleteTeaLeavesEntry />} />
         <Route path="/Rawtealeavesupdate/:id" element={<UpdateTeaLeavesEntry />} />
+
+        <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
 
       </Routes>
     </BrowserRouter>
