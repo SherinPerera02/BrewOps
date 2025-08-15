@@ -64,7 +64,7 @@ export default function ProductRecord() {
       </header>
 
       <div className="flex flex-1">
-        <Sidebar /> {/* Reuse supplier sidebar or create your own */}
+        <SupplierSidebar /> 
 
         <main className="flex-1 p-6 bg-gray-100">
           {/* Header and search */}

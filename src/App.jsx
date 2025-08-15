@@ -11,7 +11,7 @@ import LoginPage from './pages/login';
 import AdminDashboard from './pages/adminDashboard';
 import RegisterPage from './pages/register';
 
-import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode/CreateSupplierRecode';
+import StaffDashboard from './pages/Supplier/StaffDashboard'
 import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier'
 import SupplierRecode from './pages/Supplier/SupplierRecode';
@@ -41,6 +41,9 @@ function App() {
         <Route path="/inventory/details/:id" element={<ShowInventory />} />
         <Route path="/inventory/edit/:id" element={<EditInventory />} />
         <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
+
+
+        <Route path ="/staff" element={<StaffDashboard/>}/>
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
 
