@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';
-import  NavigationBar from '../../components/NavigationBar'
+import  NavigationBar from '../components/NavigationBar'
 import SupplierSidebar from '../../components/SupplierSidebar'
 
 import { BsInfoCircle } from 'react-icons/bs';

@@ -3,18 +3,15 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Link } from 'react-router-dom';
-
+import toast, { Toaster } from 'react-hot-toast';
+import Footer from '../components/Footer';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
-
-
-
-
 import Spinner from '../components/Spinner';
 
 import NavigationBar from '../components/NavigationBar';
-import Footer from '../components/Footer';
+
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -33,6 +30,9 @@ const Home = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [totalRawLeaves, setTotalRawLeaves] = useState(0);
+  const [previousTotal, setPreviousTotal] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -40,10 +40,12 @@ const Home = () => {
     // Replace with mock data if backend not ready
     setTimeout(() => {
       const mockData = [
-        { _id: '1', batchid: 'B-1001', category: 'Tea', inventorynumber: 'INV001', quantity: 100 },
-        { _id: '2', batchid: 'B-1002', category: 'Herbal', inventorynumber: 'INV002', quantity: 60 },
-        { _id: '3', batchid: 'B-1003', category: 'Tea', inventorynumber: 'INV003', quantity: 80 },
-        { _id: '4', batchid: 'B-1004', category: 'Herbal', inventorynumber: 'INV004', quantity: 120 },
+        { _id: '1', batchid: 'B-1001', category: 'Tea', inventorynumber: 'INV001', quantity: 100, date: '2023-01-15' },
+        { _id: '2', batchid: 'B-1002', category: 'Herbal', inventorynumber: 'INV002', quantity: 60, date: '2023-02-20' },
+        { _id: '3', batchid: 'B-1003', category: 'Tea', inventorynumber: 'INV003', quantity: 80, date: '2023-01-10' },
+        { _id: '4', batchid: 'B-1004', category: 'Herbal', inventorynumber: 'INV004', quantity: 120, date: '2023-03-05' },
+        { _id: '5', batchid: 'B-1005', category: 'Green', inventorynumber: 'INV005', quantity: 90, date: '2023-02-15' },
+        { _id: '6', batchid: 'B-1006', category: 'Black', inventorynumber: 'INV006', quantity: 110, date: '2023-01-25' }
       ];
       setOriginalInventory(mockData);
       setInventory(mockData);
@@ -96,9 +98,26 @@ const Home = () => {
     }
   };
 
+  const handleMonthChange = (e) => {
+    setSelectedMonth(e.target.value);
+    if (e.target.value) {
+      const filtered = originalInventory.filter(item => {
+        const itemDate = new Date(item.date); // Assuming `date` field exists in inventory data
+        return itemDate.getMonth() === parseInt(e.target.value);
+      });
+      setInventory(filtered);
+    } else {
+      setInventory(originalInventory);
+    }
+  };
+
+  const handleSort = () => {
+    const sorted = [...inventory].sort((a, b) => a.quantity - b.quantity);
+    setInventory(sorted);
+  };
 
   // Chart type state
-  const [chartType, setChartType] = useState('bar');
+  const [chartType, setChartType] = useState('line');
 
   // Prepare data for the chart (quantity per batchid)
   const chartData = {
@@ -144,6 +163,32 @@ const Home = () => {
       easing: 'easeOutQuart',
     },
   };
+
+  useEffect(() => {
+    // Calculate total raw leaves inventory
+    const total = originalInventory.reduce((sum, item) => sum + item.quantity, 0);
+    setTotalRawLeaves(total);
+
+    // Check if inventory is below threshold and avoid duplicate notifications
+    if (total < 10000 && previousTotal !== null && total !== previousTotal) {
+      // Show toast alert to the user
+      toast.error('Warning: Raw leaves inventory is below 10,000 kg! Notify the production manager.');
+
+      // Simulate sending a message to the production manager
+      const message = {
+        to: 'production_manager@example.com',
+        subject: 'Low Raw Leaves Inventory Alert',
+        body: `The current raw leaves inventory is ${total} kg, which is below the threshold of 10,000 kg. Please take necessary action.`
+      };
+
+      console.log('Notification sent to production manager:', message);
+      // Replace the above console.log with an actual API call to send the message
+      // Example: axios.post('/api/notify', message);
+    }
+
+    // Update previous total after all checks
+    setPreviousTotal(total);
+  }, [originalInventory]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -195,6 +240,36 @@ const Home = () => {
             </div>
           </div>
 
+          <div className="mb-6 grid grid-cols-3 gap-4">
+            <div className="flex items-center gap-4 mb-4 w-auto">
+              <label htmlFor="month" className="font-medium">Select Month:</label>
+            <select
+              id="month"
+              value={selectedMonth}
+              onChange={handleMonthChange}
+              className="border border-gray-300 rounded px-2 py-1"
+            >
+              <option value="">All</option>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i} value={i}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
+              ))}
+            </select>
+            
+          </div>
+
+          {/* Display for current total raw leaves inventory */}
+          <div className="bg-green-100 p-4 rounded-lg w-auto shadow-md mb-2">
+            <h2 className="text-lg font-bold text-green-800">Current Raw Leaves Inventory</h2>
+            <p className="text-green-700 text-xl">{totalRawLeaves} kg</p>
+          </div>
+
+          {/* Minimum required inventory display */}
+          <div className="bg-yellow-100 p-4 rounded-lg w-auto shadow-md mb-2">
+            <h2 className="text-lg font-bold text-yellow-800">Minimum Required to Reach Full Inventory</h2>
+            <p className="text-yellow-700 text-xl">{Math.max(10000 - totalRawLeaves, 0)} kg</p>
+          </div>
+        </div>
+
           {loading ? (
             <Spinner />
           ) : (
@@ -240,8 +315,8 @@ const Home = () => {
           )}
 
           {/* Interactive Chart at the end of the page */}
-          <div className="mt-12 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-            <div className="mb-4 flex items-center gap-4">
+          <div className="mt-12 bg-white p-6 rounded-lg shadow-md max-w-2xl w-auto mx-auto">
+            <div className="mb-4 flex items-center w-auto gap-4">
               <label htmlFor="chartType" className="font-medium">Chart Type:</label>
               <select
                 id="chartType"
@@ -262,6 +337,7 @@ const Home = () => {
         </main>
       </div>
       <Footer />
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };
