@@ -27,6 +27,10 @@ import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 
 import StaffProfile from './pages/Supplier/StaffProfile';
 import Setting from './pages/Supplier/Setting'
+import Report from './pages/Report/Report'
+import SupplyManagementReport from './pages/Supplier/SupplyManagementReport';
+
+
 
 
 
@@ -50,6 +54,9 @@ function App() {
         <Route path ="/staff" element={<StaffDashboard/>}/>
         <Route path = '/staff/profile' element = {<StaffProfile/>}/>
         <Route path='/staff/profile/setting' element={<Setting/>}/>
+        <Route path='/report' element={<Report/>}/>
+        <Route path='/supply/managemet/report' element={<SupplyManagementReport/>}/>
+        
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
 

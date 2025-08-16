@@ -85,9 +85,9 @@ export default function ProductRecord() {
                 Search
               </button>
 
-              <button Link to="" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900">
+              < Link to="/report" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900 ">
                 Generate Report
-              </button>
+              </Link>
 
               <Link
                 to="/supplyRecode/create"

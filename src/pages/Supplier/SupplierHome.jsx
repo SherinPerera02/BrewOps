@@ -64,12 +64,12 @@ export default function SupplierHome1() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
-              <button
+              <Link to='/supply/managemet/report'
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900"
                 onClick={() => alert('Generate report logic here')}
               >
                 Generate Report
-              </button>
+              </Link>
               <Link
                 to="/suppliers/create"
                 className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-900"

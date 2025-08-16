@@ -33,15 +33,19 @@ export default function StaffDashboardSlidebar() {
             <Link to="/staff" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
               <FaHome className="mr-3" /> Dashboard
             </Link>
+
             <Link to="/SupplierHome" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
               <FaUsers className="mr-3" /> Supplier
             </Link>
+
             <Link to="/inventories" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
               <FaBox className="mr-3" /> Inventory
             </Link>
-            <Link to="#" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
+
+            <Link to="/report" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
               <FaChartBar className="mr-3" /> Reports
             </Link>
+
             <Link to="#" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
               <FaDollarSign className="mr-3" /> Payments
             </Link>
