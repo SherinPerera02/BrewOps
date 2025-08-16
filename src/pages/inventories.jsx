@@ -4,15 +4,14 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-
+import Footer from '../components/Footer';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
-
-
 import Spinner from '../components/Spinner';
+
 import NavigationBar from '../components/NavigationBar';
-import Footer from '../components/Footer';
+
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
