@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle, FaTimes, FaBars, FaSignOutAlt } from "react-icons/fa";
+
+import { FaUserCircle, FaTimes, FaSignOutAlt, FaBell, FaEnvelope, FaBars } from "react-icons/fa";
+
 
 const NavigationBar = ({ user, onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,6 +35,8 @@ const NavigationBar = ({ user, onLogout }) => {
       <div className="flex items-center">
         <h1 className="text-white text-3xl font-bold">BrewOps</h1>
       </div>
+      
+
 
       {/* Desktop Menu */}
       <div className="hidden md:flex space-x-6">
@@ -97,6 +101,14 @@ const NavigationBar = ({ user, onLogout }) => {
           </div>
         </div>
       )}
+
+      {/* Icons */}
+      <div className="flex items-center space-x-4">
+        <FaBell className="text-white text-2xl cursor-pointer hover:text-green-300" />
+        <FaEnvelope className="text-white text-2xl cursor-pointer hover:text-green-300" />
+        <FaUserCircle className="text-white text-2xl cursor-pointer hover:text-green-300" />
+      </div>
+
     </nav>
   );
 };

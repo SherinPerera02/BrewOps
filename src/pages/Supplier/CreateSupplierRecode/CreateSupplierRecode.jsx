@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import NavigationBar from "../../../components/NavigationBar";
 import { Link, useNavigate } from "react-router-dom";
 import leftArrow from "../../../assets/left-arrow.png";
 import Footer from "../../../components/Footer";
+
 
 export default function CreateSupplierRecode() {
   const [suppliers, setSuppliers] = useState([

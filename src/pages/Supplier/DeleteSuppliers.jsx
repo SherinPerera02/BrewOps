@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+
 import NavigationBar from "../../components/NavigationBar";
 import leftArrow from "../../assets/left-arrow.png";
 import Footer from "../../components/Footer";
 import Spinner from "../../components/Spinner";
+
 
 export default function DeleteSuppliers() {
   const { id } = useParams();

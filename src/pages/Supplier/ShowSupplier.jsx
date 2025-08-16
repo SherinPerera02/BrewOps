@@ -6,6 +6,7 @@ import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';
 import bgImage from '../../assets/supplierBg2.avif';
 
+
 export default function ShowSupplier() {
   const { id } = useParams();
   const [supplier, setSupplier] = useState(null);
