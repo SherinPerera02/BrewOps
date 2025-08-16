@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Spinner from '../../components/spinner';
+
+import { useNavigate, Link } from 'react-router-dom';
+import Spinner from '../../components/Spinner';
+
+
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
-import bgImage from '../../assets/supplierBg2.avif';
 import leftArrow from '../../assets/left-arrow.png';
-import { Link } from 'react-router-dom';
 
 export default function CreateSupplyRecord() {
   const [supplierList, setSupplierList] = useState([]);
@@ -20,12 +21,8 @@ export default function CreateSupplyRecord() {
 
   useEffect(() => {
     axios.get('http://localhost:5555/suppliers')
-      .then((response) => {
-        setSupplierList(response.data);
-      })
-      .catch((error) => {
-        console.log('Error fetching suppliers:', error);
-      });
+      .then((response) => setSupplierList(response.data))
+      .catch((error) => console.log('Error fetching suppliers:', error));
   }, []);
 
   const validate = () => {
@@ -39,34 +36,31 @@ export default function CreateSupplyRecord() {
   };
 
   const handleSaveSupplyRecord = () => {
-    if (validate()) {
-      const data = {
-        supplierName: selectedSupplier.split('/')[1],
-        supplyDate: date,
-        quantity: parseFloat(quantity),
-        unitPrice: parseFloat(unitPrice),
-        cost: parseFloat(quantity) * parseFloat(unitPrice),
-        status: 'Pending'
-      };
+    if (!validate()) return;
 
-      setLoading(true);
-      axios.post('http://localhost:5555/supplyrecords', data)
-        .then(() => {
-          setLoading(false);
-          navigate('/SupplyRecordTable');
-        })
-        .catch((error) => {
-          setLoading(false);
-          console.log('Error saving supply record:', error);
-        });
-    }
+    const data = {
+      supplierName: selectedSupplier.split('/')[1],
+      supplyDate: date,
+      quantity: parseFloat(quantity),
+      unitPrice: parseFloat(unitPrice),
+      cost: parseFloat(quantity) * parseFloat(unitPrice),
+      status: 'Pending'
+    };
+
+    setLoading(true);
+    axios.post('http://localhost:5555/supplyrecords', data)
+      .then(() => {
+        setLoading(false);
+        navigate('/SupplyRecordTable');
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.log('Error saving supply record:', error);
+      });
   };
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
-    >
+    <div className="min-h-screen bg-cover bg-center">
       <NavigationBar />
 
       {/* Back Button */}
