@@ -1,6 +1,6 @@
 import HomePage from './pages/homePage';
 import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
-import NavigationBar from './components/navigationBar';
+import NavigationBar from './components/NavigationBar';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
@@ -23,7 +23,10 @@ import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
 import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1';
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
+
+
 import StaffProfile from './pages/Supplier/StaffProfile';
+import Setting from './pages/Supplier/Setting'
 
 
 
@@ -46,6 +49,7 @@ function App() {
 
         <Route path ="/staff" element={<StaffDashboard/>}/>
         <Route path = '/staff/profile' element = {<StaffProfile/>}/>
+        <Route path='/staff/profile/setting' element={<Setting/>}/>
   
         <Route path="/SupplierHome" element={<SupplierHome />} />
 

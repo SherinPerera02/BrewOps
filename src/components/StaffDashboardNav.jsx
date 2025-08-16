@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaSearch, FaEnvelope, FaBell } from 'react-icons/fa'
+import { FaSearch, FaEnvelope, FaBell, FaUser } from 'react-icons/fa'
 import profile from '../assets/Profile.png'
 
 export default function StaffDashboardNav() {
@@ -44,10 +44,8 @@ export default function StaffDashboardNav() {
 
         {/* Profile Image with Dropdown */}
         <div className="relative">
-          <img 
-            src={profile} 
-            alt="User" 
-            className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
+          <FaUser size={20}
+            className="w-10 h-10 rounded-full border-2  cursor-pointer"
             onClick={() => setDropdownOpen(!dropdownOpen)}
           />
 
@@ -55,7 +53,7 @@ export default function StaffDashboardNav() {
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded shadow-lg z-50 ring-1 ring-gray-200">
               <a href="/staff/profile" className="block px-4 py-2 hover:bg-gray-100 transition-colors">My Profile</a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 transition-colors">Settings</a>
+              <a href="/staff/profile/setting" className="block px-4 py-2 hover:bg-gray-100 transition-colors">Settings</a>
               <a href="/login" className="block px-4 py-2 hover:bg-gray-100 transition-colors">Logout</a>
             </div>
           )}

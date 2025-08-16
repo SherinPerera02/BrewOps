@@ -1,3 +1,4 @@
+// src/pages/StaffProfile.jsx
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -21,26 +22,37 @@ export default function StaffProfile() {
   const [savingPhoto, setSavingPhoto] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Load profile
+  // ---- Load profile ----
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/profile/me", { withCredentials: true })
-      .then(res => setProfile(res.data))
-      .catch(err => console.error(err))
+      .then((res) => setProfile(res.data))
+      .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile({ ...profile, [name]: value });
   };
 
-  const onPickImage = e => {
+  // ---- Image picker ----
+  const onPickImage = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowed.includes(file.type)) return alert("Select JPG, PNG, or WEBP image.");
-    if (file.size > 3 * 1024 * 1024) return alert("Image must be ≤ 3MB.");
+    if (!allowed.includes(file.type)) {
+      alert("Please select JPG, PNG, or WEBP image.");
+      return;
+    }
+
+    const maxMB = 3;
+    if (file.size > maxMB * 1024 * 1024) {
+      alert(`Image must be ≤ ${maxMB} MB.`);
+      return;
+    }
+
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
@@ -51,7 +63,8 @@ export default function StaffProfile() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const saveProfile = async e => {
+  // ---- Save profile ----
+  const saveProfile = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
@@ -66,8 +79,12 @@ export default function StaffProfile() {
     }
   };
 
+  // ---- Upload photo ----
   const uploadPhoto = async () => {
-    if (!selectedFile) return alert("Choose an image first.");
+    if (!selectedFile) {
+      alert("Please choose an image first.");
+      return;
+    }
     setSavingPhoto(true);
     try {
       const formData = new FormData();
@@ -88,31 +105,29 @@ export default function StaffProfile() {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><Spinner /></div>;
+  if (loading) return <div className="p-8">{<Spinner />}</div>;
 
   return (
     <div className="min-h-screen bg-green-50">
       {/* Navigation Bar */}
-      <nav className="bg-green-700 text-white p-4 flex flex-col md:flex-row justify-between items-center gap-2 md:gap-0">
+      <nav className="bg-green-700 text-white p-4 flex justify-between flex-wrap">
         <div className="text-3xl font-bold">BreOps</div>
-        <div className="flex flex-col md:flex-row gap-2 md:gap-6">
-
-          <Link to="/staff" className="hover:underline">Dashboard</Link>
+        <div className="space-x-6 mt-2 md:mt-0">
+          <Link to="/dashboard" className="hover:underline">Dashboard</Link>
           <Link to="/" className="hover:underline">Home</Link>
-          <Link to="/staff/profile" className="hover:underline">Profile</Link>
-
+          <Link to="/staff-profile" className="hover:underline">Profile</Link>
         </div>
       </nav>
 
       {/* Profile Section */}
       <div className="py-8 px-4">
         <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6 md:p-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+          <div className="flex justify-between items-center flex-wrap">
             <h1 className="text-2xl md:text-3xl font-bold">My Profile</h1>
             {!editMode && (
               <button
                 onClick={() => setEditMode(true)}
-                className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700"
+                className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 mt-2 md:mt-0"
               >
                 Edit
               </button>
@@ -122,7 +137,7 @@ export default function StaffProfile() {
 
           {/* Avatar */}
           <div className="mt-6 flex flex-col md:flex-row gap-6 md:items-center">
-            <div className="relative flex-shrink-0">
+            <div className="relative">
               <img
                 src={previewUrl || profile.photoUrl || "https://via.placeholder.com/160x160?text=Avatar"}
                 alt="Profile"
@@ -225,7 +240,7 @@ export default function StaffProfile() {
             </div>
 
             {editMode && (
-              <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
+              <div className="md:col-span-2 flex gap-3">
                 <button
                   type="submit"
                   disabled={saving}

@@ -1,64 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import profileImg from '../assets/profile.png';
+import { FaHome, FaPager, FaUsers, FaBars, FaTimes } from 'react-icons/fa';
 
 export default function SupplierSidebar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const menuItems = [
+    { label: 'Dashboard', icon: <FaHome />, to: '/staff' },
+    { label: 'Supplier Management', icon: <FaUsers />, to: '/SupplierHome' },
+    { label: 'Supply Record', icon: <FaPager />, to: '/SupplierRecode' },
+  ];
+
   return (
-    <aside className="w-64 h-screen bg-gray-800 text-white p-6 sticky top-0">
-      <h2 className="text-2xl font-bold mb-6">Supplier</h2>
-      <ul className="space-y-4">
-        {/* Profile Image */}
-        <li>
-          <NavLink
-            to="/profile"
-            className={({ isActive }) =>
-              `block px-3 py-2 rounded ${isActive ? 'bg-green-700' : 'hover:bg-gray-700'}`
-            }
-          >
-            <img
-              src={profileImg}
-              alt="Profile"
-              className="w-14 h-14 rounded-full object-cover border-2 border-gray-300"
-            />
-          </NavLink>
-        </li>
+    <>
+      {/* Hamburger Button for Mobile */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded shadow"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+      </button>
 
-        {/* Home */}
-        <li>
-          <NavLink
-            to="/HomePage"
-            className={({ isActive }) =>
-              `block px-3 py-2 rounded ${isActive ? 'bg-green-700' : 'hover:bg-gray-700'}`
-            }
-          >
-            Home
-          </NavLink>
-        </li>
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white p-6
+          transform transition-transform duration-300 ease-in-out
+          z-40
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
+          md:translate-x-0 md:relative md:block
+        `}
+      >
+        <h2 className="text-2xl font-bold mb-6">Supplier</h2>
+        <ul className="space-y-4">
+          {menuItems.map((item) => (
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center px-3 py-2 rounded ${
+                    isActive ? 'bg-green-700' : 'hover:bg-gray-700'
+                  }`
+                }
+                onClick={() => setIsOpen(false)} // close sidebar on mobile click
+              >
+                <span className="mr-3">{item.icon}</span>
+                {item.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </aside>
 
-        {/* Supplier */}
-        <li>
-          <NavLink
-            to="/SupplierHome"
-            className={({ isActive }) =>
-              `block px-3 py-2 rounded ${isActive ? 'bg-green-700' : 'hover:bg-gray-700'}`
-            }
-          >
-            Supplier
-          </NavLink>
-        </li>
-
-        {/* Supply Record */}
-        <li>
-          <NavLink
-            to="/SupplierRecode"
-            className={({ isActive }) =>
-              `block px-3 py-2 rounded ${isActive ? 'bg-green-700' : 'hover:bg-gray-700'}`
-            }
-          >
-            Supply Record
-          </NavLink>
-        </li>
-      </ul>
-    </aside>
+      {/* Overlay for Mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
+    </>
   );
 }
