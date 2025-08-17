@@ -36,7 +36,6 @@ export default function StaffDashboard() {
   const [inventory, setInventory] = useState(0);
   const [lowStock, setLowStock] = useState(0);
 
-  // Chart state
   const [stockChartData, setStockChartData] = useState({ labels: [], datasets: [] });
   const [supplierChartData, setSupplierChartData] = useState({ labels: [], datasets: [] });
 
@@ -131,22 +130,18 @@ export default function StaffDashboard() {
             <DashboardCard title="Low Stock" value={lowStock} icon={FaExclamationTriangle} color="bg-green-100" />
           </div>
 
-          {/* Quick Action Buttons */}
+          {/*Action Buttons */}
           <div className="flex flex-wrap gap-3 mb-6">
-            <Link to="/suppliers/create">
-              <button className="flex items-center bg-green-600 text-white px-3 py-2 rounded shadow hover:bg-green-700 transition">
+            <Link to="/suppliers/create"className="flex items-center bg-green-600 text-white px-3 py-2 rounded shadow hover:bg-green-700 transition">
                 <FaPlus className="mr-2" /> Add Supplier
-              </button>
             </Link>
-            <Link to="/supplyRecode/create">
-              <button className="flex items-center bg-blue-600 text-white px-3 py-2 rounded shadow hover:bg-blue-700 transition">
-                <FaPlus className="mr-2" /> Add Inventory
-              </button>
+
+            <Link to="/supplyRecode/create" className="flex items-center bg-blue-600 text-white px-3 py-2 rounded shadow hover:bg-blue-700 transition">
+                <FaPlus className="mr-2" /> Add Inven
             </Link>
-            <Link to="#">
-              <button className="flex items-center bg-gray-600 text-white px-3 py-2 rounded shadow hover:bg-gray-700 transition">
+
+            <Link to="/report" className="flex items-center bg-gray-600 text-white px-3 py-2 rounded shadow hover:bg-gray-700 transition">
                 <FaFileAlt className="mr-2" /> Generate Report
-              </button>
             </Link>
           </div>
 
@@ -155,15 +150,17 @@ export default function StaffDashboard() {
             <div className="bg-white p-3 rounded-lg shadow h-72 md:h-80">
               <Line data={stockChartData} options={stockOptions} />
             </div>
+
             <div className="bg-white p-3 rounded-lg shadow h-72 md:h-80">
               <Pie data={supplierChartData} options={supplierOptions} />
             </div>
+            
           </div>
 
         </div>
       </div>
 
-      {/* Footer */}
+    
       <Footer />
     </div>
   );

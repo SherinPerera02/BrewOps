@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NavigationBar from "../../components/NavigationBar";
+import NavigationBar from "../../components/NvigationBar";
 import ReportSlide from "../../pages/Report/ReportslideBar";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -23,6 +23,7 @@ function ReportContent() {
     const matchesSearch =
       row.Supplier.toLowerCase().includes(search.toLowerCase()) ||
       row.ID.toLowerCase().includes(search.toLowerCase());
+
     const matchesStart = startDate ? row.Date >= startDate : true;
     const matchesEnd = endDate ? row.Date <= endDate : true;
     return matchesSearch && matchesStart && matchesEnd;
@@ -107,20 +108,19 @@ function ReportContent() {
             placeholder="Search by ID or Supplier..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border p-1 rounded"
-          />
+            className="border p-1 rounded"/>
+
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="border p-1 rounded"
-          />
+            className="border p-1 rounded"/>
+
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="border p-1 rounded"
-          />
+            className="border p-1 rounded" />
 
           {/* Report type selection */}
           <select
