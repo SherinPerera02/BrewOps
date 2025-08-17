@@ -4,9 +4,7 @@ import BackButton from '../components/backButton';
 
 
 import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar';
-
-
+import NavigationBar from '../components/NavigationBar'
 import Footer from '../components/Footer';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';

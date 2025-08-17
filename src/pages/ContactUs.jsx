@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import NavigationBar from '../components/navigationBar';
+import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/Footer';
 import { MdEmail, MdFacebook, MdLocationOn, MdPhone } from 'react-icons/md';
 

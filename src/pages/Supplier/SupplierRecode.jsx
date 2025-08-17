@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-// or a relevant Sidebar component
-
-
 
 import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';

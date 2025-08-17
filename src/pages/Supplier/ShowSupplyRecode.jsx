@@ -1,5 +1,7 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+
 import NavigationBar from '../../components/NavigationBar';
 import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';

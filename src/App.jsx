@@ -25,6 +25,7 @@ import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1';
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 
 
+
 import StaffProfile from './pages/Supplier/StaffProfile';
 import Setting from './pages/Supplier/Setting'
 import Report from './pages/Report/Report'
@@ -74,6 +75,8 @@ function App() {
        <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
+
+        <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
 
       </Routes>
     </BrowserRouter>
