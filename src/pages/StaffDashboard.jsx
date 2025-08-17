@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import StaffDashboardNav from '../../components/StaffDashboardNav';
-import StaffDashboardSlidebar from '../../components/StaffDashboardSlidebar';
+import StaffDashboardNav from '../components/StaffDashboardNav';
+import StaffDashboardSlidebar from '../components/StaffDashboardSlidebar';
 import { FaBoxOpen, FaUsers, FaExclamationTriangle, FaPlus, FaFileAlt, FaBars } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import DashboardCard from '../../components/DashboardCard';
-import Footer from '../../components/Footer';
+import DashboardCard from '../components/DashboardCard';
+import Footer from '../components/Footer';
 import { Line, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -128,7 +128,7 @@ export default function StaffDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 mt-2">
             <DashboardCard title="Total Suppliers" value={suppliers} icon={FaUsers} color="bg-green-100" />
             <DashboardCard title="Raw Tea Inventory (Kg)" value={inventory} icon={FaBoxOpen} color="bg-green-100" />
-            <DashboardCard title="Low Stock" value={lowStock} icon={FaExclamationTriangle} color="bg-green-100" />
+            <DashboardCard title="Low Stock" value={lowStock} icon={FaExclamationTriangle} color="bg-yellow-100" />
           </div>
 
           {/* Quick Action Buttons */}

@@ -10,8 +10,10 @@ import WhoWeAre from './pages/WhoWeAre';
 import LoginPage from './pages/login';
 import AdminDashboard from './pages/adminDashboard';
 import RegisterPage from './pages/register';
+import SupplierDashboard from './pages/supplierDashboard';
+import ProductionManagerDashboard from './pages/ProductionManagerDashboard';
 
-import StaffDashboard from './pages/Supplier/StaffDashboard'
+import StaffDashboard from './pages/StaffDashboard'
 import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier'
 import SupplierRecode from './pages/Supplier/SupplierRecode';
@@ -24,12 +26,13 @@ import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
 import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1';
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 
-
-
 import StaffProfile from './pages/Supplier/StaffProfile';
 import Setting from './pages/Supplier/Setting'
-
-
+import Chat from './components/Chat';
+import EditProfile from './pages/editProfile';
+import PaymentSummary from './pages/paymentSummary';
+import LeavesQuantity from './pages/leavesQuantity';
+import Transaction from './pages/transaction';
 
 function App() {
   return (
@@ -43,15 +46,16 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/inventories" element={<Inventories />} />
         <Route path="/inventory/creates" element={<CreateInventory />} />
-        <Route path="/inventory/details/:id" element={<ShowInventory />} />
+        <Route path="/inventory/:id" element={<ShowInventory />} />
         <Route path="/inventory/edit/:id" element={<EditInventory />} />
         <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
+        <Route path="/chat" element={<Chat />} />
 
+        <Route path="/ProductionManagerDashboard" element={<ProductionManagerDashboard />} />
+        <Route path ="/StaffDashboard" element={<StaffDashboard/>}/>
+        <Route path = '/Staff/profile' element = {<StaffProfile/>}/>
+        <Route path='/Staff/profile/setting' element={<Setting/>}/>
 
-        <Route path ="/staff" element={<StaffDashboard/>}/>
-        <Route path = '/staff/profile' element = {<StaffProfile/>}/>
-        <Route path='/staff/profile/setting' element={<Setting/>}/>
-  
         <Route path="/SupplierHome" element={<SupplierHome />} />
 
         // Supplier Create
@@ -70,6 +74,10 @@ function App() {
        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
 
         <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
+        <Route path="/suppliers/editProfile" element={<EditProfile />} />
+        <Route path="/suppliers/paymentSummary" element={<PaymentSummary />} />
+        <Route path="/suppliers/leavesQuantity" element={<LeavesQuantity />} />
+        <Route path="/suppliers/transactions" element={<Transaction />} />
 
       </Routes>
     </BrowserRouter>

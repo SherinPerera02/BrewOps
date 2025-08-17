@@ -3,18 +3,16 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Link } from 'react-router-dom';
-
+import toast, { Toaster } from 'react-hot-toast';
+import Footer from '../components/Footer';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
-
-
-
-
+import { FaBoxOpen, FaTrashAlt, FaEdit, FaPlusCircle } from 'react-icons/fa';
 import Spinner from '../components/Spinner';
 
 import NavigationBar from '../components/NavigationBar';
-import Footer from '../components/Footer';
+
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -33,37 +31,31 @@ const Home = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [totalRawLeaves, setTotalRawLeaves] = useState(0);
+  const [previousTotal, setPreviousTotal] = useState(null);
 
   useEffect(() => {
     setLoading(true);
 
-    // Replace with mock data if backend not ready
-    setTimeout(() => {
-      const mockData = [
-        { _id: '1', batchid: 'B-1001', category: 'Tea', inventorynumber: 'INV001', quantity: 100 },
-        { _id: '2', batchid: 'B-1002', category: 'Herbal', inventorynumber: 'INV002', quantity: 60 },
-        { _id: '3', batchid: 'B-1003', category: 'Tea', inventorynumber: 'INV003', quantity: 80 },
-        { _id: '4', batchid: 'B-1004', category: 'Herbal', inventorynumber: 'INV004', quantity: 120 },
-      ];
-      setOriginalInventory(mockData);
-      setInventory(mockData);
-      setLoading(false);
-    }, 500);
   }, []);
 
-  // useEffect(() => {
-  //   setLoading(true);
-  //   axios.get('http://localhost:5555/inventory')
-  //     .then((response) => {
-  //       setOriginalInventory(response.data);
-  //       setInventory(response.data);
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error fetching data:', error);
-  //       setLoading(false);
-  //     });
-  // }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    axios.get('http://localhost:5000/inventory')
+      .then((response) => {
+        setOriginalInventory(response.data);
+        setInventory(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      });
+  }, []);
+
+
 
   const handleSearch = () => {
     if (searchInput.trim() === '') {
@@ -71,7 +63,6 @@ const Home = () => {
     } else {
       const filtered = originalInventory.filter(item =>
         item.batchid.toLowerCase().includes(searchInput.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchInput.toLowerCase()) ||
         item.inventorynumber.toLowerCase().includes(searchInput.toLowerCase())
       );
       setInventory(filtered);
@@ -81,8 +72,8 @@ const Home = () => {
   const handleReportGeneration = () => {
     try {
       const doc = new jsPDF();
-      const headers = [['Batch ID', 'Category', 'Inventory Number', 'Quantity']];
-      const rows = inventory.map(item => [item.batchid, item.category, item.inventorynumber, item.quantity]);
+      const headers = [['Batch ID', 'Inventory Number', 'Quantity']];
+      const rows = inventory.map(item => [item.batchid, item.inventorynumber, item.quantity]);
 
       doc.autoTable({
         head: headers,
@@ -96,9 +87,26 @@ const Home = () => {
     }
   };
 
+  const handleMonthChange = (e) => {
+    setSelectedMonth(e.target.value);
+    if (e.target.value) {
+      const filtered = originalInventory.filter(item => {
+        const itemDate = new Date(item.date); // Assuming `date` field exists in inventory data
+        return itemDate.getMonth() === parseInt(e.target.value);
+      });
+      setInventory(filtered);
+    } else {
+      setInventory(originalInventory);
+    }
+  };
+
+  const handleSort = () => {
+    const sorted = [...inventory].sort((a, b) => a.quantity - b.quantity);
+    setInventory(sorted);
+  };
 
   // Chart type state
-  const [chartType, setChartType] = useState('bar');
+  const [chartType, setChartType] = useState('line');
 
   // Prepare data for the chart (quantity per batchid)
   const chartData = {
@@ -145,6 +153,32 @@ const Home = () => {
     },
   };
 
+  useEffect(() => {
+    // Calculate total raw leaves inventory
+    const total = originalInventory.reduce((sum, item) => sum + item.quantity, 0);
+    setTotalRawLeaves(total);
+
+    // Check if inventory is below threshold and avoid duplicate notifications
+    if (total < 10000 && previousTotal !== null && total !== previousTotal) {
+      // Show toast alert to the user
+      toast.error('Warning: Raw leaves inventory is below 10,000 kg! Notify the production manager.');
+
+      // Simulate sending a message to the production manager
+      const message = {
+        to: 'production_manager@example.com',
+        subject: 'Low Raw Leaves Inventory Alert',
+        body: `The current raw leaves inventory is ${total} kg, which is below the threshold of 10,000 kg. Please take necessary action.`
+      };
+
+      console.log('Notification sent to production manager:', message);
+      // Replace the above console.log with an actual API call to send the message
+      // Example: axios.post('/api/notify', message);
+    }
+
+    // Update previous total after all checks
+    setPreviousTotal(total);
+  }, [originalInventory]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <NavigationBar />
@@ -152,18 +186,17 @@ const Home = () => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside className="bg-gray-800 text-white w-64 h-screen p-6 space-y-4 sticky top-0">
-          
-          <Link to="/inventories" className="block px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">
-            Inventory
+          <Link to="/inventories" className="flex items-center gap-2 px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">
+            <FaBoxOpen /> Inventory
           </Link>
-          <Link to="/waste-management" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            Waste Management
+          <Link to="/waste-management" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
+            <FaTrashAlt /> Waste Management
           </Link>
-          <Link to="/Pendingshipmentss" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            Pending Shipments
+          <Link to="/Production" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
+            <FaEdit /> Production
           </Link>
-          <Link to="/Irawleaves" className="block px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            Raw Leaves Management
+          <Link to="/rawleaves" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
+            <FaPlusCircle /> Raw Leaves Management
           </Link>
         </aside>
 
@@ -195,6 +228,36 @@ const Home = () => {
             </div>
           </div>
 
+          <div className="mb-6 grid grid-cols-3 gap-4">
+            <div className="flex items-center gap-4 mb-4 w-auto">
+              <label htmlFor="month" className="font-medium">Select Month:</label>
+            <select
+              id="month"
+              value={selectedMonth}
+              onChange={handleMonthChange}
+              className="border border-gray-300 rounded px-2 py-1"
+            >
+              <option value="">All</option>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i} value={i}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
+              ))}
+            </select>
+            
+          </div>
+
+          {/* Display for current total raw leaves inventory */}
+          <div className="bg-green-100 p-4 rounded-lg w-auto shadow-md mb-2">
+            <h2 className="text-lg font-bold text-green-800">Current Raw Leaves Inventory</h2>
+            <p className="text-green-700 text-xl">{totalRawLeaves} kg</p>
+          </div>
+
+          {/* Minimum required inventory display */}
+          <div className="bg-yellow-100 p-4 rounded-lg w-auto shadow-md mb-2">
+            <h2 className="text-lg font-bold text-yellow-800">Minimum Required to Reach Full Inventory</h2>
+            <p className="text-yellow-700 text-xl">{Math.max(10000 - totalRawLeaves, 0)} kg</p>
+          </div>
+        </div>
+
           {loading ? (
             <Spinner />
           ) : (
@@ -204,7 +267,6 @@ const Home = () => {
                   <tr>
                     <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black'>No</th>
                     <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black'>Batch ID</th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black'>Category</th>
                     <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black'>Inventory Number</th>
                     <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black'>Quantity</th>
                     <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-black'>Actions</th>
@@ -213,21 +275,20 @@ const Home = () => {
                 <tbody>
                   {/* Example row, replace with your dynamic data as needed */}
                   {inventory.map((item, index) => (
-                    <tr key={item._id} className="border-t">
+                    <tr key={item.id} className="border-t">
                       <td className="px-6 py-3">{index + 1}</td>
                       <td className="px-6 py-3">{item.batchid ?? '-'}</td>
-                      <td className="px-6 py-3">{item.category ?? '-'}</td>
                       <td className="px-6 py-3">{item.inventorynumber ?? '-'}</td>
                       <td className="px-6 py-3">{item.quantity ?? '-'}</td>
                       <td className="px-6 py-3">
                         <div className="flex gap-4">
-                          <Link to={`/inventory/details/${item._id}`} className="text-green-700 text-xl">
+                          <Link to={`/inventory/${item.id}`} className="text-green-700 text-xl">
                             <BsInfoCircle />
                           </Link>
-                          <Link to={`/inventory/edit/${item._id}`} className="text-yellow-600 text-xl">
+                          <Link to={`/inventory/edit/${item.id}`} className="text-yellow-600 text-xl">
                             <AiOutlineEdit />
                           </Link>
-                          <Link to={`/inventory/delete/${item._id}`} className="text-red-600 text-xl">
+                          <Link to={`/inventory/delete/${item.id}`} className="text-red-600 text-xl">
                             <MdOutlineDelete />
                           </Link>
                         </div>
@@ -240,8 +301,8 @@ const Home = () => {
           )}
 
           {/* Interactive Chart at the end of the page */}
-          <div className="mt-12 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-            <div className="mb-4 flex items-center gap-4">
+          <div className="mt-12 bg-white p-6 rounded-lg shadow-md max-w-2xl w-auto mx-auto">
+            <div className="mb-4 flex items-center w-auto gap-4">
               <label htmlFor="chartType" className="font-medium">Chart Type:</label>
               <select
                 id="chartType"
@@ -262,6 +323,7 @@ const Home = () => {
         </main>
       </div>
       <Footer />
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };
