@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { FaSearch, FaEnvelope, FaBell, FaUser } from 'react-icons/fa'
-import profile from '../assets/Profile.png'
+import { FaSearch, FaEnvelope, FaBell, FaUser, FaUserCircle } from 'react-icons/fa'
+
 
 export default function StaffDashboardNav() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -11,17 +11,9 @@ export default function StaffDashboardNav() {
       {/* Brand */}
       <div className="text-white text-2xl md:text-3xl font-bold mb-2 md:mb-0">
         BrewOps
-      </div>
+       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 w-full md:w-1/3 mb-2 md:mb-0">
-        <FaSearch className="text-gray-500 mr-2" />
-        <input 
-          type="text" 
-          placeholder="Search..." 
-          className="bg-transparent outline-none w-full text-sm md:text-base"
-        />
-      </div>
+    
 
       {/* Icons + Profile */}
       <div className="flex items-center space-x-4 md:space-x-6 relative">
@@ -44,10 +36,7 @@ export default function StaffDashboardNav() {
 
         {/* Profile Image with Dropdown */}
         <div className="relative">
-          <FaUser size={20}
-            className="w-10 h-10 rounded-full border-2  cursor-pointer"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          />
+          <FaUserCircle className="text-white text-2xl cursor-pointer hover:text-green-300" onClick={() => setDropdownOpen(!dropdownOpen)} />
 
           {/* Dropdown Menu */}
           {dropdownOpen && (

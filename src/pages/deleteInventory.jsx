@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import BackButton from '../components/backButton';
 
@@ -20,42 +19,30 @@ const DeleteInventory = () => {
   // Fetch inventory details
   useEffect(() => {
     setLoading(true);
-    // Mock data fallback if backend is not ready
-    setTimeout(() => {
-      // You can customize this mock data as needed
-      const mockData = {
-        name: 'Sample Inventory',
-        category: 'Tea',
-        batchid: 'B-1001',
-        inventorynumber: 'INV001'
-      };
-      setInventory(mockData);
-      setLoading(false);
-    }, 500);
-    // Uncomment below for real backend
-    // const fetchInventory = async () => {
-    //   setLoading(true);
-    //   try {
-    //     const res = await axios.get(`http://localhost:5173/inventories/${id}`);
-    //     setInventory(res.data);
-    //   } catch (error) {
-    //     console.error('Error fetching inventory details:', error);
-    //     alert('Failed to load inventory details.');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    // fetchInventory();
+    
+  
+    const fetchInventory = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`http://localhost:5000/inventory/${id}`);
+        setInventory(res.data);
+      } catch (error) {
+        console.error('Error fetching inventory details:', error);
+        alert('Failed to load inventory details.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInventory();
   }, [id]);
 
   const handleDeleteInventory = async () => {
-    const confirm = window.confirm('Are you sure you want to delete this inventory item?');
-    if (!confirm) return;
+   
 
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:5173/inventories/${id}`);
-      navigate('/inventories'); // ✅ Correct path after delete
+      await axios.delete(`http://localhost:5000/inventory/${id}`);
+      navigate('/inventories'); 
     } catch (error) {
       alert('There was an error. Please check the console.');
       console.error(error);

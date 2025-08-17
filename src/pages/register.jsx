@@ -113,7 +113,7 @@ export default function RegisterPage() {
       <Toaster />
       <div className="w-full h-screen bg-gray-50 bg-center bg-cover flex justify-evenly items-center">
         <div className="w-full h-full flex justify-center items-center">
-          <div className="w-[1300px] h-[600px] backdrop-blur-sm rounded-[20px] shadow-xl flex overflow-hidden">
+          <div className="w-[1300px] h-[650px] backdrop-blur-sm rounded-[20px] shadow-xl flex overflow-hidden">
             {/* Left half */}
             <div className="w-1/2 h-full flex flex-col items-center text-center bg-green-100 p-8">
               <h1 className="text-5xl font-bold text-green-600 mt-10">Join Us!</h1>

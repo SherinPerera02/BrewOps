@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -12,7 +11,6 @@ import Footer from '../components/Footer';
 
 const EditInventory = () => {
   const [batchId, setBatchId] = useState('');
-  const [category, setCategory] = useState('');
   const [inventoryNumber, setInventoryNumber] = useState('');
   const [quantity, setQuantity] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,47 +19,31 @@ const EditInventory = () => {
 
   useEffect(() => {
     setLoading(true);
-    // Mock data fallback if backend is not ready
-    setTimeout(() => {
-      // You can customize this mock data as needed
-      const mockData = {
-        batchid: 'B-1001',
-        category: 'Tea',
-        inventorynumber: 'INV001',
-        quantity: 100
-      };
-      setBatchId(mockData.batchid);
-      setCategory(mockData.category);
-      setInventoryNumber(mockData.inventorynumber);
-      setQuantity(mockData.quantity);
-      setLoading(false);
-    }, 500);
+
     // Uncomment below for real backend
-    // axios.get(`http://localhost:5555/inventory/${id}`)
-    //   .then((res) => {
-    //     const data = res.data;
-    //     setBatchId(data.batchid);
-    //     setCategory(data.category);
-    //     setInventoryNumber(data.inventorynumber);
-    //     setQuantity(data.quantity);
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     setLoading(false);
-    //     alert("Failed to fetch inventory.");
-    //   });
+     axios.get(`http://localhost:5000/inventory/${id}`) // Updated endpoint
+      .then((res) => {
+        const data = res.data;
+        setBatchId(data.batchid);
+        setInventoryNumber(data.inventorynumber);
+        setQuantity(data.quantity);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+        alert("Failed to fetch inventory.");
+      });
   }, [id]);
 
   const handleUpdate = () => {
     const updatedData = {
       batchid: batchId,
-      category,
       inventorynumber: inventoryNumber,
       quantity
     };
     setLoading(true);
-    axios.put(`http://localhost:5173/inventories/${id}`, updatedData)
+    axios.put(`http://localhost:5000/inventory/${id}`, updatedData)
       .then(() => {
         setLoading(false);
         navigate('/inventories');
@@ -92,17 +74,6 @@ const EditInventory = () => {
                   type="text"
                   value={batchId}
                   onChange={(e) => setBatchId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-300"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="category" className="block text-gray-700">Category</label>
-                <input
-                  id="category"
-                  type="text"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-300"
                 />
               </div>

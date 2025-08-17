@@ -20,7 +20,7 @@ export default function StaffDashboardSlidebar() {
       <div className={`fixed md:relative z-50 h-screen w-64 bg-gray-800 text-white flex flex-col justify-between transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0`}>
         <div>
           {/* Profile Image */}
-          <div className="flex items-center p-4 border-b border-green-600">
+          <div className="flex items-center p-4 border-b ">
             <img src={profile} alt="User" className="w-12 h-12 rounded-full mr-3 border"/>
             <div>
               <p className="font-semibold text-white">Staff Name</p>

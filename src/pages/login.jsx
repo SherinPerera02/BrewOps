@@ -106,7 +106,7 @@ export default function LoginPage() {
         } else if (role === "staff") {
           navigate("/StaffDashboard", { state: { toastMessage: "Login Successful!" } });
         } else if (role === "manager") {
-          navigate("/ManagerDashboard", { state: { toastMessage: "Login Successful!" } });
+          navigate("/ProductionManagerDashboard", { state: { toastMessage: "Login Successful!" } });
         } else {
           navigate("/admin", { state: { toastMessage: "Login Successful!" } });
         }

@@ -1,7 +1,7 @@
 // src/pages/SupplierDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaLeaf, FaMoneyBillWave, FaExclamationTriangle, FaEdit, FaChartBar, FaBell, FaEnvelope, FaUserCircle } from "react-icons/fa";
+import { FaLeaf, FaMoneyBillWave, FaExclamationTriangle, FaEdit, FaChartBar, FaBell, FaEnvelope, FaUserCircle, FaHome } from "react-icons/fa";
 import NavigationBar from '../components/NavigationBar';
 import DashboardCard from '../components/DashboardCard';
 import { Line, Pie, Bar } from 'react-chartjs-2';
@@ -128,13 +128,25 @@ export default function SupplierDashboard() {
         <div className="flex flex-1 bg-gray-100">
           {/* Sidebar */}
           <aside className="w-64 bg-gray-900 text-white flex flex-col">
-            
             <nav className="flex-1 p-4 space-y-2">
-              <Link to="/supplier/dashboard" className="block p-2 rounded bg-green-700 text-white">Dashboard</Link>
-              <Link to="/supplier/transactions" className="block p-2 rounded hover:bg-gray-700">Transactions</Link>
-              <Link to="/supplier/leaves" className="block p-2 rounded hover:bg-gray-700">Leaves Quantity</Link>
-              <Link to="/supplier/payments" className="block p-2 rounded hover:bg-gray-700">Payment Summary</Link>          
-              <Link to="/supplier/profile" className="block p-2 rounded hover:bg-gray-700">Edit Profile</Link>
+              <Link to="/" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+                <FaHome /> Home
+              </Link>
+              <Link to="/SupplierDashboard" className="flex text-sm items-center gap-2 p-2 rounded bg-green-700 text-white">
+                <FaChartBar /> Dashboard
+              </Link>
+              <Link to="/suppliers/transactions" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+                <FaMoneyBillWave /> Transactions
+              </Link>
+              <Link to="/suppliers/leavesQuantity" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+                <FaLeaf /> Leaves Quantity
+              </Link>
+              <Link to="/suppliers/paymentSummary" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+                <FaMoneyBillWave /> Payment Summary
+              </Link>
+              <Link to="/suppliers/editProfile" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+                <FaUserCircle /> Edit Profile
+              </Link>
             </nav>
           </aside>
 
