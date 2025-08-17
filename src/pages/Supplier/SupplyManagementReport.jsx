@@ -5,9 +5,22 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 
+export default function SupplierReportPage() {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <NavigationBar />
+      <div className="flex flex-col md:flex-row">
+        <ReportSlide />
+        <SupplierReport />
+      </div>
+    </div>
+  );
+}
+
 function SupplierReport() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [search, setSearch] = useState("");
 
   // Example supplier data
   const allSuppliers = [
@@ -34,12 +47,19 @@ function SupplierReport() {
     return acc;
   }, {});
 
-  const summaryArray = Object.keys(summary).map((supplier, index) => ({
+  let summaryArray = Object.keys(summary).map((supplier, index) => ({
     ID: index + 1,
     Supplier: supplier,
     TotalQuantity: summary[supplier].Quantity,
     TotalPayment: summary[supplier].TotalPayment,
   }));
+
+  // 🔹 Search filter (by ID or Supplier name)
+  summaryArray = summaryArray.filter(
+    (row) =>
+      row.Supplier.toLowerCase().includes(search.toLowerCase()) ||
+      String(row.ID).includes(search)
+  );
 
   // PDF Export
   const handleExportPDF = () => {
@@ -76,8 +96,17 @@ function SupplierReport() {
     <div className="flex-1 p-6 bg-gray-50">
       <h1 className="text-2xl font-bold mb-4">Supplier Summary Report</h1>
 
-      {/* Date range selection */}
-      <div className="flex gap-2 mb-4 flex-wrap">
+      {/* 🔹 Date range + Search + Buttons */}
+      <div className="mb-5">
+      <input
+          type="text"
+          placeholder="Search by Supplier or ID"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border p-2 rounded flex-1 min-w-[200px]"
+        />
+      </div>
+      <div className="flex flex-wrap gap-2 mb-4">
         <input
           type="date"
           value={startDate}
@@ -90,6 +119,7 @@ function SupplierReport() {
           onChange={(e) => setEndDate(e.target.value)}
           className="border p-2 rounded"
         />
+        
         <button
           onClick={handleExportPDF}
           className="bg-red-500 text-white px-4 py-2 rounded"
@@ -104,47 +134,36 @@ function SupplierReport() {
         </button>
       </div>
 
-      {/* Table */}
-      <table className="min-w-full bg-white border">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="border px-4 py-2">ID</th>
-            <th className="border px-4 py-2">Supplier</th>
-            <th className="border px-4 py-2">Total Quantity</th>
-            <th className="border px-4 py-2">Total Payment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {summaryArray.length > 0 ? (
-            summaryArray.map((row, index) => (
-              <tr key={index} className="text-center border-b">
-                <td className="px-4 py-2">{row.ID}</td>
-                <td className="px-4 py-2">{row.Supplier}</td>
-                <td className="px-4 py-2">{row.TotalQuantity}</td>
-                <td className="px-4 py-2">{row.TotalPayment}</td>
-              </tr>
-            ))
-          ) : (
+      {/* 🔹 Responsive Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border">
+          <thead className="bg-gray-200">
             <tr>
-              <td colSpan={4} className="text-center p-4">
-                No data in this date range
-              </td>
+              <th className="border px-4 py-2">ID</th>
+              <th className="border px-4 py-2">Supplier</th>
+              <th className="border px-4 py-2">Total Quantity</th>
+              <th className="border px-4 py-2">Total Payment</th>
             </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// Main Page
-export default function SupplierReportPage() {
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <NavigationBar />
-      <div className="flex">
-        <ReportSlide />
-        <SupplierReport />
+          </thead>
+          <tbody>
+            {summaryArray.length > 0 ? (
+              summaryArray.map((row, index) => (
+                <tr key={index} className="text-center border-b">
+                  <td className="px-4 py-2">{row.ID}</td>
+                  <td className="px-4 py-2">{row.Supplier}</td>
+                  <td className="px-4 py-2">{row.TotalQuantity}</td>
+                  <td className="px-4 py-2">{row.TotalPayment}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="text-center p-4">
+                  No data in this date range / search
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

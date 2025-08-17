@@ -7,7 +7,7 @@ export default function ReportslideBar() {
 
   const menuItems = [
     { label: 'Dashboard', icon: <FaHome />, to: '/staff' },
-    { label: 'Supplier', icon: <FaUsers />, to: '/supplier' },
+    { label: 'Supplier', icon: <FaUsers />, to: '/report' },
     { label: 'Inventory', icon: <FaPager />, to: '/inventory' },
   ];
 

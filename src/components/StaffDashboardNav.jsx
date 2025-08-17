@@ -13,16 +13,6 @@ export default function StaffDashboardNav() {
         BrewOps
       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 w-full md:w-1/3 mb-2 md:mb-0">
-        <FaSearch className="text-gray-500 mr-2" />
-        <input 
-          type="text" 
-          placeholder="Search..." 
-          className="bg-transparent outline-none w-full text-sm md:text-base"
-        />
-      </div>
-
       {/* Icons + Profile */}
       <div className="flex items-center space-x-4 md:space-x-6 relative">
 
@@ -45,7 +35,7 @@ export default function StaffDashboardNav() {
         {/* Profile Image with Dropdown */}
         <div className="relative">
           <FaUser size={20}
-            className="w-10 h-10 rounded-full border-2  cursor-pointer"
+            className="w-7 h-7 rounded-full border-2  cursor-pointer text-white"
             onClick={() => setDropdownOpen(!dropdownOpen)}
           />
 
