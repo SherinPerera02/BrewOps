@@ -240,15 +240,4 @@ function ReportContent() {
   );
 }
 
-// Main Report Page
-export default function Report() {
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <NavigationBar />
-      <div className="flex">
-        <ReportSlide />
-        <ReportContent />
-      </div>
-    </div>
-  );
-}
+

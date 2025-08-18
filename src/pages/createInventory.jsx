@@ -1,19 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import BackButton from '../components/backButton';
-
-<<<<<<< HEAD
-
-import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar'
-=======
-
 import Spinner from '../components/Spinner';
 import NavigationBar from '../components/NavigationBar';
-
-
-
->>>>>>> 481cf5ebda61d64f79a0450e50d0e93083414f0c
 import Footer from '../components/Footer';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';

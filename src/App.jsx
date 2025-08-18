@@ -76,7 +76,7 @@ function App() {
        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
 
-        <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
+        <Route path="/SupplierDashboard" element={<supplierDashboard />} />
 
       </Routes>
     </BrowserRouter>

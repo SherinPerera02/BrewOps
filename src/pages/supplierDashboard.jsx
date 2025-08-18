@@ -3,11 +3,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FaLeaf, FaMoneyBillWave, FaExclamationTriangle, FaEdit, FaChartBar, FaBell, FaEnvelope, FaUserCircle } from "react-icons/fa";
 import NavigationBar from '../components/NavigationBar';
-<<<<<<< HEAD
+
 import DashboardCard from '../components/DashboardCard';
-=======
-import DashboardCard from '../components/dashboardCard';
->>>>>>> 481cf5ebda61d64f79a0450e50d0e93083414f0c
+
+
 import { Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
