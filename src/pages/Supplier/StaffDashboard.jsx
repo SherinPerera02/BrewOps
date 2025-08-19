@@ -147,12 +147,10 @@ export default function StaffDashboard() {
       </div>
 
       <div className="flex flex-1 relative">
-        {/* Sidebar */}
+        
         <div
           className={`fixed z-50 h-full w-64 bg-gray-800 text-white transform transition-transform duration-300 md:relative md:translate-x-0 ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
           <StaffDashboardSlidebar />
         </div>
 
