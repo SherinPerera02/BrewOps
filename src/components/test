@@ -1,0 +1,328 @@
+import React, { useState, useEffect } from "react";
+import { FaEnvelope, FaBell, FaUserCircle } from "react-icons/fa";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  User,
+  Bell,
+  MessageSquare,
+  Search,
+  Settings,
+  BarChart3,
+  Users,
+  Home,
+  BookOpen,
+  Star,
+  Calendar,
+  LogOut,
+  X,
+  ChevronDown,
+  Package,
+  Trash2,
+  Factory,
+  Leaf,
+  Plus,
+  Eye,
+  Edit,
+  FileText,
+} from "lucide-react";
+
+const NavigationBar = () => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showChat, setShowChat] = useState(false);
+  const [username, setUsername] = useState("ProductionManager");
+  const [room, setRoom] = useState("general");
+  const [notifications, setNotifications] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showUserPanel, setShowUserPanel] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState("All");
+  const navigate = useNavigate();
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken"); // Retrieve token from localStorage
+      const response = await axios.get("/api/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser(response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      navigate("/login"); // Redirect to login if token is invalid
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken"); // Remove token on logout
+    setDropdownOpen(false);
+    navigate("/login");
+  };
+
+  // Function to handle new toast messages
+  const handleNewNotification = (message) => {
+    setNotifications((prevNotifications) => [...prevNotifications, message]);
+  };
+
+  // Example: Simulate receiving a toast message
+  useEffect(() => {
+    const simulateToast = setTimeout(() => {
+      handleNewNotification("New inventory update available!");
+    }, 5000);
+
+    return () => clearTimeout(simulateToast);
+  }, []);
+
+  // Toggle notification dropdown
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const closeAllPanels = () => {
+    setShowUserPanel(false);
+    setShowNotifications(false);
+    setShowMessages(false);
+  };
+
+  const toggleUserPanel = () => {
+    closeAllPanels();
+    setShowUserPanel(!showUserPanel);
+  };
+
+  const toggleNotifications = () => {
+    closeAllPanels();
+    setShowNotifications(!showNotifications);
+  };
+
+  const toggleMessages = () => {
+    closeAllPanels();
+    setShowMessages(!showMessages);
+  };
+
+  return (
+    <nav className="bg-green-600 px-4 py-3 flex items-center justify-between relative z-50">
+      {/* Left Side - Logo */}
+      <div className="flex items-center space-x-4">
+        <h1
+          className="text-2xl font-bold text-white cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          BrewOps
+        </h1>
+      </div>
+
+      {/* Right Side - Icons */}
+      <div className="flex items-center space-x-4">
+        <button
+          onClick={toggleMessages}
+          className="p-2 text-white hover:bg-green-700 rounded-lg transition-colors relative"
+        >
+          <MessageSquare className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            3
+          </span>
+        </button>
+
+        <button
+          onClick={toggleNotifications}
+          className="p-2 text-white hover:bg-green-700 rounded-lg transition-colors relative"
+        >
+          <Bell className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            1
+          </span>
+        </button>
+
+        <button
+          onClick={toggleUserPanel}
+          className="flex items-center space-x-2 bg-green-700 text-white px-3 py-2 rounded-lg hover:bg-green-800 transition-colors"
+        >
+          <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+            <User className="w-5 h-5 text-white" />
+          </div>
+        </button>
+      </div>
+
+      {/* Overlay */}
+      {(showUserPanel || showNotifications || showMessages) && (
+        <div
+          className="fixed inset-0"
+          onClick={closeAllPanels}
+          style={{ pointerEvents: "auto" }} // Ensures overlay does not block navigation bar
+        />
+      )}
+
+      {/* User Profile Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${
+          showUserPanel ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Manager</h3>
+                <p className="text-sm text-gray-600">Tea Factory Admin</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowUserPanel(false)}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-2">
+          <button
+            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
+            onClick={() => navigate("/")}
+          >
+            <Home className="w-5 h-5 text-gray-600" />
+            <span>Dashboard</span>
+          </button>
+
+          <button
+            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
+            onClick={() => navigate("/Staff/profile")}
+          >
+            <User className="w-5 h-5 text-gray-600" />
+            <span>Profile</span>
+          </button>
+
+          <button
+            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
+            onClick={() => navigate("/ProductionManagerDashboard")}
+          >
+            <BarChart3 className="w-5 h-5 text-gray-600" />
+            <span>Reports</span>
+          </button>
+
+          <button
+            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
+            onClick={() => navigate("/Staff/profile/setting")}
+          >
+            <Settings className="w-5 h-5 text-gray-600" />
+            <span>Settings</span>
+          </button>
+
+          <hr className="my-4" />
+
+          <button
+            className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors text-red-600"
+            onClick={() => navigate("/login")}
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Log out</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Notifications Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${
+          showNotifications ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Notifications</h3>
+            <div className="flex items-center space-x-2">
+              <button className="p-2 hover:bg-gray-100 rounded-lg">
+                <Settings className="w-4 h-4 text-gray-600" />
+              </button>
+              <button
+                onClick={() => setShowNotifications(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-3">
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <Bell className="w-4 h-4 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-red-900">
+                  Low Inventory Alert
+                </p>
+                <p className="text-xs text-red-700">
+                  Batch B-004 has only 220kg remaining
+                </p>
+                <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Messages Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${
+          showMessages ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Messages</h3>
+            <button
+              onClick={() => setShowMessages(false)}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-3">
+          <div className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+            <div className="flex items-start space-x-3">
+              <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-medium">
+                PM
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">Production Manager</p>
+                <p className="text-xs text-gray-600">
+                  Batch B-007 processing completed
+                </p>
+                <p className="text-xs text-gray-500 mt-1">1 hour ago</p>
+              </div>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+          </div>
+
+          <div className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+            <div className="flex items-start space-x-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                QC
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">Quality Controller</p>
+                <p className="text-xs text-gray-600">
+                  Quality check report ready
+                </p>
+                <p className="text-xs text-gray-500 mt-1">3 hours ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default NavigationBar;
