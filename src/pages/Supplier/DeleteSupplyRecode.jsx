@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import Spinner from '../../components/Spinner';
 
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import Footer from '../../components/Footer';
 import leftArrow from '../../assets/left-arrow.png';
 

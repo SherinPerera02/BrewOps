@@ -3,9 +3,11 @@ import axios from 'axios';
 import { User, Bell, MessageSquare, X, Home, BarChart3, Settings, LogOut, Search, Send, CheckCheck, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import ProfileIcon from './ProfileIcon';
 
 const NavigationBar = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState([]);
+  const [profile, setProfile] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [messages, setMessages] = useState([]);
@@ -22,8 +24,10 @@ const NavigationBar = () => {
   const navigate = useNavigate();
   const chatEndRef = useRef(null);
 
+
   useEffect(() => {
-    fetchUserProfile();
+    
+    fetchProfile();
     fetchNotifications();
     fetchMessages();
     fetchAllUsers();
@@ -67,75 +71,72 @@ const NavigationBar = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const fetchUserProfile = async () => {
+  // Ensure JWT token is sent in all protected API calls
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("jwtToken");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('jwtToken');
-      const res = await axios.get('/api/profile', {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await fetch("/api/profile", {
+        headers: getAuthHeaders()
       });
-      // Adjust for backend response structure
-      if (res.data && res.data.success && res.data.data) {
-        setUser(res.data.data);
-      } else {
-        setUser(null);
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error('Profile API did not return JSON. Status:', res.status);
+        setProfile(null);
+        return;
       }
-    } catch (error) {
-      setUser(null);
+      const result = await res.json();
+      console.log('Profile API result:', result);
+      if (result.success && result.data) setProfile(result.data);
+      else setProfile(null);
+    } catch (err) {
+      console.error('Profile API fetch error:', err);
+      setProfile(null);
     }
   };
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem('jwtToken');
-      const res = await axios.get('/api/notifications', {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await fetch("/api/notifications", {
+        headers: getAuthHeaders()
       });
-      
-      let notificationData = [];
-      if (Array.isArray(res.data)) {
-        notificationData = res.data;
-      } else if (res.data && Array.isArray(res.data.notifications)) {
-        notificationData = res.data.notifications;
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error('Notifications API did not return JSON. Status:', res.status);
+        setNotifications([]);
+        return;
       }
-      
-      setNotifications(notificationData);
-      setUnreadNotifications(notificationData.filter(n => !n.read).length);
-      
-      // Show toast for new notifications
-      const newNotifications = notificationData.filter(n => !n.read && n.isNew);
-      newNotifications.forEach(notif => {
-        toast.success(notif.title || 'New notification', {
-          duration: 4000,
-          position: 'top-right',
-        });
-      });
-      
-    } catch (error) {
+      const result = await res.json();
+      if (Array.isArray(result)) setNotifications(result);
+      else if (result.success && Array.isArray(result.data)) setNotifications(result.data);
+      else setNotifications([]);
+    } catch (err) {
+      console.error('Notifications API fetch error:', err);
       setNotifications([]);
-      setUnreadNotifications(0);
     }
   };
 
   const fetchMessages = async () => {
     try {
-      const token = localStorage.getItem('jwtToken');
-      const res = await axios.get('/api/messages', {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await fetch("/api/messages", {
+        headers: getAuthHeaders()
       });
-      
-      let messageData = [];
-      if (Array.isArray(res.data)) {
-        messageData = res.data;
-      } else if (res.data && Array.isArray(res.data.messages)) {
-        messageData = res.data.messages;
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error('Messages API did not return JSON. Status:', res.status);
+        setMessages([]);
+        return;
       }
-      
-      setMessages(messageData);
-      setUnreadMessages(messageData.filter(m => !m.read).length);
-      
-    } catch (error) {
+      const result = await res.json();
+      if (Array.isArray(result)) setMessages(result);
+      else if (result.success && Array.isArray(result.data)) setMessages(result.data);
+      else setMessages([]);
+    } catch (err) {
+      console.error('Messages API fetch error:', err);
       setMessages([]);
-      setUnreadMessages(0);
     }
   };
 
@@ -254,6 +255,11 @@ const NavigationBar = () => {
       .substring(0, 2);
   };
 
+  const handleProfileClick = async () => {
+    await fetchProfile();
+    setShowUserPanel(true);
+  };
+
   return (
     <>
       <nav className="bg-green-600 px-4 py-3 flex items-center justify-between relative z-50 w-full">
@@ -277,11 +283,8 @@ const NavigationBar = () => {
               </span>
             )}
           </button>
-          <button onClick={toggleUserPanel} className="flex items-center space-x-2 bg-green-700 text-white px-3 py-2 rounded-lg hover:bg-green-800 transition-colors">
-            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
-            </div>
-          </button>
+          {/* Replace profile icon button with ProfileIcon component */}
+          <ProfileIcon onClick={handleProfileClick} />
         </div>
 
         {/* Overlay */}
@@ -290,18 +293,18 @@ const NavigationBar = () => {
         )}
 
         {/* User Profile Panel */}
-        <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${showUserPanel ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`fixed top-0 right-0 h-full w-80 bg-white transform transition-transform duration-300 ease-in-out z-50 ${showUserPanel ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-medium text-sm">
-                    {user?.name ? getInitials(user.name) : 'U'}
+                    {profile && profile.name ? getInitials(profile.name) : (profile && profile.email ? getInitials(profile.email) : 'U')}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">{user?.name || user?.email || 'No Name'}</h3>
-                  <p className="text-sm text-gray-600">{user?.role || 'No Role'}</p>
+                  <h3 className="text-lg font-semibold">{profile && profile.name ? profile.name : (profile && profile.email ? profile.email : 'No Name')}</h3>
+                  <p className="text-sm text-gray-600">{profile && profile.role ? profile.role : 'No Role'}</p>
                 </div>
               </div>
               <button onClick={() => setShowUserPanel(false)} className="p-2 hover:bg-gray-100 rounded-lg">
@@ -463,12 +466,12 @@ const NavigationBar = () => {
                           </div>
                         </div>
                       ))
-                    )}
+                   ) }
                   </div>
                 </div>
               </div>
             </>
-          ) : (
+         ) : (
             // Chat View
             <>
               <div className="p-4 border-b border-gray-200">
@@ -544,7 +547,7 @@ const NavigationBar = () => {
                 </div>
               </div>
             </>
-          )}
+           )}
         </div>
       </nav>
     </>

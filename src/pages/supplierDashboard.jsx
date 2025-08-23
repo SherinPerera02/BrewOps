@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaLeaf, FaMoneyBillWave, FaExclamationTriangle, FaEdit, FaChartBar, FaBell, FaEnvelope, FaUserCircle, FaHome } from "react-icons/fa";
-import NavigationBar from '../components/NavigationBar';
+import NavigationBar from '../components/navigationBar';
 import DashboardCard from '../components/DashboardCard';
 import { Line, Pie, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';

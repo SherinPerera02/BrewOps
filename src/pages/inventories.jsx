@@ -11,7 +11,7 @@ import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 import { FaBoxOpen, FaTrashAlt, FaEdit, FaPlusCircle } from 'react-icons/fa';
 import Spinner from '../components/Spinner';
 
-import NavigationBar from '../components/NavigationBar';
+import NavigationBar from '../components/navigationBar';
 
 import { Bar, Line } from 'react-chartjs-2';
 import {

@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
-import NavigationBar from "../../components/NavigationBar";
+import NavigationBar from "../../components/navigationBar";
 import leftArrow from "../../assets/left-arrow.png";
 import Footer from "../../components/Footer";
 import Spinner from "../../components/Spinner";

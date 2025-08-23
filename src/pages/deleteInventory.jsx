@@ -3,7 +3,7 @@ import BackButton from '../components/backButton';
 
 
 import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar';
+import NavigationBar from '../components/navigationBar';
 
 
 import Footer from '../components/Footer';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import leftArrow from '../../assets/left-arrow.png';
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';
 import bgImage from '../../assets/supplierBg2.avif';

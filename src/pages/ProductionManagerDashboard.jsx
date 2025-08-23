@@ -6,7 +6,7 @@ import Footer from '../components/Footer';
 import { FaBell, FaUsers, FaBoxOpen, FaExclamationTriangle, FaPlus, FaFileAlt, FaHome, FaWarehouse, FaTruck, FaLeaf } from 'react-icons/fa';
 import { MdDashboardCustomize } from "react-icons/md";
 import Spinner from '../components/Spinner';
-import NavigationBar from '../components/NavigationBar';
+import NavigationBar from '../components/navigationBar';
 import DashboardCard from '../components/DashboardCard';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import {

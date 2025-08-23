@@ -110,7 +110,7 @@ export default function LoginPage() {
         } else {
           navigate("/admin", { state: { toastMessage: "Login Successful!" } });
         }
-      }, 3000);
+      }, );
     } catch (e) {
       console.error("Login error:", e);
 

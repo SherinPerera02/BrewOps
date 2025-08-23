@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import Footer from '../../components/Footer';
 import Spinner from '../../components/Spinner';
 import leftArrow from '../../assets/left-arrow.png';

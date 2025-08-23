@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import NavigationBar from '../../components/NavigationBar';
+import NavigationBar from '../../components/navigationBar';
 import SupplierSidebar from '../../components/SupplierSidebar';
 import { Link } from 'react-router-dom';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
