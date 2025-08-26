@@ -31,44 +31,45 @@ import EditProfile from './pages/editProfile';
 import PaymentSummary from './pages/paymentSummary';
 import LeavesQuantity from './pages/leavesQuantity';
 import Transaction from './pages/transaction';
+import NavigationBar from "./components/navigationBar";
 
 function App() {
   return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/AboutUs" element={<WhoWeAre />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/inventories" element={<Inventories />} />
-          <Route path="/inventory/creates" element={<CreateInventory />} />
-          <Route path="/inventory/:id" element={<ShowInventory />} />
-          <Route path="/inventory/edit/:id" element={<EditInventory />} />
-          <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
-          <Route path="/ProductionManagerDashboard" element={<ProductionManagerDashboard />} />
-          <Route path ="/StaffDashboard" element={<StaffDashboard/>}/>
-          <Route path = '/Staff/profile' element = {<StaffProfile/>}/>
-          <Route path='/Staff/profile/setting' element={<Setting/>}/>
-          <Route path="/SupplierHome" element={<SupplierHome />} />
-          <Route path ="/suppliers/create" element={<CreateSupplier />} />
-          <Route path ="/suppliers/details/:id"  element={<ShowSupplier />} />
-          <Route path ='/SupplierRecodeCreate' element={<CreateSupplyRecode1 />} />
-          <Route path ="/Suppliers/edit/:id" element={<EditSupplier/>}/>
-          <Route path="/Suppliers/delete/:id" element={<DeleteSuppliers/>}/>
-          <Route path ='/SupplierRecode' element={<SupplierRecode />} />
-          <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
-          <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
-          <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
-          <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
-          <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
-          <Route path="/suppliers/editProfile" element={<EditProfile />} />
-          <Route path="/suppliers/paymentSummary" element={<PaymentSummary />} />
-          <Route path="/suppliers/leavesQuantity" element={<LeavesQuantity />} />
-          <Route path="/suppliers/transactions" element={<Transaction />} />
-        </Routes>
-      </BrowserRouter>
-   
+    <BrowserRouter>
+      
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/AboutUs" element={<WhoWeAre />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/inventories" element={<Inventories />} />
+        <Route path="/inventory/creates" element={<CreateInventory />} />
+        <Route path="/inventory/:id" element={<ShowInventory />} />
+        <Route path="/inventory/edit/:id" element={<EditInventory />} />
+        <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
+        <Route path="/ProductionManagerDashboard" element={<ProductionManagerDashboard />} />
+        <Route path ="/StaffDashboard" element={<StaffDashboard/>}/>
+        <Route path = '/Staff/profile' element = {<StaffProfile/>}/>
+        <Route path='/Staff/profile/setting' element={<Setting/>}/>
+        <Route path="/SupplierHome" element={<SupplierHome />} />
+        <Route path ="/suppliers/create" element={<CreateSupplier />} />
+        <Route path ="/suppliers/details/:id"  element={<ShowSupplier />} />
+        <Route path ='/SupplierRecodeCreate' element={<CreateSupplyRecode1 />} />
+        <Route path ="/Suppliers/edit/:id" element={<EditSupplier/>}/>
+        <Route path="/Suppliers/delete/:id" element={<DeleteSuppliers/>}/>
+        <Route path ='/SupplierRecode' element={<SupplierRecode />} />
+        <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
+        <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
+        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
+        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
+        <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
+        <Route path="/suppliers/editProfile" element={<EditProfile />} />
+        <Route path="/suppliers/paymentSummary" element={<PaymentSummary />} />
+        <Route path="/suppliers/leavesQuantity" element={<LeavesQuantity />} />
+        <Route path="/suppliers/transactions" element={<Transaction />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

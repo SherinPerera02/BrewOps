@@ -3,11 +3,10 @@ import axios from 'axios';
 import { User, Bell, MessageSquare, X, Home, BarChart3, Settings, LogOut, Search, Send, CheckCheck, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import ProfileIcon from './ProfileIcon';
+import { io } from 'socket.io-client';
 
 const NavigationBar = () => {
-  const [user, setUser] = useState([]);
-  const [profile, setProfile] = useState([]);
+  const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [messages, setMessages] = useState([]);
@@ -24,24 +23,53 @@ const NavigationBar = () => {
   const navigate = useNavigate();
   const chatEndRef = useRef(null);
 
-
   useEffect(() => {
-    
-    fetchProfile();
+    fetchUserProfile();
     fetchNotifications();
     fetchMessages();
     fetchAllUsers();
     
-    // Set up polling for real-time updates
-    const interval = setInterval(() => {
-      fetchNotifications();
-      fetchMessages();
-      if (selectedUser) {
-        fetchChatHistory(selectedUser.id);
-      }
-    }, 5000);
+    // Connect to Socket.IO server
+    const socket = io('http://localhost:5000', {
+      transports: ['websocket'],
 
-    return () => clearInterval(interval);
+      auth: {
+        token: localStorage.getItem('jwtToken')
+      }
+    });
+
+    // Listen for notification events
+    socket.on('notification', (notif) => {
+      // Only add if notification has a valid ID
+      if (notif && notif.id) {
+        setNotifications((prev) => [notif, ...prev]);
+        setUnreadNotifications((prev) => prev + 1);
+        toast.success(notif.title || 'New notification', {
+          duration: 4000,
+          position: 'top-right',
+        });
+      } else {
+        console.warn('Received notification without valid ID:', notif);
+      }
+    });
+
+    // Listen for message events
+    socket.on('message', (msg) => {
+      // Only add if message has a valid ID
+      if (msg && msg.id) {
+        setMessages((prev) => [msg, ...prev]);
+        setUnreadMessages((prev) => prev + 1);
+      } else {
+        console.warn('Received message without valid ID:', msg);
+      }
+    });
+
+    // Clean up listeners on unmount
+    return () => {
+      socket.off('notification');
+      socket.off('message');
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -71,79 +99,82 @@ const NavigationBar = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Ensure JWT token is sent in all protected API calls
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("jwtToken");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
-  const fetchProfile = async () => {
+  const fetchUserProfile = async () => {
     try {
-      const res = await fetch("/api/profile", {
-        headers: getAuthHeaders()
+      const token = localStorage.getItem('jwtToken');
+      const res = await axios.get('http://localhost:5000/api/profile', { 
+        headers: { Authorization: `Bearer ${token}` }
       });
-      const contentType = res.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        console.error('Profile API did not return JSON. Status:', res.status);
-        setProfile(null);
-        return;
+      // Adjust for backend response structure
+      if (res.data && res.data.success && res.data.data) {
+        setUser(res.data.data);
+      } else {
+        setUser(null);
       }
-      const result = await res.json();
-      console.log('Profile API result:', result);
-      if (result.success && result.data) setProfile(result.data);
-      else setProfile(null);
-    } catch (err) {
-      console.error('Profile API fetch error:', err);
-      setProfile(null);
+    } catch (error) {
+      setUser(null);
     }
   };
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("/api/notifications", {
-        headers: getAuthHeaders()
+      const token = localStorage.getItem('jwtToken');
+      const res = await axios.get('http://localhost:5000/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      const contentType = res.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        console.error('Notifications API did not return JSON. Status:', res.status);
-        setNotifications([]);
-        return;
+      
+      let notificationData = [];
+      if (Array.isArray(res.data)) {
+        notificationData = res.data;
+      } else if (res.data && Array.isArray(res.data.notifications)) {
+        notificationData = res.data.notifications;
       }
-      const result = await res.json();
-      if (Array.isArray(result)) setNotifications(result);
-      else if (result.success && Array.isArray(result.data)) setNotifications(result.data);
-      else setNotifications([]);
-    } catch (err) {
-      console.error('Notifications API fetch error:', err);
+      
+      setNotifications(notificationData);
+      setUnreadNotifications(notificationData.filter(n => !n.read).length);
+      
+      // Show toast for new notifications
+      const newNotifications = notificationData.filter(n => !n.read && n.isNew);
+      newNotifications.forEach(notif => {
+        toast.success(notif.title || 'New notification', {
+          duration: 4000,
+          position: 'top-right',
+        });
+      });
+      
+    } catch (error) {
       setNotifications([]);
+      setUnreadNotifications(0);
     }
   };
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch("/api/messages", {
-        headers: getAuthHeaders()
+      const token = localStorage.getItem('jwtToken');
+      const res = await axios.get('http://localhost:5000/api/messages', {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      const contentType = res.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        console.error('Messages API did not return JSON. Status:', res.status);
-        setMessages([]);
-        return;
+      
+      let messageData = [];
+      if (Array.isArray(res.data)) {
+        messageData = res.data;
+      } else if (res.data && Array.isArray(res.data.messages)) {
+        messageData = res.data.messages;
       }
-      const result = await res.json();
-      if (Array.isArray(result)) setMessages(result);
-      else if (result.success && Array.isArray(result.data)) setMessages(result.data);
-      else setMessages([]);
-    } catch (err) {
-      console.error('Messages API fetch error:', err);
+      
+      setMessages(messageData);
+      setUnreadMessages(messageData.filter(m => !m.read).length);
+      
+    } catch (error) {
       setMessages([]);
+      setUnreadMessages(0);
     }
   };
 
   const fetchAllUsers = async () => {
     try {
       const token = localStorage.getItem('jwtToken');
-      const res = await axios.get('/api/users', {
+      const res = await axios.get('http://localhost:5000/api/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAllUsers(res.data || []);
@@ -155,7 +186,7 @@ const NavigationBar = () => {
   const fetchChatHistory = async (userId) => {
     try {
       const token = localStorage.getItem('jwtToken');
-      const res = await axios.get(`/api/messages/chat/${userId}`, {
+      const res = await axios.get(`http://localhost:5000/api/messages/chat/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setChatHistory(res.data || []);
@@ -166,11 +197,24 @@ const NavigationBar = () => {
 
   const markNotificationAsRead = async (notificationId) => {
     try {
+      // Check if notificationId is valid
+      if (!notificationId) {
+        console.error('Cannot mark notification as read: Invalid ID');
+        return;
+      }
+      
       const token = localStorage.getItem('jwtToken');
-      await axios.patch(`/api/notifications/${notificationId}/read`, {}, {
+      await axios.patch(`http://localhost:5000/api/notifications/${notificationId}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      fetchNotifications();
+      
+      // Update local state instead of refetching
+      setNotifications(prev => 
+        prev.map(notif => 
+          notif.id === notificationId ? { ...notif, read: true } : notif
+        )
+      );
+      setUnreadNotifications(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
@@ -178,11 +222,24 @@ const NavigationBar = () => {
 
   const markMessageAsRead = async (messageId) => {
     try {
+      // Check if messageId is valid
+      if (!messageId) {
+        console.error('Cannot mark message as read: Invalid ID');
+        return;
+      }
+      
       const token = localStorage.getItem('jwtToken');
-      await axios.patch(`/api/messages/${messageId}/read`, {}, {
+      await axios.patch(`http://localhost:5000/api/messages/${messageId}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      fetchMessages();
+      
+      // Update local state instead of refetching
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === messageId ? { ...msg, read: true } : msg
+        )
+      );
+      setUnreadMessages(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Error marking message as read:', error);
     }
@@ -193,7 +250,7 @@ const NavigationBar = () => {
 
     try {
       const token = localStorage.getItem('jwtToken');
-      await axios.post('/api/messages/send', {
+      await axios.post('http://localhost:5000/api/messages/send', {
         receiverId: selectedUser.id,
         message: messageText.trim()
       }, {
@@ -255,11 +312,6 @@ const NavigationBar = () => {
       .substring(0, 2);
   };
 
-  const handleProfileClick = async () => {
-    await fetchProfile();
-    setShowUserPanel(true);
-  };
-
   return (
     <>
       <nav className="bg-green-600 px-4 py-3 flex items-center justify-between relative z-50 w-full">
@@ -283,8 +335,11 @@ const NavigationBar = () => {
               </span>
             )}
           </button>
-          {/* Replace profile icon button with ProfileIcon component */}
-          <ProfileIcon onClick={handleProfileClick} />
+          <button onClick={toggleUserPanel} className="flex items-center space-x-2 bg-green-700 text-white px-3 py-2 rounded-lg hover:bg-green-800 transition-colors">
+            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+              <User className="w-5 h-5 text-white" />
+            </div>
+          </button>
         </div>
 
         {/* Overlay */}
@@ -293,18 +348,18 @@ const NavigationBar = () => {
         )}
 
         {/* User Profile Panel */}
-        <div className={`fixed top-0 right-0 h-full w-80 bg-white transform transition-transform duration-300 ease-in-out z-50 ${showUserPanel ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${showUserPanel ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-medium text-sm">
-                    {profile && profile.name ? getInitials(profile.name) : (profile && profile.email ? getInitials(profile.email) : 'U')}
+                    {user?.name ? getInitials(user.name) : 'U'}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">{profile && profile.name ? profile.name : (profile && profile.email ? profile.email : 'No Name')}</h3>
-                  <p className="text-sm text-gray-600">{profile && profile.role ? profile.role : 'No Role'}</p>
+                  <h3 className="text-lg font-semibold">{user?.name || user?.email || 'No Name'}</h3>
+                  <p className="text-sm text-gray-600">{user?.role || 'No Role'}</p>
                 </div>
               </div>
               <button onClick={() => setShowUserPanel(false)} className="p-2 hover:bg-gray-100 rounded-lg">
@@ -466,12 +521,12 @@ const NavigationBar = () => {
                           </div>
                         </div>
                       ))
-                   ) }
+                    )}
                   </div>
                 </div>
               </div>
             </>
-         ) : (
+          ) : (
             // Chat View
             <>
               <div className="p-4 border-b border-gray-200">
@@ -547,7 +602,7 @@ const NavigationBar = () => {
                 </div>
               </div>
             </>
-           )}
+          )}
         </div>
       </nav>
     </>

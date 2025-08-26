@@ -83,9 +83,9 @@ export default function LoginPage() {
       );
 
       // Save token
-      const token = response.data.token;
-      const role = response.data.role; // Assuming backend returns user role
-      localStorage.setItem("token", token);
+      if (response.data && response.data.token) {
+        localStorage.setItem('jwtToken', response.data.token);
+      }
 
       // Show toast message before navigating
       toast.success("Login Successful! Redirecting", {
@@ -99,6 +99,9 @@ export default function LoginPage() {
         
       });
 
+      // Get role from response
+      const role = response.data.role;
+
       // Delay navigation until the toast message is shown
       setTimeout(() => {
         if (role === "supplier") {
@@ -110,7 +113,7 @@ export default function LoginPage() {
         } else {
           navigate("/admin", { state: { toastMessage: "Login Successful!" } });
         }
-      }, );
+      }, 0);
     } catch (e) {
       console.error("Login error:", e);
 

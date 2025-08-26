@@ -1,6 +1,5 @@
 import React from 'react';
 import NavigationBar from '../components/navigationBar';
-import NavigationPanel from '../components/navigationPanel';
 import Footer from '../components/Footer';
 import DashboardCard from '../components/DashboardCard';
 import { FaBoxOpen, FaLeaf, FaBox, FaIndustry, FaTruckLoading } from 'react-icons/fa';
@@ -13,7 +12,7 @@ const AdminDashboard = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <NavigationBar />
-      <NavigationPanel />
+ 
 
       <main className="flex-grow px-6 py-8 space-y-8">
         {/* KPI Cards */}
