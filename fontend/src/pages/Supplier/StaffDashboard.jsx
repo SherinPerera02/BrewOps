@@ -51,7 +51,7 @@ export default function StaffDashboard() {
   //Fetch dashboard summary
   useEffect(() => {
     axios
-      .get("/api/dashboard/summary")
+      .get("/suppliers/summery")
       .then((res) => {
         setSuppliers(res.data.totalSuppliers);
         setInventory(res.data.totalInventory);

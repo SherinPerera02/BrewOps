@@ -29,6 +29,8 @@ const NavigationBar = ({ user, onLogout }) => {
     navigate("/login");
   };
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   return (
     <nav className="bg-green-600 px-6 py-4 flex justify-between items-center shadow-md relative">
       {/* Logo */}
@@ -106,7 +108,16 @@ const NavigationBar = ({ user, onLogout }) => {
       <div className="flex items-center space-x-4">
         <FaBell className="text-white text-2xl cursor-pointer hover:text-green-300" />
         <FaEnvelope className="text-white text-2xl cursor-pointer hover:text-green-300" />
-        <FaUserCircle className="text-white text-2xl cursor-pointer hover:text-green-300" />
+        <FaUserCircle className="w-7 h-7 rounded-full border-2  cursor-pointer text-white"
+          onClick={() => setDropdownOpen(!dropdownOpen)} />
+
+        {dropdownOpen && (
+            <div className="absolute right-0 mt-40 w-44 bg-white text-gray-800 rounded shadow-lg z-50 ring-1 ring-gray-200">
+              <a href="/staff/profile" className="block px-4 py-2 hover:bg-gray-100 transition-colors">My Profile</a>
+              <a href="/staff/profile/setting" className="block px-4 py-2 hover:bg-gray-100 transition-colors">Settings</a>
+              <a href="/login" className="block px-4 py-2 hover:bg-gray-100 transition-colors">Logout</a>
+            </div>
+          )}
       </div>
 
     </nav>
