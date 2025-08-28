@@ -32,6 +32,8 @@ import PaymentSummary from './pages/paymentSummary';
 import LeavesQuantity from './pages/leavesQuantity';
 import Transaction from './pages/transaction';
 import NavigationBar from "./components/navigationBar";
+import Production from './pages/Production';
+import SupplierLayout from './components/SupplierLayout';
 
 function App() {
   return (
@@ -49,6 +51,7 @@ function App() {
         <Route path="/inventory/edit/:id" element={<EditInventory />} />
         <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
         <Route path="/ProductionManagerDashboard" element={<ProductionManagerDashboard />} />
+        <Route path="/Production" element={<Production />} />
         <Route path ="/StaffDashboard" element={<StaffDashboard/>}/>
         <Route path = '/Staff/profile' element = {<StaffProfile/>}/>
         <Route path='/Staff/profile/setting' element={<Setting/>}/>
@@ -68,6 +71,8 @@ function App() {
         <Route path="/suppliers/paymentSummary" element={<PaymentSummary />} />
         <Route path="/suppliers/leavesQuantity" element={<LeavesQuantity />} />
         <Route path="/suppliers/transactions" element={<Transaction />} />
+        <Route path="/suppliers" element={<SupplierLayout />}/>
+        
       </Routes>
     </BrowserRouter>
   );

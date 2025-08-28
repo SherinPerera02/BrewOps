@@ -156,14 +156,14 @@ const NavigationBar = () => {
       });
       
       let messageData = [];
-      if (Array.isArray(res.data)) {
+      if (res.data && res.data.success && Array.isArray(res.data.data)) {
+        messageData = res.data.data;
+      } else if (Array.isArray(res.data)) {
         messageData = res.data;
-      } else if (res.data && Array.isArray(res.data.messages)) {
-        messageData = res.data.messages;
       }
       
       setMessages(messageData);
-      setUnreadMessages(messageData.filter(m => !m.read).length);
+      setUnreadMessages(messageData.filter(m => m.unread).length);
       
     } catch (error) {
       setMessages([]);
@@ -174,10 +174,19 @@ const NavigationBar = () => {
   const fetchAllUsers = async () => {
     try {
       const token = localStorage.getItem('jwtToken');
-      const res = await axios.get('http://localhost:5000/api/users', {
+      // Use a wildcard search to get all users
+      const res = await axios.get('http://localhost:5000/api/messages/search-users?query=a', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setAllUsers(res.data || []);
+      
+      let userData = [];
+      if (res.data && res.data.success && Array.isArray(res.data.data)) {
+        userData = res.data.data;
+      } else if (Array.isArray(res.data)) {
+        userData = res.data;
+      }
+      
+      setAllUsers(userData);
     } catch (error) {
       setAllUsers([]);
     }
@@ -189,7 +198,15 @@ const NavigationBar = () => {
       const res = await axios.get(`http://localhost:5000/api/messages/chat/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setChatHistory(res.data || []);
+      
+      let chatData = [];
+      if (res.data && res.data.success && Array.isArray(res.data.data)) {
+        chatData = res.data.data;
+      } else if (Array.isArray(res.data)) {
+        chatData = res.data;
+      }
+      
+      setChatHistory(chatData);
     } catch (error) {
       setChatHistory([]);
     }
@@ -250,7 +267,7 @@ const NavigationBar = () => {
 
     try {
       const token = localStorage.getItem('jwtToken');
-      await axios.post('http://localhost:5000/api/messages/send', {
+      const res = await axios.post('http://localhost:5000/api/messages/send', {
         receiverId: selectedUser.id,
         message: messageText.trim()
       }, {
@@ -260,7 +277,12 @@ const NavigationBar = () => {
       setMessageText('');
       fetchChatHistory(selectedUser.id);
       fetchMessages();
-      toast.success('Message sent successfully!');
+      
+      if (res.data && res.data.success) {
+        toast.success(res.data.message || 'Message sent successfully!');
+      } else {
+        toast.success('Message sent successfully!');
+      }
     } catch (error) {
       toast.error('Failed to send message');
     }
@@ -497,30 +519,40 @@ const NavigationBar = () => {
                     {messages.length === 0 ? (
                       <div className="text-gray-500 text-center py-8">No messages</div>
                     ) : (
-                      messages.map((msg, idx) => (
-                        <div
-                          key={idx}
-                          className={`p-3 hover:bg-gray-50 rounded-lg cursor-pointer ${
-                            !msg.read ? 'bg-blue-50 border border-blue-200' : ''
-                          }`}
-                          onClick={() => {
-                            selectUser({ id: msg.senderId, name: msg.senderName, role: msg.senderRole });
-                            markMessageAsRead(msg.id);
-                          }}
-                        >
-                          <div className="flex items-start space-x-3">
-                            <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-medium">
-                              {msg.senderInitials || getInitials(msg.senderName || 'Unknown')}
+                      messages.map((msg, idx) => {
+                        // Use the backend's "otherPerson" fields for conversation display
+                        const displayName = msg.otherPersonName || 'Unknown';
+                        const displayInitials = msg.otherPersonInitials || getInitials(displayName);
+                        const partnerId = msg.otherPersonId;
+                        const partnerRole = msg.otherPersonRole;
+
+                        return (
+                          <div
+                            key={idx}
+                            className={`p-3 hover:bg-gray-50 rounded-lg cursor-pointer ${
+                              msg.unread ? 'bg-blue-50 border border-blue-200' : ''
+                            }`}
+                            onClick={() => {
+                              selectUser({ id: partnerId, name: displayName, role: partnerRole });
+                              if (msg.unread) {
+                                markMessageAsRead(msg.id);
+                              }
+                            }}
+                          >
+                            <div className="flex items-start space-x-3">
+                              <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-medium">
+                                {displayInitials}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">{displayName}</p>
+                                <p className="text-xs text-gray-600 truncate">{msg.body || ''}</p>
+                                <p className="text-xs text-gray-500 mt-1">{msg.time || ''}</p>
+                              </div>
+                              {msg.unread && <div className="w-3 h-3 bg-green-500 rounded-full"></div>}
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">{msg.senderName || 'Unknown'}</p>
-                              <p className="text-xs text-gray-600 truncate">{msg.body || ''}</p>
-                              <p className="text-xs text-gray-500 mt-1">{msg.time || ''}</p>
-                            </div>
-                            {!msg.read && <div className="w-3 h-3 bg-green-500 rounded-full"></div>}
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                 </div>

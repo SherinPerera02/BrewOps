@@ -1,5 +1,4 @@
-import React from "react";
-import { FaBell, FaEnvelope } from "react-icons/fa";
+	import React from "react";
 
 
 const PaymentSummary = () => {
@@ -35,15 +34,7 @@ const PaymentSummary = () => {
 					{/* Main Content */}
 					<div className="flex-1 flex flex-col">
 						{/* Top Bar */}
-						<header className="flex items-center justify-end px-8 py-4 border-b bg-white">
-							<button className="mx-2 text-gray-500 hover:text-gray-700">
-								<FaBell size={22} />
-							</button>
-							<button className="mx-2 text-gray-500 hover:text-gray-700">
-								<FaEnvelope size={22} />
-							</button>
-							<img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" className="w-8 h-8 rounded-full ml-4" />
-						</header>
+						
 
 						<main className="flex-1 px-12 py-8">
 							<h1 className="text-3xl font-bold mb-8">Payment Summary</h1>

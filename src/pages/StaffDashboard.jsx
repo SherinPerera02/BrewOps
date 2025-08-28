@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import StaffDashboardNav from '../components/StaffDashboardNav';
+import NavigationBar from '../components/navigationBar';
 import StaffDashboardSlidebar from '../components/StaffDashboardSlidebar';
 import { FaBoxOpen, FaUsers, FaExclamationTriangle, FaPlus, FaFileAlt, FaBars } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -101,7 +101,7 @@ export default function StaffDashboard() {
     <div className="flex flex-col min-h-screen">
 
       {/* Navigation */}
-      <StaffDashboardNav />
+      <NavigationBar />
 
       {/* Mobile Hamburger */}
       <div className="md:hidden flex items-center bg-gray-100 p-2">
