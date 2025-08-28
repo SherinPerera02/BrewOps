@@ -98,8 +98,8 @@ export default function DeleteSupplyRecode() {
       </div>
       </div>
 
-      <div className='mt-20'>
-      <Footer />
+      <div className='mt-32'>
+      <Footer  />
       </div>
       
     </div>

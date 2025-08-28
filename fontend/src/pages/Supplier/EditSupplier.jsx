@@ -55,7 +55,7 @@ export default function EditSupplier() {
   return (
     <div
       className="min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      
     >
       <NavigationBar />
 

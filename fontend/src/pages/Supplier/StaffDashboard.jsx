@@ -110,7 +110,7 @@ export default function StaffDashboard() {
           ],
         });
       })
-      .catch((err) => console.error("Error fetching charts:", err));
+    
   }, []);
 
   //  Chart options

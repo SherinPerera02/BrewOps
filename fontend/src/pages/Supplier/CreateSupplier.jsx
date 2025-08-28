@@ -4,21 +4,30 @@ import { Link } from 'react-router-dom';
 import leftArrow from '../../assets/left-arrow.png';
 import Spinner from '../../components/Spinner';
 import Footer from '../../components/Footer';
+import axios from 'axios';
 
-export default function CreateSupplier() {
+export default function CreateTeaSupplier() {
   const [supplierId, setSupplierId] = useState('');
   const [name, setName] = useState('');
   const [NIC, setNIC] = useState('');
   const [address, setAddress] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
+  const [district, setDistrict] = useState('');
+  const [teaGrade, setTeaGrade] = useState('');
+  const [monthlyCapacity, setMonthlyCapacity] = useState('');
+  const [supplierType, setSupplierType] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+ 
+
+  
+  
   // Generate unique Supplier ID
   const generateUniqueSupplierID = () => {
     const randomNumber = Math.floor(Math.random() * 1000) + 1;
-    const newID = `SID${randomNumber.toString().padStart(4, '0')}`;
+    const newID = `TSL${randomNumber.toString().padStart(4, '0')}`; // TSL = Tea Supplier Lanka
     setSupplierId(newID);
   };
 
@@ -28,29 +37,58 @@ export default function CreateSupplier() {
 
   // Validation functions
   const validateName = (value) => {
-    if (!value.trim()) return 'Name is required';
-    if (value.length < 5 || value.length > 20) return 'Name must be 5–20 characters';
+    if (!value.trim()) return 'Supplier name is required';
+    if (value.length < 3 || value.length > 50) return 'Name must be 3–50 characters';
     return '';
   };
+
   const validateNIC = (value) => {
     if (!value.trim()) return 'NIC is required';
-    if (!/^([0-9]{9}[vV]|[0-9]{12})$/.test(value)) return 'Invalid NIC format';
+    if (!/^([0-9]{9}[vVxX]|[0-9]{12})$/.test(value)) return 'Invalid NIC format (9 digits + V/X or 12 digits)';
     return '';
   };
+
   const validateAddress = (value) => {
     if (!value.trim()) return 'Address is required';
-    if (value.length < 15 || value.length > 50) return 'Address must be 15–50 characters';
+    if (value.length < 10 || value.length > 100) return 'Address must be 10–100 characters';
     return '';
   };
+
   const validateContact = (value) => {
     if (!value.trim()) return 'Contact number is required';
-    if (!/^\d{10}$/.test(value)) return 'Contact number must be 10 digits';
+    if (!/^0[0-9]{9}$/.test(value)) return 'Contact number must be 10 digits starting with 0';
     return '';
   };
+
   const validateEmail = (value) => {
     const emailCheck = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
     if (!value.trim()) return 'Email is required';
     if (!emailCheck.test(value)) return 'Invalid email format';
+    return '';
+  };
+
+  const validateDistrict = (value) => {
+    if (!value.trim()) return 'District is required';
+    return '';
+  };
+
+  const validateTeaGrade = (value) => {
+    if (supplierType === 'Tea Leaf Supplier' && !value.trim()) {
+      return 'Tea grade is required for tea leaf suppliers';
+    }
+    return '';
+  };
+
+  const validateMonthlyCapacity = (value) => {
+    if (supplierType === 'Tea Leaf Supplier') {
+      if (!value.trim()) return 'Monthly capacity is required for tea leaf suppliers';
+      if (isNaN(value) || value <= 0) return 'Monthly capacity must be a positive number';
+    }
+    return '';
+  };
+
+  const validateSupplierType = (value) => {
+    if (!value.trim()) return 'Supplier type is required';
     return '';
   };
 
@@ -60,50 +98,99 @@ export default function CreateSupplier() {
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
   };
 
-  const handleSaveSupplier = () => {
+  const handleSaveSupplier = async () => {
     const newErrors = {
       name: validateName(name),
       NIC: validateNIC(NIC),
       address: validateAddress(address),
       contact: validateContact(contact),
       email: validateEmail(email),
+      district: validateDistrict(district),
+      supplierType: validateSupplierType(supplierType),
+      teaGrade: validateTeaGrade(teaGrade),
+      monthlyCapacity: validateMonthlyCapacity(monthlyCapacity),
     };
+
     setErrors(newErrors);
     const isValid = !Object.values(newErrors).some((err) => err !== '');
-    if (!isValid) return;
+    
+    if (!isValid) {
+      alert('Please fix all validation errors before submitting');
+      return;
+    }
 
-    const data = { supplierid: supplierId, name, nic: NIC, address, contact, email };
+    const supplierData = {
+      supplierId,
+      name,
+      nic: NIC,
+      address,
+      contact,
+      email,
+      district,
+      supplierType,
+      teaGrade: teaGrade || null,
+      monthlyCapacity: monthlyCapacity || null,
+      status: 'Active',
+      createdAt: new Date().toISOString()
+    };
+
     setLoading(true);
-    setTimeout(() => {
-      console.log('Saved data:', data);
-      alert('Supplier saved successfully (frontend only)');
+
+    try {
+      // Replace with actual API endpoint
+      const response = await axios.post('http://localhost:8080/api/tea-suppliers', supplierData);
+      
+      alert('Tea supplier added successfully!');
+      console.log('Supplier saved:', response.data);
+      
+      // Reset form
+      generateUniqueSupplierID();
+      setName('');
+      setNIC('');
+      setAddress('');
+      setContact('');
+      setEmail('');
+      setDistrict('');
+      setTeaGrade('');
+      setMonthlyCapacity('');
+      setSupplierType('');
+      setErrors({});
+      
+    } catch (error) {
+      console.error('Error saving supplier:', error);
+      alert('Error adding supplier. Please try again.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-green-50">
+    <div className="min-h-screen flex flex-col bg-green-50"
+    >
       <NavigationBar />
 
       <div className="flex-1 flex flex-col items-center relative p-4 md:p-8">
         {/* Back Arrow */}
-        <Link to="/SupplierHome" className="absolute top-4 left-4 md:top-8 md:left-8">
-          <img src={leftArrow} alt="Go Back" className="w-10 h-10 hover:scale-105 transition-transform" />
+        <Link to="/supplierHome" className="absolute top-4 left-4 md:top-8 md:left-8">
+          <img src={leftArrow} alt="Go Back" className="w-10 h-10 hover:scale-105 transition-transform filter drop-shadow-md" />
         </Link>
 
         {/* Form Container */}
-        <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6 md:p-10 mt-12 md:mt-16">
+        <div className="w-full max-w-4xl bg-white rounded-xl shadow-2xl p-6 md:p-10 mt-12 md:mt-16">
           {loading && <Spinner />}
 
-          <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Add New Supplier</h1>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-800 mb-2"> Add New Tea Supplier</h1>
+            <p className="text-gray-600">Register a new supplier for the tea factory</p>
+          </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Supplier ID */}
             <div>
-              <label className="block font-medium mb-1">Supplier ID</label>
+              <label className="block font-semibold mb-2 text-gray-700">Supplier ID</label>
               <input
                 type="text"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
+                className="w-full border-2 border-gray-300 px-4 py-3 rounded-lg bg-gray-50"
                 value={supplierId}
                 readOnly
               />
@@ -111,12 +198,12 @@ export default function CreateSupplier() {
 
             {/* Supplier Name */}
             <div>
-              <label className="block font-medium mb-1">Supplier Name</label>
+              <label className="block font-semibold mb-2 text-gray-700">Supplier Name *</label>
               <input
                 type="text"
                 name="name"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Supplier Name"
+                className="w-full border-2 border-gray-300 px-4 py-3 rounded-lg focus:border-green-500 focus:outline-none"
+                placeholder="Enter supplier name"
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
@@ -128,46 +215,29 @@ export default function CreateSupplier() {
 
             {/* NIC */}
             <div>
-              <label className="block font-medium mb-1">NIC</label>
+              <label className="block font-semibold mb-2 text-gray-700">NIC Number *</label>
               <input
                 type="text"
                 name="NIC"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter NIC (e.g., 123456789V)"
+                className="w-full border-2 border-gray-300 px-4 py-3 rounded-lg focus:border-green-500 focus:outline-none"
+                placeholder="Enter NIC (e.g., 123456789V or 123456789012)"
                 value={NIC}
                 onChange={(e) => {
-                  setNIC(e.target.value);
+                  setNIC(e.target.value.toUpperCase());
                   handleInputChange(e, validateNIC);
                 }}
               />
               {errors.NIC && <p className="text-red-500 text-sm mt-1">{errors.NIC}</p>}
             </div>
 
-            {/* Address */}
-            <div>
-              <label className="block font-medium mb-1">Address</label>
-              <input
-                type="text"
-                name="address"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Address"
-                value={address}
-                onChange={(e) => {
-                  setAddress(e.target.value);
-                  handleInputChange(e, validateAddress);
-                }}
-              />
-              {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
-            </div>
-
             {/* Contact Number */}
             <div>
-              <label className="block font-medium mb-1">Contact Number</label>
+              <label className="block font-semibold mb-2 text-gray-700">Contact Number *</label>
               <input
                 type="text"
                 name="contact"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Contact Number"
+                className="w-full border-2 border-gray-300 px-4 py-3 rounded-lg focus:border-green-500 focus:outline-none"
+                placeholder="Enter contact number (e.g., 0771234567)"
                 value={contact}
                 onChange={(e) => {
                   setContact(e.target.value);
@@ -179,12 +249,12 @@ export default function CreateSupplier() {
 
             {/* Email */}
             <div>
-              <label className="block font-medium mb-1">Email</label>
+              <label className="block font-semibold mb-2 text-gray-700">Email Address *</label>
               <input
                 type="email"
                 name="email"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Email"
+                className="w-full border-2 border-gray-300 px-4 py-3 rounded-lg focus:border-green-500 focus:outline-none"
+                placeholder="Enter email address"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -193,16 +263,39 @@ export default function CreateSupplier() {
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
+            
 
-            {/* Submit Button */}
-            <div className="text-center mt-6">
-              <button
-                onClick={handleSaveSupplier}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded w-full md:w-auto"
-              >
-                Submit
-              </button>
-            </div>
+           
+
+           
+          </div>
+
+          {/* Address (full width) */}
+          <div className="mt-6">
+            <label className="block font-semibold mb-2 text-gray-700">Full Address *</label>
+            <textarea
+              name="address"
+              className="w-full border-2 border-gray-300 px-4 py-3 rounded-lg focus:border-green-500 focus:outline-none"
+              placeholder="Enter complete address"
+              rows="3"
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                handleInputChange(e, validateAddress);
+              }}
+            />
+            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+          </div>
+
+          {/* Submit Button */}
+          <div className="text-center mt-8">
+            <button
+              onClick={handleSaveSupplier}
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold px-8 py-3 rounded-lg text-lg transition-colors duration-200 min-w-48"
+            >
+              {loading ? 'Adding Supplier...' : 'Add Tea Supplier'}
+            </button>
           </div>
         </div>
       </div>
