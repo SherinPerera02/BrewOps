@@ -1,276 +1,374 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
-import Footer from '../components/Footer';
-import { FaBell, FaUsers, FaBoxOpen, FaExclamationTriangle, FaPlus, FaFileAlt, FaHome, FaWarehouse, FaTruck, FaLeaf } from 'react-icons/fa';
-import { MdDashboardCustomize } from "react-icons/md";
-import Spinner from '../components/Spinner';
 import NavigationBar from '../components/navigationBar';
-import DashboardCard from '../components/DashboardCard';
-import { Bar, Line, Pie } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-} from 'chart.js';
-import { MdDashboard } from 'react-icons/md';
+import Footer from '../components/Footer';
+import { Link } from 'react-router-dom';
+import { 
+  FaBell, 
+  FaUsers, 
+  FaBoxOpen, 
+  FaExclamationTriangle, 
+  FaPlus, 
+  FaFileAlt, 
+  FaHome, 
+  FaWarehouse, 
+  FaTruck,
+  FaSearch,
+  FaFilter,
+  FaChevronDown,
+  FaCog,
+  FaExpand,
+  FaEye,
+  FaChartBar,
+  FaMoneyBillWave,
+  FaLeaf,
+  FaUserCircle
+} from 'react-icons/fa';
+import { MdDashboard, MdTrendingUp, MdTrendingDown } from 'react-icons/md';
+import { LineChart, BarChart, PieChart, AreaChart, Line, Bar, Pie, Area, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
-
-const ProductionManagerDashboard = () => {
-  const [originalInventory, setOriginalInventory] = useState([]);
-  const [inventory, setInventory] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [totalRawLeaves, setTotalRawLeaves] = useState(0);
-  const [previousTotal, setPreviousTotal] = useState(null);
-  const [notifications, setNotifications] = useState([]);
+const ModernProductionDashboard = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'warning', message: 'Low stock alert: Green Tea Leaves below 5000kg', time: '2 mins ago' },
+    { id: 2, type: 'info', message: 'New supplier application received', time: '15 mins ago' },
+    { id: 3, type: 'success', message: 'Production batch #PT-2024-001 completed', time: '1 hour ago' }
+  ]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [chartType, setChartType] = useState('line');
-  const [messages, setMessages] = useState([]);
-
-  const [suppliers, setSuppliers] = useState(5); // Mock data
-  const [lowStock, setLowStock] = useState(2); // Mock data
-  const [stockChartData, setStockChartData] = useState({
-    labels: ['January', 'February', 'March', 'April', 'May'],
-    datasets: [{
-      label: 'Stock (kg)',
-      data: [5000, 7000, 6000, 8000, 7500], // Mock data
-      borderColor: 'rgba(75, 192, 192, 1)',
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      fill: true,
-      tension: 0.3
-    }]
-  });
-  const [supplierChartData, setSupplierChartData] = useState({
-    labels: ['Supplier A', 'Supplier B', 'Supplier C', 'Supplier D'],
-    datasets: [{
-      label: 'Tea Leaves Supply',
-      data: [2000, 3000, 1500, 2500], // Mock data
-      backgroundColor: [
-        'rgba(255,99,132,0.7)',
-        'rgba(54,162,235,0.7)',
-        'rgba(255,206,86,0.7)',
-        'rgba(75,192,192,0.7)'
-      ],
-      borderColor: [
-        'rgba(255,99,132,1)',
-        'rgba(54,162,235,1)',
-        'rgba(255,206,86,1)',
-        'rgba(75,192,192,1)'
-      ],
-      borderWidth: 1
-    }]
+  const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Mock data with more realistic values
+  const [dashboardData, setDashboardData] = useState({
+    totalSuppliers: 12,
+    rawTeaInventory: 47250,
+    lowStockItems: 3,
+    productionTarget: 85.6,
+    todayProduction: 2340,
+    weeklyGrowth: 12.5,
+    monthlyRevenue: 125000,
+    activeOrders: 28
   });
 
-  // Fetch inventory
-  useEffect(() => {
-    setLoading(true);
-    axios.get('http://localhost:5000/inventory')
-      .then((response) => {
-        setOriginalInventory(response.data);
-        setInventory(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      });
+  // Enhanced chart data
+  const stockData = [
+    { name: 'Jan', stock: 45000, target: 50000, production: 38000 },
+    { name: 'Feb', stock: 52000, target: 50000, production: 42000 },
+    { name: 'Mar', stock: 48000, target: 50000, production: 39000 },
+    { name: 'Apr', stock: 51000, target: 50000, production: 44000 },
+    { name: 'May', stock: 47250, target: 50000, production: 41000 },
+  ];
 
-    axios.get('/api/dashboard/summary')
-      .then(res => {
-        setSuppliers(res.data.totalSuppliers);
-        setLowStock(res.data.lowStock);
-      })
-      .catch(err => console.log(err));
+  const supplierData = [
+    { name: 'Highland Tea Co.', value: 35, color: '#10B981' },
+    { name: 'Valley Estates', value: 28, color: '#3B82F6' },
+    { name: 'Mountain Springs', value: 22, color: '#F59E0B' },
+    { name: 'Sunrise Gardens', value: 15, color: '#EF4444' }
+  ];
 
-    axios.get('/api/dashboard/charts')
-      .then(res => {
-        setStockChartData({
-          labels: res.data.stock.labels,
-          datasets: [{
-            label: 'Stock (kg)',
-            data: res.data.stock.data,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.3
-          }]
-        });
+  const productionTrends = [
+    { time: '00:00', black: 120, green: 85, white: 45, oolong: 30 },
+    { time: '04:00', black: 150, green: 92, white: 52, oolong: 38 },
+    { time: '08:00', black: 180, green: 110, white: 68, oolong: 45 },
+    { time: '12:00', black: 220, green: 135, white: 82, oolong: 55 },
+    { time: '16:00', black: 200, green: 128, white: 75, oolong: 50 },
+    { time: '20:00', black: 170, green: 105, white: 60, oolong: 42 },
+  ];
 
-        setSupplierChartData({
-          labels: res.data.suppliers.labels,
-          datasets: [{
-            label: 'Tea Leaves Supply',
-            data: res.data.suppliers.data,
-            backgroundColor: [
-              'rgba(255,99,132,0.7)',
-              'rgba(54,162,235,0.7)',
-              'rgba(255,206,86,0.7)',
-              'rgba(75,192,192,0.7)'
-            ],
-            borderColor: [
-              'rgba(255,99,132,1)',
-              'rgba(54,162,235,1)',
-              'rgba(255,206,86,1)',
-              'rgba(75,192,192,1)'
-            ],
-            borderWidth: 1
-          }]
-        });
-      })
-      .catch(err => console.log(err));
+  const recentActivities = [
+    { id: 1, action: 'Batch PT-2024-045 started', user: 'John Smith', time: '10 mins ago', type: 'production' },
+    { id: 2, action: 'Inventory updated: +2500kg Green Tea', user: 'Sarah Wilson', time: '25 mins ago', type: 'inventory' },
+    { id: 3, action: 'Quality check completed', user: 'Mike Chen', time: '1 hour ago', type: 'quality' },
+    { id: 4, action: 'New supplier onboarded', user: 'Emma Davis', time: '2 hours ago', type: 'supplier' }
+  ];
 
-    // Fetch messages from the backend
+  const DashboardCard = ({ title, value, icon: Icon, color, trend, trendValue, subtitle }) => (
+    <div className={`${color} rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-white/20 backdrop-blur-sm`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="p-3 bg-white/20 rounded-lg">
+            <Icon className="text-2xl text-white" />
+          </div>
+          <div>
+            <h3 className="text-white/80 text-sm font-medium">{title}</h3>
+            <p className="text-3xl font-bold text-white">{value}</p>
+          </div>
+        </div>
+        {trend && (
+          <div className={`flex items-center space-x-1 ${trend === 'up' ? 'text-green-200' : 'text-red-200'}`}>
+            {trend === 'up' ? <MdTrendingUp /> : <MdTrendingDown />}
+            <span className="text-sm font-medium">{trendValue}%</span>
+          </div>
+        )}
+      </div>
+      {subtitle && <p className="text-white/70 text-sm">{subtitle}</p>}
+    </div>
+  );
 
-  }, []);
+  const QuickActionButton = ({ icon: Icon, label, color, onClick }) => (
+    <button 
+      onClick={onClick}
+      className={`${color} text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center space-x-3 font-medium`}
+    >
+      <Icon className="text-lg" />
+      <span>{label}</span>
+    </button>
+  );
 
-  // Monitor total inventory
-  useEffect(() => {
-    const total = originalInventory.reduce((sum, item) => sum + item.quantity, 0);
-    setTotalRawLeaves(total);
+  const ChartCard = ({ title, children, fullWidth = false }) => (
+    <div className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${fullWidth ? 'col-span-full' : ''}`}>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+        <div className="flex items-center space-x-2">
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <FaExpand className="text-gray-400" />
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <FaCog className="text-gray-400" />
+          </button>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
 
-    if (total < 10000 && previousTotal !== null && total !== previousTotal) {
-      const alertMsg = `Raw leaves inventory is below 10,000 kg! Current: ${total} kg.`;
+  const ActivityItem = ({ activity }) => {
+    const getIconColor = (type) => {
+      switch(type) {
+        case 'production': return 'bg-blue-100 text-blue-600';
+        case 'inventory': return 'bg-green-100 text-green-600';
+        case 'quality': return 'bg-purple-100 text-purple-600';
+        case 'supplier': return 'bg-orange-100 text-orange-600';
+        default: return 'bg-gray-100 text-gray-600';
+      }
+    };
 
-      // Toast alert
-      toast.error(alertMsg);
-
-
-    }
-
-    setPreviousTotal(total);
-  }, [originalInventory]);
-
-  // Chart options
-  const stockOptions = { responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Tea Leaves Stock Levels Over Time' } } };
-  const supplierOptions = { responsive: true, plugins: { legend: { position: 'right' }, title: { display: true, text: 'Supplier-wise Tea Leaves Supply' } } };
-
-  // Chart data
-  const chartData = {
-    labels: inventory.map(item => item.batchid),
-    datasets: [
-      {
-        label: 'Quantity',
-        data: inventory.map(item => item.quantity),
-        backgroundColor: 'rgba(34,197,94,0.7)',
-        borderColor: 'rgba(34,197,94,1)',
-        borderWidth: 2,
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { display: true, position: 'top' },
-      title: { display: true, text: 'Inventory Quantity per Batch' },
-    },
-    scales: { y: { beginAtZero: true } },
+    return (
+      <div className="flex items-center space-x-4 p-4 hover:bg-gray-50 rounded-lg transition-colors">
+        <div className={`p-2 rounded-full ${getIconColor(activity.type)}`}>
+          <FaEye className="text-sm" />
+        </div>
+        <div className="flex-1">
+          <p className="font-medium text-gray-800">{activity.action}</p>
+          <p className="text-sm text-gray-500">by {activity.user} • {activity.time}</p>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <NavigationBar notifications={notifications} />
+    <div className="min-h-screen bg-gray-50">
+      {/* Keep existing global NavigationBar */}
+      <NavigationBar />
 
-      <div className="flex flex-1">
+      <div className="flex">
         {/* Sidebar */}
-        <aside className="bg-gray-800 text-white w-64 h-screen p-6 space-y-4 sticky top-0">
-          <Link to="/" className="px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium flex items-center">
-            <FaHome className="mr-3" /> Home
-          </Link>
-          <Link to="/ProductionManagerDashboard" className="px-4 py-2 rounded bg-green-600  text-sm font-medium flex items-center">
-            <MdDashboardCustomize className="mr-3" /> Dashboard
-          </Link>
-          <Link to="/inventories" className="px-4 py-2 rounded hover:bg-gray-700 bg-opacity-40 text-sm font-medium flex items-center">
-            <FaWarehouse className="mr-3" /> Inventory
-          </Link>
-          <Link to="/SupplierHome" className="px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium flex items-center">
-            <FaUsers className="mr-3" /> Supplier
-          </Link>
-          <Link to="/production" className="px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium flex items-center">
-            <FaTruck className="mr-3" /> Production
-          </Link>
-          
+        <aside className="w-64 bg-gray-900 text-white flex flex-col sticky top-0 h-screen">
+          <nav className="flex-1 p-4 space-y-2">
+            <Link to="/" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+              <FaHome /> Home
+            </Link>
+            <Link to="/SupplierDashboard" className="flex text-sm items-center gap-2 p-2 rounded bg-green-700 text-white">
+              <FaChartBar /> Dashboard
+            </Link>
+            <Link to="/suppliers/transactions" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+              <FaMoneyBillWave /> Transactions
+            </Link>
+            <Link to="/suppliers/leavesQuantity" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+              <FaLeaf /> Leaves Quantity
+            </Link>
+            <Link to="/suppliers/paymentSummary" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+              <FaMoneyBillWave /> Payment Summary
+            </Link>
+            <Link to="/suppliers/editProfile" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
+              <FaUserCircle /> Edit Profile
+            </Link>
+          </nav>
 
-
+          {/* Quick Stats kept in sidebar */}
+          <div className="p-4 border-t border-gray-800">
+            <h4 className="text-xs text-gray-400 uppercase mb-2">Quick Stats</h4>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                <div>
+                  <div className="text-xs text-gray-300">Suppliers</div>
+                  <div className="text-lg font-bold">{dashboardData.totalSuppliers}</div>
+                </div>
+                <div className="text-green-400">📦</div>
+              </div>
+              <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                <div>
+                  <div className="text-xs text-gray-300">Raw Inventory (kg)</div>
+                  <div className="text-lg font-bold">{dashboardData.rawTeaInventory}</div>
+                </div>
+                <div className="text-yellow-300">🌿</div>
+              </div>
+              <div className="flex items-center justify-between bg-white/5 p-2 rounded">
+                <div>
+                  <div className="text-xs text-gray-300">Low Stock</div>
+                  <div className="text-lg font-bold">{dashboardData.lowStockItems}</div>
+                </div>
+                <div className="text-red-400">⚠️</div>
+              </div>
+            </div>
+          </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8 overflow-auto">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Production Manager Dashboard</h1>
-
-          {/* Dashboard Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 mt-2">
-            <DashboardCard title="Total Suppliers" value={suppliers} icon={FaUsers} color="bg-green-100" />
-            <DashboardCard title="Raw Tea Inventory (Kg)" value={totalRawLeaves} icon={FaBoxOpen} color="bg-green-100" />
-            <DashboardCard title="Low Stock" value={lowStock} icon={FaExclamationTriangle} color="bg-yellow-100" />
-          </div>
-
-          {/* Quick Action Buttons */}
-          <div className="flex flex-wrap gap-3 mb-6">
-            <Link to="/suppliers/create">
-              <button className="flex items-center bg-green-600 text-white px-3 py-2 rounded shadow hover:bg-green-700 transition">
-                <FaPlus className="mr-2" /> Add Supplier
-              </button>
-            </Link>
-            <Link to="/supplyRecode/create">
-              <button className="flex items-center bg-blue-600 text-white px-3 py-2 rounded shadow hover:bg-blue-700 transition">
-                <FaPlus className="mr-2" /> Add Inventory
-              </button>
-            </Link>
-            <Link to="#">
-              <button className="flex items-center bg-gray-600 text-white px-3 py-2 rounded shadow hover:bg-gray-700 transition">
-                <FaFileAlt className="mr-2" /> Generate Report
-              </button>
-            </Link>
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-            <div className="bg-white p-3 rounded-lg shadow h-72 md:h-80">
-              <Line data={stockChartData} options={stockOptions} />
+        <main className="flex-1 p-8">
+          {/* Header with Time Range Selector */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-800">Production Overview</h2>
+              <p className="text-gray-600 mt-1">Monitor and manage your tea production operations</p>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow h-72 md:h-80">
-              <Pie data={supplierChartData} options={supplierOptions} />
-            </div>
-          </div>
-
-          {/* Inventory Chart */}
-          <div className="mt-12 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-            <div className="mb-4 flex items-center gap-4">
-              <label htmlFor="chartType" className="font-medium">Chart Type:</label>
+            <div className="flex items-center space-x-4">
               <select
-                id="chartType"
-                value={chartType}
-                onChange={e => setChartType(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1"
+                value={selectedTimeRange}
+                onChange={(e) => setSelectedTimeRange(e.target.value)}
+                className="px-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
-                <option value="bar">Bar</option>
-                <option value="line">Line</option>
+                <option value="1d">Last 24 hours</option>
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="90d">Last 90 days</option>
               </select>
             </div>
-            {chartType === 'bar' ? (
-              <Bar data={chartData} options={chartOptions} />
-            ) : (
-              <Line data={chartData} options={chartOptions} />
-            )}
+          </div>
+
+          {/* Dashboard Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <DashboardCard
+              title="Total Suppliers"
+              value={dashboardData.totalSuppliers}
+              icon={FaUsers}
+              color="bg-gradient-to-br from-blue-500 to-blue-600"
+              trend="up"
+              trendValue="8"
+              subtitle="2 new this month"
+            />
+            <DashboardCard
+              title="Raw Inventory"
+              value={`${(dashboardData.rawTeaInventory / 1000).toFixed(1)}K kg`}
+              icon={FaBoxOpen}
+              color="bg-gradient-to-br from-green-500 to-green-600"
+              trend="down"
+              trendValue="3"
+              subtitle="Stock level normal"
+            />
+            <DashboardCard
+              title="Production Target"
+              value={`${dashboardData.productionTarget}%`}
+              icon={MdTrendingUp}
+              color="bg-gradient-to-br from-purple-500 to-purple-600"
+              trend="up"
+              trendValue="12"
+              subtitle="Above target"
+            />
+            <DashboardCard
+              title="Active Orders"
+              value={dashboardData.activeOrders}
+              icon={FaTruck}
+              color="bg-gradient-to-br from-orange-500 to-orange-600"
+              trend="up"
+              trendValue="15"
+              subtitle="On schedule"
+            />
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-4 mb-8">
+            <QuickActionButton
+              icon={FaPlus}
+              label="Add Supplier"
+              color="bg-gradient-to-r from-green-500 to-green-600"
+              onClick={() => console.log('Add supplier')}
+            />
+            <QuickActionButton
+              icon={FaBoxOpen}
+              label="Update Inventory"
+              color="bg-gradient-to-r from-blue-500 to-blue-600"
+              onClick={() => console.log('Update inventory')}
+            />
+            <QuickActionButton
+              icon={FaFileAlt}
+              label="Generate Report"
+              color="bg-gradient-to-r from-purple-500 to-purple-600"
+              onClick={() => console.log('Generate report')}
+            />
+          </div>
+
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <ChartCard title="Stock Levels & Production">
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={stockData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Area type="monotone" dataKey="stock" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
+                  <Area type="monotone" dataKey="production" stackId="2" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Supplier Distribution">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    dataKey="value"
+                    data={supplierData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label={({name, value}) => `${name}: ${value}%`}
+                  >
+                    {supplierData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartCard>
+          </div>
+
+          {/* Production Trends - Full Width */}
+          <ChartCard title="Real-time Production Trends" fullWidth>
+            <ResponsiveContainer width="100%" height={350}>
+              <LineChart data={productionTrends}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="black" stroke="#374151" strokeWidth={3} dot={{r: 4}} />
+                <Line type="monotone" dataKey="green" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
+                <Line type="monotone" dataKey="white" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
+                <Line type="monotone" dataKey="oolong" stroke="#8B5CF6" strokeWidth={3} dot={{r: 4}} />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          {/* Recent Activities */}
+          <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-800">Recent Activities</h3>
+              <button className="text-blue-600 hover:text-blue-700 font-medium">View All</button>
+            </div>
+            <div className="space-y-1">
+              {recentActivities.map((activity) => (
+                <ActivityItem key={activity.id} activity={activity} />
+              ))}
+            </div>
           </div>
         </main>
       </div>
-
+      {/* Keep existing Footer */}
       <Footer />
-      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };
 
-export default ProductionManagerDashboard;
+export default ModernProductionDashboard;

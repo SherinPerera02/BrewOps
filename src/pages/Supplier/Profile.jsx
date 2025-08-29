@@ -3,7 +3,7 @@ import axios from "axios";
 import NavigationBar from "../../components/navigationBar";
 import SupplierSidebar from "../../components/SupplierSidebar";
 import Footer from "../../components/Footer";
-import Spinner from "../../components/spinner";
+import Spinner from "../../components/Spinner";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);

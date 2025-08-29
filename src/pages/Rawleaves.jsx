@@ -4,7 +4,7 @@ import Spinner from '../components/Spinner';
 import { Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import NavigationBar from '../components/NavigationBar';
+import NavigationBar from '../components/navigationBar';
 import Footer from '../components/Footer';
 import InventorySidebar from '../components/inventorySidebar';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';

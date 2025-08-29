@@ -11,6 +11,7 @@ import AdminDashboard from './pages/adminDashboard';
 import RegisterPage from './pages/register';
 import SupplierDashboard from './pages/supplierDashboard';
 import ProductionManagerDashboard from './pages/ProductionManagerDashboard';
+import StaffDashboard from './pages/StaffDashboard';
 
 import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier'
