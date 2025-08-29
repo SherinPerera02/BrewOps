@@ -1,22 +1,16 @@
 import HomePage from './pages/homePage';
-import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
-import NavigationBar from './components/navigationBar';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
 import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
-
-import SupplyRecordTable from './pages/Rawleaves';
-import RetrieveTeaLeavesEntries from './pages/Rawtealeaves';
-import CreateTeaLeavesEntry from './pages/Rawtealeavescreate';
-import DeleteTeaLeavesEntry from './pages/Rawtealeavesdelete';
-import UpdateTeaLeavesEntry from './pages/Rawtealeavesupdate';
-
 import WhoWeAre from './pages/WhoWeAre';
 import LoginPage from './pages/login';
 import AdminDashboard from './pages/adminDashboard';
 import RegisterPage from './pages/register';
+import SupplierDashboard from './pages/supplierDashboard';
+import ProductionManagerDashboard from './pages/ProductionManagerDashboard';
 
 import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier'
@@ -27,52 +21,78 @@ import DeleteSuppliers from './pages/Supplier/DeleteSuppliers'
 
 import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
-import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1'
+import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1';
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 
-function App() {
+import StaffProfile from './pages/Supplier/StaffProfile';
+import Setting from './pages/Supplier/Setting'
+import EditProfile from './pages/editProfile';
+import PaymentSummary from './pages/paymentSummary';
+import LeavesQuantity from './pages/leavesQuantity';
+import Transaction from './pages/transaction';
+import NavigationBar from "./components/navigationBar";
+import Production from './pages/Production';
+
+function AppRoutes() {
+  const location = useLocation();
+  // This lets us render a background page while a modal route is active
+  const background = location.state && location.state.background;
+
   return (
-    <BrowserRouter>
-      
-      <Routes>
+    <>
+      <Routes location={background || location}>
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutUs" element={<WhoWeAre />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/admin" element={<AdminDashboard />} />
-       
         <Route path="/inventories" element={<Inventories />} />
         <Route path="/inventory/creates" element={<CreateInventory />} />
-        <Route path="/inventory/details/:id" element={<ShowInventory />} />
+        <Route path="/inventory/:id" element={<ShowInventory />} />
         <Route path="/inventory/edit/:id" element={<EditInventory />} />
         <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
-  
+        <Route path="/ProductionManagerDashboard" element={<ProductionManagerDashboard />} />
+        <Route path="/Production" element={<Production />} />
+        <Route path ="/StaffDashboard" element={<StaffDashboard/>}/>
+        <Route path = '/Staff/profile' element = {<StaffProfile/>}/>
+        <Route path='/Staff/profile/setting' element={<Setting/>}/>
         <Route path="/SupplierHome" element={<SupplierHome />} />
-
-        // Supplier Create
         <Route path ="/suppliers/create" element={<CreateSupplier />} />
         <Route path ="/suppliers/details/:id"  element={<ShowSupplier />} />
         <Route path ='/SupplierRecodeCreate' element={<CreateSupplyRecode1 />} />
         <Route path ="/Suppliers/edit/:id" element={<EditSupplier/>}/>
         <Route path="/Suppliers/delete/:id" element={<DeleteSuppliers/>}/>
-
-
-        // Supplier Recode Table
         <Route path ='/SupplierRecode' element={<SupplierRecode />} />
         <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
         <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
         <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
         <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
-
-        <Route path="/Rawleaves" element={<SupplyRecordTable />} />
-        <Route path="/Rawtealeaves" element={<RetrieveTeaLeavesEntries />} />
-        <Route path="/Rawtealeavescreate" element={<CreateTeaLeavesEntry />} />
-        <Route path="/Rawtealeavesdelete/:id" element={<DeleteTeaLeavesEntry />} />
-        <Route path="/Rawtealeavesupdate/:id" element={<UpdateTeaLeavesEntry />} />
-
+        <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
+        <Route path="/suppliers/editProfile" element={<EditProfile />} />
+        <Route path="/suppliers/paymentSummary" element={<PaymentSummary />} />
+        <Route path="/suppliers/leavesQuantity" element={<LeavesQuantity />} />
+        <Route path="/suppliers/transactions" element={<Transaction />} />
+       
+        
       </Routes>
-    </BrowserRouter>
+
+      {/* If a background location exists, render modal routes over the background */}
+      {background && (
+        <Routes>
+          <Route path="/inventory/creates" element={<CreateInventory />} />
+          <Route path="/inventory/:id" element={<ShowInventory />} />
+          <Route path="/inventory/edit/:id" element={<EditInventory />} />
+          <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
+        </Routes>
+      )}
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}

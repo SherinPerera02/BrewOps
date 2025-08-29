@@ -1,10 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
-import BackButton from '../components/backButton';
-import Spinner from '../components/spinner';
-import NavigationBar from '../components/navigationBar';
-import Footer from '../components/footer';
+import Spinner from '../components/Spinner';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const DeleteInventory = () => {
@@ -16,45 +13,30 @@ const DeleteInventory = () => {
   // Fetch inventory details
   useEffect(() => {
     setLoading(true);
-    // Mock data fallback if backend is not ready
-    setTimeout(() => {
-      // You can customize this mock data as needed
-      const mockData = {
-        name: 'Sample Inventory',
-        category: 'Tea',
-        batchid: 'B-1001',
-        inventorynumber: 'INV001'
-      };
-      setInventory(mockData);
-      setLoading(false);
-    }, 500);
-    // Uncomment below for real backend
-    // const fetchInventory = async () => {
-    //   setLoading(true);
-    //   try {
-    //     const res = await axios.get(`http://localhost:5173/inventories/${id}`);
-    //     setInventory(res.data);
-    //   } catch (error) {
-    //     console.error('Error fetching inventory details:', error);
-    //     alert('Failed to load inventory details.');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    // fetchInventory();
+    
+    const fetchInventory = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`http://localhost:5000/inventory/${id}`);
+        setInventory(res.data.data);
+      } catch (error) {
+        console.error('Error fetching inventory details:', error);
+  toast.error('Failed to load inventory details.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInventory();
   }, [id]);
 
   const handleDeleteInventory = async () => {
-    const confirm = window.confirm('Are you sure you want to delete this inventory item?');
-    if (!confirm) return;
-
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:5173/inventories/${id}`);
-      navigate('/inventories'); // ✅ Correct path after delete
+      await axios.delete(`http://localhost:5000/inventory/${id}`);
+      navigate('/inventories'); 
     } catch (error) {
-      alert('There was an error. Please check the console.');
       console.error(error);
+  toast.error('There was an error deleting the inventory. Please check the console.');
     } finally {
       setLoading(false);
     }
@@ -62,37 +44,68 @@ const DeleteInventory = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <NavigationBar />
-      <div className="flex-1 p-4">     <BackButton />
+      <Toaster position="top-middle" />
+      {/* Modal backdrop */}
+  <div className='fixed inset-0 bg-black/60 flex items-center justify-center z-50' onClick={() => navigate('/inventories')}>
+        <div className="mt-6 bg-white p-8 rounded-lg shadow-md max-w-xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
 
-        {loading && <Spinner />}
+          {loading && <Spinner />}
 
-        {!loading && inventory && (
-          <div className="flex flex-col items-center rounded-xl w-[600px] p-8 mx-auto shadow-md bg-white">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800">Delete Inventory</h1>
+          {!loading && inventory && (
+            <>
+              <h1 className="text-2xl font-bold mb-6 text-gray-800">Delete Inventory</h1>
 
-            <div className="text-left w-full mb-4 text-md">
-              <p><strong>Inventory Name:</strong> {inventory.name}</p>
-              <p><strong>Category:</strong> {inventory.category}</p>
-              <p><strong>Batch ID:</strong> {inventory.batchid}</p>
-              <p><strong>Inventory Number:</strong> {inventory.inventorynumber}</p>
-            </div>
+              <div className="text-center w-full mb-4 text-md space-y-2">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="mb-2">
+                    <strong className="text-gray-700">Inventory ID:</strong> 
+                    <span className="text-gray-900 font-semibold ml-2">{inventory.inventoryid}</span>
+                  </p>
+                  <p className="mb-2">
+                    <strong className="text-gray-700">Quantity:</strong> 
+                    <span className="text-gray-900 font-semibold ml-2">{inventory.quantity} kg</span>
+                  </p>
+                  {inventory.createdAt && (
+                    <p className="mb-2">
+                      <strong className="text-gray-700">Date Created:</strong> 
+                      <span className="text-gray-600 ml-2">
+                        {new Date(inventory.createdAt).toLocaleDateString()}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              </div>
 
-            <p className="text-center text-red-600 mb-4">
-              Are you sure you want to permanently delete this inventory item?
-            </p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 w-full">
+                <p className="text-center text-red-600 font-semibold">
+                   Warning: This action cannot be undone
+                </p>
+                <p className="text-center text-gray-700 mt-2">
+                  Are you sure you want to permanently delete this inventory item?
+                </p>
+              </div>
 
-            <button
-              onClick={handleDeleteInventory}
-              disabled={loading}
-              className="bg-red-500 text-white p-2 mt-2 rounded-md hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Confirm Delete
-            </button>
-          </div>
-        )}
+              <div className="flex gap-4">
+                <button
+                  onClick={handleDeleteInventory}
+                  disabled={loading}
+                  className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                >
+                  {loading ? 'Deleting...' : 'Confirm Delete'}
+                </button>
+                
+                <button
+                  onClick={() => navigate('/inventories')}
+                  className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition-all font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
-      <Footer />
+      
     </div>
   );
 };

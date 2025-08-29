@@ -67,7 +67,7 @@ const HomePage = () => {
   }, [currentSlide, slides.length]);
 
   return (
-    <div className="font-sans bg-green-50">
+    <div className="font-sans bg-gray-50">
       {/* Header */}
       <NavigationBar />
 
