@@ -5,6 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
 
+// Keep a singleton socket instance to avoid rapid create/destroy cycles
+// (React StrictMode in development can mount/unmount components twice).
+let socketInstance = null;
+let socketHandlersAttached = false;
+
 const NavigationBar = () => {
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
@@ -29,18 +34,58 @@ const NavigationBar = () => {
     fetchMessages();
     fetchAllUsers();
     
-    // Connect to Socket.IO server
-    const socket = io('http://localhost:5000', {
-      transports: ['websocket'],
-
-      auth: {
-        token: localStorage.getItem('jwtToken')
+    // Connect to Socket.IO server with conservative reconnection settings
+    // Reuse singleton socket to avoid close-before-open
+    if (!socketInstance) {
+      try {
+        socketInstance = io('http://localhost:5000', {
+          transports: ['websocket'],
+          reconnectionAttempts: 5,
+          reconnectionDelayMax: 5000,
+          auth: {
+            token: localStorage.getItem('jwtToken')
+          }
+        });
+      } catch (err) {
+        console.error('Failed to initialize socket.io client:', err);
       }
-    });
+    }
+
+    // Attach diagnostic handlers once
+    if (socketInstance && !socketHandlersAttached) {
+      socketHandlersAttached = true;
+      socketInstance.on('connect', () => {
+        console.info('Socket connected, id=', socketInstance.id);
+      });
+
+      socketInstance.on('connect_error', (err) => {
+        console.error('Socket connect_error:', err && err.message ? err.message : err);
+        console.debug('connect_error full:', err);
+      });
+
+      socketInstance.on('connect_timeout', (timeout) => {
+        console.warn('Socket connect_timeout:', timeout);
+      });
+
+      socketInstance.on('reconnect_attempt', (attempt) => {
+        console.warn('Socket reconnect_attempt:', attempt);
+      });
+
+      socketInstance.on('reconnect_failed', () => {
+        console.error('Socket reconnect_failed');
+      });
+
+      socketInstance.on('disconnect', (reason) => {
+        console.warn('Socket disconnected:', reason);
+      });
+
+      socketInstance.on('error', (err) => {
+        console.error('Socket error event:', err);
+      });
+    }
 
     // Listen for notification events
-    socket.on('notification', (notif) => {
-      // Only add if notification has a valid ID
+    const onNotification = (notif) => {
       if (notif && notif.id) {
         setNotifications((prev) => [notif, ...prev]);
         setUnreadNotifications((prev) => prev + 1);
@@ -51,26 +96,32 @@ const NavigationBar = () => {
       } else {
         console.warn('Received notification without valid ID:', notif);
       }
-    });
+    };
 
     // Listen for message events
-    socket.on('message', (msg) => {
-      // Only add if message has a valid ID
+    const onMessage = (msg) => {
       if (msg && msg.id) {
         setMessages((prev) => [msg, ...prev]);
         setUnreadMessages((prev) => prev + 1);
       } else {
         console.warn('Received message without valid ID:', msg);
       }
-    });
+    };
 
-    // Clean up listeners on unmount
+    if (socketInstance) {
+      socketInstance.on('notification', onNotification);
+      socketInstance.on('message', onMessage);
+    }
+
+    // Clean up listeners on unmount (remove handlers but keep singleton socket alive)
     return () => {
-      socket.off('notification');
-      socket.off('message');
-      socket.disconnect();
+      if (socketInstance) {
+        socketInstance.off('notification', onNotification);
+        socketInstance.off('message', onMessage);
+      }
     };
   }, []);
+
 
   useEffect(() => {
     // Filter users based on search query
@@ -117,6 +168,9 @@ const NavigationBar = () => {
   };
 
   const fetchNotifications = async () => {
+  // simple rate-limit guard: avoid calling more than once every 10s
+  if (fetchNotifications._lastCalled && Date.now() - fetchNotifications._lastCalled < 10000) return;
+  fetchNotifications._lastCalled = Date.now();
     try {
       const token = localStorage.getItem('jwtToken');
       const res = await axios.get('http://localhost:5000/api/notifications', {
@@ -149,6 +203,8 @@ const NavigationBar = () => {
   };
 
   const fetchMessages = async () => {
+  if (fetchMessages._lastCalled && Date.now() - fetchMessages._lastCalled < 10000) return;
+  fetchMessages._lastCalled = Date.now();
     try {
       const token = localStorage.getItem('jwtToken');
       const res = await axios.get('http://localhost:5000/api/messages', {
@@ -172,6 +228,8 @@ const NavigationBar = () => {
   };
 
   const fetchAllUsers = async () => {
+  if (fetchAllUsers._lastCalled && Date.now() - fetchAllUsers._lastCalled < 10000) return;
+  fetchAllUsers._lastCalled = Date.now();
     try {
       const token = localStorage.getItem('jwtToken');
       // Use a wildcard search to get all users

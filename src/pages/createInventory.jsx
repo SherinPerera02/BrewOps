@@ -1,102 +1,86 @@
-import React, { useState, useEffect } from 'react';
-import BackButton from '../components/backButton';
-import Spinner from '../components/Spinner';
-import NavigationBar from '../components/navigationBar';
-import Footer from '../components/Footer';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
+import Spinner from '../components/Spinner';
+
 const CreateInventory = () => {
-  const [batchid, setBatchId] = useState('');
-  const [inventorynumber, setInventoryNumber] = useState('');
   const [quantity, setQuantity] = useState('');
   const [loading, setLoading] = useState(false);
-  const [batchIdError, setBatchIdError] = useState('');
   const [quantityError, setQuantityError] = useState('');
-  const [inventoryNumberError, setInventoryNumberError] = useState('');
-  const [inventory, setInventory] = useState([]);
+  const [createdInventoryId, setCreatedInventoryId] = useState('');
+  const [preGeneratedInventoryId, setPreGeneratedInventoryId] = useState('');
   const navigate = useNavigate();
-  
+  const quantityRef = useRef(null);
+
   useEffect(() => {
-    setLoading(true);
-    
-    axios
-      .get('http://localhost:5000/inventory')
-      .then((response) => {
-        setInventory(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching inventory:', error);
-        setLoading(false);
-      });
+    // pre-generate inventory id in format INV-YYYYMMDD-HHMM using local time
+    const pad = (n) => n.toString().padStart(2, '0');
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = pad(now.getMonth() + 1);
+    const day = pad(now.getDate());
+    const hours = pad(now.getHours());
+    const minutes = pad(now.getMinutes());
+    const generated = `INV-${year}${month}${day}-${hours}${minutes}`;
+    setPreGeneratedInventoryId(generated);
   }, []);
 
+  useEffect(() => {
+    // focus the quantity input when modal finishes loading
+    if (!loading) {
+      setTimeout(() => {
+        quantityRef.current?.focus();
+      }, 0);
+    }
+  }, [loading]);
+
   const handleSaveInventory = () => {
-    const batchIdPattern = /^B-\d+$/; // Batch ID should start with B- followed by numbers
-    const inventoryNumberPattern = /^INV\d+$/; // Inventory Number should start with INV followed by numbers
-
-    if (!batchIdPattern.test(batchid)) {
-      alert('Batch ID must start with B- followed by numbers (e.g., B-1001)');
+    if (quantityError || !quantity) {
+      toast.error('Please fill all fields correctly');
       return;
     }
-
-    if (!inventoryNumberPattern.test(inventorynumber)) {
-      alert('Inventory Number must start with INV followed by numbers (e.g., INV001)');
+    if (quantity <= 0) {
+      toast.error('Quantity must be greater than 0');
       return;
     }
-
-    if (batchIdError || quantityError || inventoryNumberError || batchid.length < 5 || !batchid || !inventorynumber || !quantity) {
-      alert('Please fill all fields correctly');
-      return;
-    }
-
     const data = {
-      batchid,
-      inventorynumber,
-      quantity,
+      quantity: parseInt(quantity),
     };
     setLoading(true);
-    axios.post('http://localhost:5000/inventory', data)
-      .then(() => {
+    axios
+      .post('http://localhost:5000/inventory', data)
+      .then((response) => {
         setLoading(false);
-        navigate('/Inventories');
+        // Display the auto-generated inventory ID from backend
+        if (response.data && response.data.data && response.data.data.inventoryid) {
+          setCreatedInventoryId(response.data.data.inventoryid);
+          toast.success(`Inventory created successfully! ID: ${response.data.data.inventoryid}`);
+        } else {
+          // fallback confirmation when server didn't return an id
+          toast.success('Inventory created successfully!');
+        }
+  // Navigate after short delay so user can read the toast
+  setTimeout(() => navigate('/inventories'), );
       })
       .catch((error) => {
         console.error('Error saving inventory:', error);
-        alert('An error occurred');
+        toast.error('An error occurred while saving inventory');
         setLoading(false);
       });
   };
 
   useEffect(() => {
-    // Real-time validation for batchid
-    const pattern = /^B-\d+$/; // Batch ID should start with B- followed by numbers
-    if (!pattern.test(batchid)) {
-      setBatchIdError('Batch ID must start with B- followed by numbers (e.g., B-1001)');
-    } else {
-      setBatchIdError('');
-    }
-  }, [batchid]);
-
-  useEffect(() => {
     // Real-time validation for quantity
     if (quantity.length > 6) {
       setQuantityError('Quantity must not exceed 6 digits');
+    } else if (quantity && parseInt(quantity) <= 0) {
+      setQuantityError('Quantity must be greater than 0');
     } else {
       setQuantityError('');
     }
   }, [quantity]);
-
-  useEffect(() => {
-    // Real-time validation for inventory number
-    const pattern = /^INV\d+$/; // Inventory Number should start with INV followed by numbers
-    if (!pattern.test(inventorynumber)) {
-      setInventoryNumberError('Inventory Number must start with INV followed by numbers (e.g., INV001)');
-    } else {
-      setInventoryNumberError('');
-    }
-  }, [inventorynumber]);
 
   const handleQuantityChange = (e) => {
     const value = e.target.value;
@@ -105,82 +89,65 @@ const CreateInventory = () => {
     }
   };
 
-  const updateStatus = (id) => {
-    axios.put(`http://localhost:5000/inventory/${id}`, { status: 'add to the inventory' })
-      .then((response) => {
-        // Update the status in the state
-        setInventory(prevState => {
-          return prevState.map(item => {
-            if (item._id === id) {
-              return { ...item, status: 'add to the inventory' };
-            }
-            return item;
-          });
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
-      <NavigationBar />
-      <div className='flex-1 container mx-auaypx-4'>
-        <BackButton />
-        <h1 className='text-2xl my-4 text-center font-bold'>Create Inventory</h1>
+  {/* Modal backdrop */}
+  <div className='fixed inset-0 bg-black/60 flex items-center justify-center z-50' onClick={() => navigate('/inventories')}>
+        <div className='max-w-2xl w-full mx-4 bg-white p-8 rounded-lg shadow-md' onClick={(e) => e.stopPropagation()}>
+          <h1 className='text-2xl my-2 text-center font-bold text-gray-800'>Create Inventory</h1>
 
-        {loading ? <Spinner /> : ''}
-        <div className='max-w-3xl mx-auto px-4 bg-white shadow-md rounded-lg py-6 mb-8'>
-          <div className='mb-4'>
-            <label className='block text-md mb-2 text-gray-700'>Batch ID</label>
-            <input
-              type="text"
-              value={batchid}
-              onChange={(e) => setBatchId(e.target.value)}
-              onBlur={() => {
-                const pattern = /^B-\d+$/; // Batch ID should start with B- followed by numbers
-                if (!pattern.test(batchid)) {
-                  setBatchIdError('Batch ID must start with B- followed by numbers (e.g., B-1001)');
-                } else {
-                  setBatchIdError('');
-                }
-              }}
-              className={`border-2 border-gray-500 px-4 py-2 w-full rounded-md focus:outline-none focus:border-blue-500 ${batchIdError && 'border-red-500'}`}
-            />
-            {batchIdError && <div className="text-red-500">{batchIdError}</div>}
-          </div>
+          {loading && <Spinner />}
 
-          <div className='mb-4'>
-            <label className='block text-md mb-2 text-gray-700'>Inventory Number</label>
-            <input
-              type="text"
-              value={inventorynumber}
-              onChange={(e) => setInventoryNumber(e.target.value)}
-              className={`border-2 border-gray-500 px-4 py-2 w-full rounded-md focus:outline-none focus:border-blue-500 ${inventoryNumberError && 'border-red-500'}`}
-            />
-            {inventoryNumberError && <div className="text-red-500">{inventoryNumberError}</div>}
-          </div>
+          {!loading && (
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Inventory Number</label>
+                <input
+                  type="text"
+                  value={createdInventoryId || preGeneratedInventoryId || ''}
+                  placeholder={createdInventoryId || preGeneratedInventoryId ? '' : 'Will be generated by server (INV-YYYYMMDD-HHMM)'}
+                  disabled
+                  className='border border-gray-300 bg-gray-100 text-gray-700 px-4 py-2 w-full rounded-md'
+                />
+                <p className='text-xs text-gray-500 mt-1'>Inventory ID is auto-generated by the server.</p>
+              </div>
 
-          <div className='mb-4'>
-            <label className='block text-md mb-2 text-gray-700'>Quantity</label>
-            <input
-              type="number"
-              value={quantity}
-              onChange={handleQuantityChange}
-              className={`border-2 border-gray-500 px-4 py-2 w-full rounded-md focus:outline-none focus:border-blue-500 ${quantityError && 'border-red-500'}`}
-            />
-            {quantityError && <div className="text-red-500">{quantityError}</div>}
-          </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Quantity (kg)</label>
+                <input
+                  type="number"
+                  ref={quantityRef}
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  min="1"
+                  max="999999"
+                  placeholder="Enter quantity in kilograms"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 ${quantityError && 'border-red-500'}`}
+                />
+                {quantityError && <div className="text-red-500 text-sm mt-1">{quantityError}</div>}
+                <p className='text-sm text-gray-500 mt-1'>* Enter the quantity of raw leaves in kilograms (max 6 digits)</p>
+              </div>
 
-          <button className='py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600' onClick={handleSaveInventory}>
-            Save
-          </button>
+              <div className='flex gap-4'>
+                <button 
+                  className='py-2 px-6 bg-green-600 text-white rounded-md hover:bg-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed' 
+                  onClick={handleSaveInventory}
+                  disabled={loading || quantityError || !quantity}
+                >
+                  {loading ? 'Saving...' : 'Save Inventory'}
+                </button>
+
+                <button 
+                  className='py-2 px-6 bg-gray-500 text-white rounded-md hover:bg-gray-700 focus:outline-none' 
+                  onClick={() => navigate('/inventories')}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-
-
       </div>
-      <Footer />
     </div>
   );
 };

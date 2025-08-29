@@ -1,5 +1,5 @@
 import HomePage from './pages/homePage';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Inventories from './pages/inventories';
 import CreateInventory from './pages/createInventory';
 import ShowInventory from './pages/showInventory';
@@ -33,13 +33,15 @@ import LeavesQuantity from './pages/leavesQuantity';
 import Transaction from './pages/transaction';
 import NavigationBar from "./components/navigationBar";
 import Production from './pages/Production';
-import SupplierLayout from './components/SupplierLayout';
 
-function App() {
+function AppRoutes() {
+  const location = useLocation();
+  // This lets us render a background page while a modal route is active
+  const background = location.state && location.state.background;
+
   return (
-    <BrowserRouter>
-      
-      <Routes>
+    <>
+      <Routes location={background || location}>
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutUs" element={<WhoWeAre />} />
         <Route path="/login" element={<LoginPage />} />
@@ -65,17 +67,33 @@ function App() {
         <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
         <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
         <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
-        <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
+  <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
         <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
         <Route path="/suppliers/editProfile" element={<EditProfile />} />
         <Route path="/suppliers/paymentSummary" element={<PaymentSummary />} />
         <Route path="/suppliers/leavesQuantity" element={<LeavesQuantity />} />
         <Route path="/suppliers/transactions" element={<Transaction />} />
-        <Route path="/suppliers" element={<SupplierLayout />}/>
+       
         
       </Routes>
-    </BrowserRouter>
+
+      {/* If a background location exists, render modal routes over the background */}
+      {background && (
+        <Routes>
+          <Route path="/inventory/creates" element={<CreateInventory />} />
+          <Route path="/inventory/:id" element={<ShowInventory />} />
+          <Route path="/inventory/edit/:id" element={<EditInventory />} />
+          <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
+        </Routes>
+      )}
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}
