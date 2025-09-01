@@ -21,7 +21,8 @@ import {
   FaChartBar,
   FaMoneyBillWave,
   FaLeaf,
-  FaUserCircle
+  FaUserCircle,
+  FaUser
 } from 'react-icons/fa';
 import { MdDashboard, MdTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { LineChart, BarChart, PieChart, AreaChart, Line, Bar, Pie, Area, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
@@ -161,57 +162,152 @@ const ModernProductionDashboard = () => {
       <NavigationBar />
 
       <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-gray-900 text-white flex flex-col sticky top-0 h-screen">
-          <nav className="flex-1 p-4 space-y-2">
-            <Link to="/" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
-              <FaHome /> Home
-            </Link>
-            <Link to="/SupplierDashboard" className="flex text-sm items-center gap-2 p-2 rounded bg-green-700 text-white">
-              <FaChartBar /> Dashboard
-            </Link>
-            <Link to="/suppliers/transactions" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
-              <FaMoneyBillWave /> Transactions
-            </Link>
-            <Link to="/suppliers/leavesQuantity" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
-              <FaLeaf /> Leaves Quantity
-            </Link>
-            <Link to="/suppliers/paymentSummary" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
-              <FaMoneyBillWave /> Payment Summary
-            </Link>
-            <Link to="/suppliers/editProfile" className="flex text-sm items-center gap-2 p-2 rounded hover:bg-gray-700">
-              <FaUserCircle /> Edit Profile
-            </Link>
-          </nav>
+        {/* Enhanced Modern Sidebar */}
+        <div className="w-80 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 shadow-2xl border-r border-gray-700">
+          <div className="p-6">
+            {/* User Profile Section */}
+            <div className="flex items-center space-x-4 mb-8 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                <FaUserCircle className="text-white text-2xl" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold">Supplier Portal</h3>
+                <p className="text-gray-400 text-sm">Tea Leaf Supplier</p>
+              </div>
 
-          {/* Quick Stats kept in sidebar */}
-          <div className="p-4 border-t border-gray-800">
-            <h4 className="text-xs text-gray-400 uppercase mb-2">Quick Stats</h4>
+            </div>
+
+            {/* Navigation Links */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                <div>
-                  <div className="text-xs text-gray-300">Suppliers</div>
-                  <div className="text-lg font-bold">{dashboardData.totalSuppliers}</div>
-                </div>
-                <div className="text-green-400">📦</div>
+              <Link 
+                to="/" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaHome className="text-xl" />
+                <span>Home</span>
+              </Link>
+              
+              <Link 
+                to="/SupplierDashboard" 
+                className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700 text-white shadow-md"
+              >
+                <MdDashboard className="text-xl" />
+                <span className="font-medium">Dashboard</span>
+              </Link>
+              
+              <Link 
+                to="/SupplierHome" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaUsers className="text-xl" />
+                <span>Supplier Management</span>
+              </Link>
+              
+              <Link 
+                to="/inventories" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaWarehouse className="text-xl" />
+                <span>Inventory Management</span>
+              </Link>
+              
+              <Link 
+                to="/staff/editProfile" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaUserCircle className="text-xl" />
+                <span>Edit Profile</span>
+              </Link>
+              
+              <Link 
+                to="/Production" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaChartBar className="text-xl" />
+                <span>Production</span>
+              </Link>
+
+             <Link 
+                to="/Raw-leaves" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaLeaf className="text-xl" />
+                <span>Raw Leaves</span>
+              </Link>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mt-8">
+              <h4 className="text-gray-300 font-medium text-sm uppercase tracking-wider border-b border-gray-700 pb-2 mb-4">
+                Quick Actions
+              </h4>
+              
+              <div className="space-y-3">
+                <Link 
+                  to="/supplier/create-supply-recode" 
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-green-600 to-emerald-700 text-white hover:from-green-700 hover:to-emerald-800 transition-all duration-200 shadow-lg"
+                >
+                  <FaPlus className="text-lg" />
+                  <span className="font-medium">New Supply Record</span>
+                </Link>
+                
+                <button className="w-full flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg">
+                  <FaSearch className="text-lg" />
+                  <span className="font-medium">Search Records</span>
+                </button>
               </div>
-              <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                <div>
-                  <div className="text-xs text-gray-300">Raw Inventory (kg)</div>
-                  <div className="text-lg font-bold">{dashboardData.rawTeaInventory}</div>
+            </div>
+
+            {/* Quick Stats Section - Moved to Bottom */}
+            <div className="mt-8 space-y-4">
+              <h4 className="text-gray-300 font-medium text-sm uppercase tracking-wider border-b border-gray-700 pb-2">
+                Quick Stats
+              </h4>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <div className="bg-gradient-to-r from-green-600 to-emerald-700 p-4 rounded-xl shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-green-100 text-sm">Monthly Delivery</p>
+                      <p className="text-white text-2xl font-bold">{dashboardData.monthlyLeaves} kg</p>
+                    </div>
+                    <FaLeaf className="text-green-200 text-2xl" />
+                  </div>
                 </div>
-                <div className="text-yellow-300">🌿</div>
-              </div>
-              <div className="flex items-center justify-between bg-white/5 p-2 rounded">
-                <div>
-                  <div className="text-xs text-gray-300">Low Stock</div>
-                  <div className="text-lg font-bold">{dashboardData.lowStockItems}</div>
+
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 rounded-xl shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-blue-100 text-sm">Quality Score</p>
+                      <p className="text-white text-2xl font-bold">{dashboardData.qualityScore}%</p>
+                    </div>
+                    <FaChartBar className="text-blue-200 text-2xl" />
+                  </div>
                 </div>
-                <div className="text-red-400">⚠️</div>
+
+                <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4 rounded-xl shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-purple-100 text-sm">Monthly Revenue</p>
+                      <p className="text-white text-xl font-bold">Rs. {dashboardData.monthlyRevenue.toLocaleString()}</p>
+                    </div>
+                    <FaMoneyBillWave className="text-purple-200 text-2xl" />
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-orange-600 to-orange-700 p-4 rounded-xl shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-orange-100 text-sm">Delivery Rate</p>
+                      <p className="text-white text-2xl font-bold">{dashboardData.deliveryRate}%</p>
+                    </div>
+                    <FaTruck className="text-orange-200 text-2xl" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </aside>
+        </div>
 
         {/* Main Content */}
         <main className="flex-1 p-8">

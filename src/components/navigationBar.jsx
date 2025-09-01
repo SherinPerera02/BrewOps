@@ -10,7 +10,7 @@ import { io } from 'socket.io-client';
 let socketInstance = null;
 let socketHandlersAttached = false;
 
-const NavigationBar = () => {
+const NavigationBar = ({ onMenuClick }) => {
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -396,6 +396,14 @@ const NavigationBar = () => {
     <>
       <nav className="bg-green-600 px-4 py-3 flex items-center justify-between relative z-50 w-full">
         <div className="flex items-center space-x-4">
+          {onMenuClick && (
+            <button onClick={onMenuClick} className="lg:hidden p-2 rounded-md text-white hover:bg-green-700 mr-2">
+              {/* simple hamburger icon */}
+              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" d="M3 5h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2zm0 4h14a1 1 0 110 2H3a1 1 0 110-2z" clipRule="evenodd" />
+              </svg>
+            </button>
+          )}
           <h1 className="text-2xl font-bold text-white cursor-pointer" onClick={() => navigate('/')}>BrewOps</h1>
         </div>
         <div className="flex items-center space-x-4">

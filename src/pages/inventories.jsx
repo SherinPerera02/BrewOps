@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { Link, useLocation } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import Footer from '../components/Footer';
@@ -17,12 +17,23 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend
 } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale, 
+  LinearScale, 
+  BarElement, 
+  PointElement,
+  LineElement,
+  Title, 
+  Tooltip, 
+  Legend
+);
 
 const Home = () => {
   const [originalInventory, setOriginalInventory] = useState([]);
@@ -35,7 +46,18 @@ const Home = () => {
   const [previousTotal, setPreviousTotal] = useState(null);
   const [chartType, setChartType] = useState('line');
   const lowInventoryToastShown = useRef(false);
+  const chartRef = useRef(null);
   const location = useLocation();
+
+  // Cleanup effect to destroy chart instances when chart type changes
+  useEffect(() => {
+    return () => {
+      // Clean up any existing chart instances
+      if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    };
+  }, [chartType]);
 
   // Send a notification to the server (will be picked up by production manager)
   const sendLowInventoryNotification = async (total) => {
@@ -88,27 +110,216 @@ const Home = () => {
     }
   };
 
-  const handleReportGeneration = () => {
-    try {
-      const doc = new jsPDF();
-      const headers = [['Inventory ID', 'Quantity', 'Date Created']];
-      const rows = inventory.map(item => [
-        item.inventoryid,
-        item.quantity,
-        item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''
-      ]);
+// Replace your existing handleReportGeneration function with this modern version
+const handleReportGeneration = () => {
+  try {
+    // Get current date and calculate past month date range
+    const currentDate = new Date();
+    const pastMonth = new Date();
+    pastMonth.setMonth(currentDate.getMonth() - 1);
+    
+    // Filter inventories from the past month
+    const pastMonthInventories = originalInventory.filter(item => {
+      if (!item.createdAt) return false;
+      const itemDate = new Date(item.createdAt);
+      return itemDate >= pastMonth && itemDate <= currentDate;
+    });
 
-      doc.autoTable({
-        head: headers,
-        body: rows,
-        startY: 20,
+    if (pastMonthInventories.length === 0) {
+      toast.error('No inventory records found for the past month.');
+      return;
+    }
+
+    // Calculate statistics
+    const totalQuantity = pastMonthInventories.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    const averageQuantity = totalQuantity / pastMonthInventories.length;
+    const minQuantity = Math.min(...pastMonthInventories.map(item => item.quantity || 0));
+    const maxQuantity = Math.max(...pastMonthInventories.map(item => item.quantity || 0));
+
+    // Group by week for trend analysis
+    const weeklyData = {};
+    pastMonthInventories.forEach(item => {
+      const itemDate = new Date(item.createdAt);
+      const weekStart = new Date(itemDate);
+      weekStart.setDate(itemDate.getDate() - itemDate.getDay());
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (!weeklyData[weekKey]) {
+        weeklyData[weekKey] = { count: 0, totalQuantity: 0, items: [] };
+      }
+      weeklyData[weekKey].count++;
+      weeklyData[weekKey].totalQuantity += item.quantity || 0;
+      weeklyData[weekKey].items.push(item);
+    });
+
+    const doc = new jsPDF();
+    let yPosition = 20;
+
+    // Header with company branding
+    doc.setFillColor(34, 197, 94); // Green color
+    doc.rect(0, 0, 210, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.text('INVENTORY MANAGEMENT REPORT', 105, 20, { align: 'center' });
+
+    // Report metadata
+    yPosition = 45;
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.text(`Report Period: ${pastMonth.toLocaleDateString()} - ${currentDate.toLocaleDateString()}`, 20, yPosition);
+    yPosition += 8;
+    doc.text(`Generated on: ${currentDate.toLocaleDateString()} at ${currentDate.toLocaleTimeString()}`, 20, yPosition);
+    yPosition += 8;
+    doc.text(`Total Records: ${pastMonthInventories.length}`, 20, yPosition);
+    yPosition += 15;
+
+    // Executive Summary Section
+    doc.setFillColor(240, 240, 240);
+    doc.rect(15, yPosition - 5, 180, 25, 'F');
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('EXECUTIVE SUMMARY', 20, yPosition + 5);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    yPosition += 15;
+    
+    doc.text(`• Total Inventory Quantity: ${totalQuantity.toLocaleString()} kg`, 25, yPosition);
+    yPosition += 5;
+    doc.text(`• Average Quantity per Entry: ${averageQuantity.toFixed(2)} kg`, 25, yPosition);
+    yPosition += 5;
+    doc.text(`• Highest Single Entry: ${maxQuantity.toLocaleString()} kg`, 25, yPosition);
+    yPosition += 5;
+    doc.text(`• Lowest Single Entry: ${minQuantity.toLocaleString()} kg`, 25, yPosition);
+    yPosition += 15;
+
+    // Weekly Trend Analysis
+    if (Object.keys(weeklyData).length > 1) {
+      doc.setFont(undefined, 'bold');
+      doc.setFontSize(14);
+      doc.text('WEEKLY TREND ANALYSIS', 20, yPosition);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(10);
+      yPosition += 10;
+
+      const weeklyHeaders = [['Week Starting', 'Entries', 'Total Quantity (kg)', 'Average (kg)']];
+      const weeklyRows = Object.entries(weeklyData)
+        .sort(([a], [b]) => new Date(a) - new Date(b))
+        .map(([weekStart, data]) => [
+          new Date(weekStart).toLocaleDateString(),
+          data.count.toString(),
+          data.totalQuantity.toLocaleString(),
+          (data.totalQuantity / data.count).toFixed(2)
+        ]);
+
+      autoTable(doc, {
+        head: weeklyHeaders,
+        body: weeklyRows,
+        startY: yPosition,
+        headStyles: { fillColor: [34, 197, 94], textColor: 255 },
+        alternateRowStyles: { fillColor: [249, 250, 251] },
+        margin: { left: 20, right: 20 },
+      });
+      
+      yPosition = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Inventory Status Analysis
+    const lowStock = pastMonthInventories.filter(item => (item.quantity || 0) < 100);
+    const mediumStock = pastMonthInventories.filter(item => (item.quantity || 0) >= 100 && (item.quantity || 0) < 500);
+    const highStock = pastMonthInventories.filter(item => (item.quantity || 0) >= 500);
+
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(14);
+    doc.text('INVENTORY STATUS DISTRIBUTION', 20, yPosition);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    yPosition += 10;
+
+    const statusHeaders = [['Status Category', 'Count', 'Percentage', 'Total Quantity (kg)']];
+    const statusRows = [
+      ['Low Stock (< 100 kg)', lowStock.length.toString(), `${((lowStock.length/pastMonthInventories.length)*100).toFixed(1)}%`, lowStock.reduce((sum, item) => sum + (item.quantity || 0), 0).toLocaleString()],
+      ['Medium Stock (100-499 kg)', mediumStock.length.toString(), `${((mediumStock.length/pastMonthInventories.length)*100).toFixed(1)}%`, mediumStock.reduce((sum, item) => sum + (item.quantity || 0), 0).toLocaleString()],
+      ['High Stock (≥ 500 kg)', highStock.length.toString(), `${((highStock.length/pastMonthInventories.length)*100).toFixed(1)}%`, highStock.reduce((sum, item) => sum + (item.quantity || 0), 0).toLocaleString()]
+    ];
+
+    autoTable(doc, {
+      head: statusHeaders,
+      body: statusRows,
+      startY: yPosition,
+      headStyles: { fillColor: [34, 197, 94], textColor: 255 },
+      alternateRowStyles: { fillColor: [249, 250, 251] },
+      margin: { left: 20, right: 20 },
+    });
+    
+    yPosition = doc.lastAutoTable.finalY + 15;
+
+    // Check if we need a new page
+    if (yPosition > 250) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    // Detailed Inventory Records
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(14);
+    doc.text('DETAILED INVENTORY RECORDS', 20, yPosition);
+    yPosition += 10;
+
+    const detailedHeaders = [['#', 'Inventory ID', 'Quantity (kg)', 'Date Created', 'Status']];
+    const detailedRows = pastMonthInventories
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map((item, index) => {
+        let status = 'High Stock';
+        if ((item.quantity || 0) < 100) status = 'Low Stock';
+        else if ((item.quantity || 0) < 500) status = 'Medium Stock';
+        
+        return [
+          (index + 1).toString(),
+          item.inventoryid || 'N/A',
+          (item.quantity || 0).toLocaleString(),
+          item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A',
+          status
+        ];
       });
 
-      doc.save('Inventory_Report.pdf');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
+    autoTable(doc, {
+      head: detailedHeaders,
+      body: detailedRows,
+      startY: yPosition,
+      headStyles: { fillColor: [34, 197, 94], textColor: 255 },
+      alternateRowStyles: { fillColor: [249, 250, 251] },
+      margin: { left: 20, right: 20 },
+      styles: { fontSize: 9 },
+      columnStyles: {
+        0: { cellWidth: 15 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 35 },
+        4: { cellWidth: 25 }
+      }
+    });
+
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text(`Generated by Inventory Management System | Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
+      doc.text('This report is confidential and for internal use only', 105, 285, { align: 'center' });
     }
-  };
+
+    // Save the PDF with a descriptive filename
+    const fileName = `Inventory_Report_${pastMonth.toISOString().slice(0, 7)}_to_${currentDate.toISOString().slice(0, 10)}.pdf`;
+    doc.save(fileName);
+    
+    toast.success(`Report generated successfully! Found ${pastMonthInventories.length} records from the past month.`);
+    
+  } catch (error) {
+    console.error('Error generating modern PDF report:', error);
+    toast.error('Failed to generate report. Please try again.');
+  }
+};
 
   const handleMonthChange = (e) => {
     setSelectedMonth(e.target.value);
@@ -347,11 +558,31 @@ const Home = () => {
                 <option value="line">Line</option>
               </select>
             </div>
-            {chartType === 'bar' ? (
-              <Bar data={chartData} options={chartOptions} />
-            ) : (
-              <Line data={chartData} options={chartOptions} />
-            )}
+            <div style={{ height: '400px', width: '100%' }}>
+              {chartType === 'bar' ? (
+                <Bar 
+                  key={`bar-chart-${inventory.length}`} 
+                  ref={chartRef}
+                  data={chartData} 
+                  options={{
+                    ...chartOptions,
+                    maintainAspectRatio: false,
+                    responsive: true
+                  }} 
+                />
+              ) : (
+                <Line 
+                  key={`line-chart-${inventory.length}`} 
+                  ref={chartRef}
+                  data={chartData} 
+                  options={{
+                    ...chartOptions,
+                    maintainAspectRatio: false,
+                    responsive: true
+                  }} 
+                />
+              )}
+            </div>
           </div>
         </main>
       </div>

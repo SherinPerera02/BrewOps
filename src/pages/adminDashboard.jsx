@@ -194,7 +194,7 @@ const AdminDashboard = () => {
               </h4>
               
               <Link 
-                to="/admin-dashboard" 
+                to="/admin" 
                 className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700 text-white shadow-md"
               >
                 <MdDashboard className="text-xl" />
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
               </Link>
               
               <Link 
-                to="/admin/user-management" 
+                to="/userManagement" 
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <FaUsers className="text-xl" />
@@ -210,7 +210,7 @@ const AdminDashboard = () => {
               </Link>
               
               <Link 
-                to="/admin/role-permissions" 
+                to="/rolePermissions" 
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <FaShieldAlt className="text-xl" />
@@ -218,7 +218,7 @@ const AdminDashboard = () => {
               </Link>
               
               <Link 
-                to="/admin/system-security" 
+                to="/systemSecurity" 
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <MdSecurity className="text-xl" />
@@ -226,20 +226,13 @@ const AdminDashboard = () => {
               </Link>
               
               <Link 
-                to="/admin/data-management" 
+                to="/backupRecovery" 
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <FaDatabase className="text-xl" />
-                <span>Data Management</span>
+                <span>Backup and Recovery</span>
               </Link>
-              
-              <Link 
-                to="/admin/settings" 
-                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
-              >
-                <FaCog className="text-xl" />
-                <span>System Settings</span>
-              </Link>
+          
             </div>
 
             {/* Quick Actions */}

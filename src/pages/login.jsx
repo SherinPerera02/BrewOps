@@ -105,13 +105,13 @@ export default function LoginPage() {
       // Delay navigation until the toast message is shown
       setTimeout(() => {
         if (role === "supplier") {
-          navigate("/SupplierDashboard", { state: { toastMessage: "Login Successful!" } });
+          navigate("/SupplierDashboard");
         } else if (role === "staff") {
-          navigate("/StaffDashboard", { state: { toastMessage: "Login Successful!" } });
+          navigate("/StaffDashboard");
         } else if (role === "manager") {
-          navigate("/ProductionManagerDashboard", { state: { toastMessage: "Login Successful!" } });
+          navigate("/ProductionManagerDashboard");
         } else {
-          navigate("/admin", { state: { toastMessage: "Login Successful!" } });
+          navigate("/admin");
         }
       }, 0);
     } catch (e) {

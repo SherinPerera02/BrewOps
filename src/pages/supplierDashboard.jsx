@@ -190,12 +190,16 @@ export default function SupplierDashboard() {
 
             {/* Navigation Links */}
             <div className="space-y-2">
-              <h4 className="text-gray-300 font-medium text-sm uppercase tracking-wider border-b border-gray-700 pb-2 mb-4">
-                Navigation
-              </h4>
+              <Link 
+                to="/" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaHome className="text-xl" />
+                <span>Home</span>
+              </Link>
               
               <Link 
-                to="/supplier-dashboard" 
+                to="/SupplierDashboard" 
                 className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700 text-white shadow-md"
               >
                 <MdDashboard className="text-xl" />
@@ -203,7 +207,7 @@ export default function SupplierDashboard() {
               </Link>
               
               <Link 
-                to="/supplier/supplier-recode" 
+                to="/suppliers/transactions" 
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <FaFileAlt className="text-xl" />
@@ -211,7 +215,7 @@ export default function SupplierDashboard() {
               </Link>
               
               <Link 
-                to="/supplier/payment-records" 
+                to="/suppliers/paymentSummary" 
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <FaMoneyBillWave className="text-xl" />
@@ -219,7 +223,7 @@ export default function SupplierDashboard() {
               </Link>
               
               <Link 
-                to="/supplier/profile" 
+                to="/suppliers/editProfile" 
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <FaUser className="text-xl" />

@@ -33,6 +33,12 @@ import LeavesQuantity from './pages/leavesQuantity';
 import Transaction from './pages/transaction';
 import NavigationBar from "./components/navigationBar";
 import Production from './pages/Production';
+import TeaFactoryPayment from './pages/SupplierPayment';
+import UserManagement from './pages/UserManagement';
+import SystemSecurity from './pages/SystemSecurity';
+import RolePermissions from './pages/RolePermissions';
+import BackupAndRecovery from './pages/BackupAndRecovery';
+
 
 function AppRoutes() {
   const location = useLocation();
@@ -41,7 +47,7 @@ function AppRoutes() {
 
   return (
     <>
-      <Routes location={background || location}>
+        <Routes location={background || location}>
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutUs" element={<WhoWeAre />} />
         <Route path="/login" element={<LoginPage />} />
@@ -73,8 +79,12 @@ function AppRoutes() {
         <Route path="/suppliers/paymentSummary" element={<PaymentSummary />} />
         <Route path="/suppliers/leavesQuantity" element={<LeavesQuantity />} />
         <Route path="/suppliers/transactions" element={<Transaction />} />
-       
-        
+        <Route path="/suppliers/payments" element={<TeaFactoryPayment />} />
+        <Route path="/userManagement" element={<UserManagement />} />
+        <Route path="/systemSecurity" element={<SystemSecurity />} />
+        <Route path="/rolePermissions" element={<RolePermissions />} />
+        <Route path="/backupRecovery" element={<BackupAndRecovery />} />
+
       </Routes>
 
       {/* If a background location exists, render modal routes over the background */}

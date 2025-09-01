@@ -1,36 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import WhoWeAre from './WhoWeAre';
-import NavigationBar from '../components/homeNavigation';
+import { Link } from 'react-router-dom';
+import { ChevronRight, Leaf, Users, Award, ArrowDown, Play, Pause, Coffee, Heart, Star, Menu, X, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
-const HomePage = () => {
-  const textRefs = useRef([]);
-  const imageRefs = useRef([]);
+const mapContainerStyle = {
+  width: '100%',
+  height: '400px',
+  borderRadius: '24px'
+};
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in-up');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+const mapCenter = {
+  lat: 6.555103856339234,
+  lng: 80.18148954466014,
+};
 
-    textRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    imageRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+const Homepage = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const heroRef = useRef(null);
+  const statsRef = useRef(null);
+  const [statsVisible, setStatsVisible] = useState(false);
 
   const heroImages = [
     '/background.jpg',
@@ -39,212 +31,760 @@ const HomePage = () => {
     '/pic_01.jpg',
     '/pic_02.jpg',
   ];
-  const slides = [...heroImages, heroImages[0]]; // clone first slide at end for seamless loop
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(true);
-
+  // Parallax effect
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => prev + 1);
-      setIsTransitioning(true);
-    }, 5000);
-    return () => clearInterval(interval);
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Mouse tracking for interactive elements
   useEffect(() => {
-    if (currentSlide === slides.length - 1) {
-      // After transition duration, jump instantly back to slide 0 without animation
-      const timeout = setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentSlide(0);
-      }, 700); // match transition duration
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-      return () => clearTimeout(timeout);
-    } else {
-      setIsTransitioning(true);
+  // Auto-slide with pause on hover
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
+  // Stats animation observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStatsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
     }
-  }, [currentSlide, slides.length]);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const stats = [
+    { number: 50, suffix: '+', label: 'Years of Excellence' },
+    { number: 1000, suffix: '+', label: 'Tea Pluckers Supported' },
+    { number: 500, suffix: 'K+', label: 'Cups Served Daily' },
+    { number: 25, suffix: '+', label: 'Countries Exported' }
+  ];
+
+  const features = [
+    {
+      icon: <Leaf className="w-8 h-8" />,
+      title: "Sustainable Farming",
+      description: "Eco-friendly practices that preserve our environment for future generations",
+      color: "from-green-400 to-emerald-500"
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Community Support",
+      description: "Empowering local farmers with fair trade and sustainable livelihoods",
+      color: "from-blue-400 to-cyan-500"
+    },
+    {
+      icon: <Award className="w-8 h-8" />,
+      title: "Premium Quality",
+      description: "Award-winning Ceylon tea crafted with traditional methods and modern technology",
+      color: "from-amber-400 to-orange-500"
+    }
+  ];
 
   return (
-    <div className="font-sans bg-gray-50">
-      {/* Header */}
-      <NavigationBar />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50 text-gray-900 overflow-hidden">
+      {/* Floating cursor effect */}
+      <div 
+        className="fixed w-6 h-6 bg-green-500 rounded-full pointer-events-none z-50 mix-blend-multiply transition-all duration-300 opacity-60"
+        style={{
+          left: mousePosition.x - 12,
+          top: mousePosition.y - 12,
+          transform: `scale(${mousePosition.x > 0 ? 1 : 0})`
+        }}
+      />
+
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full z-40 bg-white/30 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+            Maleesha Tea
+          </div>
+          <div className="hidden md:flex items-center space-x-8">
+            {['Home', 'About', 'Products', 'Tours', 'Contact'].map((item) => (
+              <a 
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="relative group text-gray-600 hover:text-gray-900 transition-all duration-300 font-medium"
+              >
+                {item}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-500 group-hover:w-full transition-all duration-300" />
+              </a>
+            ))}
+            <Link
+              to="/login"
+              className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 hover:shadow-lg transition-all duration-300 font-medium ml-4"
+            >
+              Log In
+            </Link>
+          </div>
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+        
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-gray-200/50">
+            <div className="px-6 py-4 space-y-4">
+              {['Home', 'About', 'Products', 'Tours', 'Contact'].map((item) => (
+                <a 
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="block text-gray-600 hover:text-gray-900 transition-colors font-medium py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item}
+                </a>
+              ))}
+              <Link
+                to="/login"
+                className="block bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition-colors text-center font-medium mt-4"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Log In
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] md:min-h-[80vh] rounded-xl overflow-hidden shadow-lg mx-2 md:mx-6 mt-6">
-        {/* Sliding images container */}
-        <div
-          className={`flex min-h-[70vh] md:min-h-[80vh] ${
-            isTransitioning ? 'transition-transform duration-1300 ease-in-out' : ''
-          }`}
-          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-        >
-          {slides.map((img, idx) => (
+      <section 
+        ref={heroRef}
+        className="relative h-screen flex items-center justify-center overflow-hidden"
+      >
+        {/* Dynamic background */}
+        <div className="absolute inset-0">
+          {heroImages.map((img, idx) => (
             <div
               key={idx}
-              className="flex-shrink-0 w-full bg-center bg-cover rounded-xl"
-              style={{ backgroundImage: `url('${img}')` }}
+              className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ${
+                idx === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+              }`}
+              style={{ 
+                backgroundImage: `url('${img}')`,
+                transform: `translateY(${scrollY * 0.5}px) scale(${idx === currentSlide ? 1 : 1.1})`
+              }}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/90 via-green-50/80 to-emerald-100/90" />
+        </div>
+
+        {/* Animated particles */}
+        <div className="absolute inset-0">
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-green-400/40 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`
+              }}
             />
           ))}
         </div>
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-green-900/60 to-black/60 rounded-xl z-10" />
-
-        {/* Fixed content on top */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 py-12 text-center z-20 pointer-events-none">
-          <h1
-            ref={(el) => textRefs.current.push(el)}
-            className="text-4xl md:text-6xl font-extrabold text-white drop-shadow-lg animate-fade-in-up mb-6 pointer-events-auto"
-          >
-            Welcome to Maleesha Tea Factory
-          </h1>
-          <p
-            className="text-lg md:text-2xl text-white mb-8 max-w-2xl animate-fade-in-up delay-100 pointer-events-auto"
-          >
-            Experience the future of tea production with digital tools, transparent supply chains and a commitment to quality.
+        {/* Hero content */}
+        <div className="relative z-20 text-center px-6 max-w-5xl">
+          <div className="mb-6 overflow-hidden">
+            <h1 className="text-6xl md:text-8xl font-black leading-tight animate-slide-up">
+              <span className="bg-gradient-to-r from-gray-800 via-green-600 to-emerald-500 bg-clip-text text-transparent">
+                CRAFT
+              </span>
+              <br />
+              <span className="text-gray-800">
+                THE FUTURE
+              </span>
+            </h1>
+          </div>
+          
+          <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-delayed">
+            Where ancient Ceylon tea traditions meet cutting-edge innovation. 
+            Experience tea like never before.
           </p>
-          <a
-            href="#features"
-            className="inline-block bg-green-400 hover:bg-black text-black hover:text-white font-semibold cursor-pointer px-8 py-3 rounded-full shadow-lg transition-all duration-300 animate-fade-in-up delay-200 pointer-events-auto"
-          >
-            Discover More
-          </a>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-delayed-2">
+            <button className="group relative px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-full overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/30 hover:scale-105">
+              <span className="relative z-10 flex items-center gap-2">
+                Start Journey
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-700 translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+            </button>
+            
+            <button 
+              className="flex items-center gap-3 px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-full backdrop-blur-sm hover:bg-gray-50 hover:border-green-500 hover:text-green-600 transition-all duration-300"
+              onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+            >
+              {isVideoPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              Watch Story
+            </button>
+          </div>
         </div>
 
-        {/* Slider Dots */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+          <span className="text-sm text-gray-600">Scroll to explore</span>
+          <ArrowDown className="w-5 h-5 text-green-500" />
+        </div>
+
+        {/* Slide indicators */}
+        <div className="absolute bottom-8 right-8 flex flex-col gap-3">
           {heroImages.map((_, idx) => (
-            <span
+            <button
               key={idx}
-              className={`w-3 h-3 rounded-full border border-white transition-all duration-300 ${
-                currentSlide === idx ||
-                (currentSlide === slides.length - 1 && idx === 0)
-                  ? 'bg-green-400'
-                  : 'bg-white/40'
+              onClick={() => setCurrentSlide(idx)}
+              className={`w-1 h-8 rounded-full transition-all duration-300 ${
+                idx === currentSlide ? 'bg-green-500 w-2' : 'bg-gray-400 hover:bg-gray-600'
               }`}
             />
           ))}
         </div>
       </section>
 
-      {/* Animations */}
-      <style>{`
-        @keyframes fade-in-up {
-          0% { opacity: 0; transform: translateY(40px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 2s cubic-bezier(0.23, 1, 0.32, 1) both;
-        }
-        .delay-100 { animation-delay: 0.15s; }
-        .delay-200 { animation-delay: 0.3s; }
-
-        
-      `}</style>
-
-      {/* Description Section */}
-      <section className="px-6 py-10 space-y-6">
-        <div
-          ref={(el) => textRefs.current.push(el)}
-          className="text-center py-10"
-        >
-          <h1 className="text-4xl font-bold mb-6">
-            Maleesha Tea – More Than Just a Tea Factory
-          </h1>
-          <p className="text-gray-700 mt-2 text-lg max-w-3xl mx-auto ">
-            For generations, Maleesha Tea Factory has been at the heart of our
-            community,
-            <br />
-            working hand in hand with individual tea pluckers and small-scale
-            growers from nearby villages.
-            <br />
-            Rooted in tradition yet embracing modern processing standards, we
-            ensure that every leaf
-            <br />
-            reflects the dedication and care of those who harvest it.
-            <br />
-            Beyond producing the finest Ceylon tea,
-            <br />
-            we provide fair prices, reliable support and a lifeline for local
-            livelihoods,
-            <br />
-            sustaining families and preserving the proud heritage of Sri Lankan
-            tea.
-            <br />
-            Join us in celebrating this timeless craft.
-          </p>
-          <button className="mt-6 px-6 py-2 font-semibold bg-green-400 rounded-full hover:bg-black hover:text-white transition cursor-pointer ">
-            Read About Us
-          </button>
+      {/* Stats Section */}
+      <section 
+        ref={statsRef}
+        className="py-20 bg-gradient-to-b from-white to-gray-50"
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, idx) => (
+              <div key={idx} className="text-center group">
+                <div className="text-4xl md:text-6xl font-black mb-2">
+                  <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                    {statsVisible ? (
+                      <CountUp end={stat.number} suffix={stat.suffix} />
+                    ) : '0'}
+                  </span>
+                </div>
+                <p className="text-gray-600 text-sm md:text-base font-medium">{stat.label}</p>
+                <div className="w-12 h-0.5 bg-gradient-to-r from-green-500 to-transparent mx-auto mt-2 transform scale-0 group-hover:scale-100 transition-transform duration-500" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section id="who-we-are">
-        <WhoWeAre />
+      {/* Features Section */}
+      <section className="py-20 px-6 bg-gradient-to-br from-gray-50 to-green-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black mb-6">
+              <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Why Choose
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                Maleesha
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Experience the perfect blend of tradition, innovation and sustainability
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature, idx) => (
+              <div
+                key={idx}
+                className="group relative p-8 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200 hover:border-green-300 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+              >
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-gray-800 group-hover:text-green-600 transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+                <div className="absolute inset-0 bg-gradient-to-br from-green-50/0 to-emerald-50/0 group-hover:from-green-50/50 group-hover:to-emerald-50/30 rounded-3xl transition-all duration-500" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Live Map Section */}
+      <section className="py-20 px-6 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black mb-6">
+              <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Visit Our
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                Tea Factory
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Located in the heart of Sri Lanka's tea country, experience our heritage firsthand
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Map Container */}
+            <div className="relative">
+              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200 group hover:shadow-3xl transition-all duration-500">
+                <div className="aspect-video bg-gradient-to-br from-green-100 to-emerald-50 relative overflow-hidden">
+                  {/* Google Maps Integration */}
+                  <LoadScript googleMapsApiKey="AIzaSyC1CYIFS-xyTC5bNdycOVWmORIiyFRwUMs">
+                    <GoogleMap 
+                      mapContainerStyle={mapContainerStyle} 
+                      center={mapCenter} 
+                      zoom={15}
+                      options={{
+                        styles: [
+                          {
+                            featureType: "all",
+                            elementType: "geometry.fill",
+                            stylers: [
+                              {
+                                weight: "2.00"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "all",
+                            elementType: "geometry.stroke",
+                            stylers: [
+                              {
+                                color: "#9c9c9c"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "all",
+                            elementType: "labels.text",
+                            stylers: [
+                              {
+                                visibility: "on"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "landscape",
+                            elementType: "all",
+                            stylers: [
+                              {
+                                color: "#f2f2f2"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "landscape",
+                            elementType: "geometry.fill",
+                            stylers: [
+                              {
+                                color: "#ffffff"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "landscape.man_made",
+                            elementType: "geometry.fill",
+                            stylers: [
+                              {
+                                color: "#ffffff"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "poi",
+                            elementType: "all",
+                            stylers: [
+                              {
+                                visibility: "off"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "road",
+                            elementType: "all",
+                            stylers: [
+                              {
+                                saturation: -100
+                              },
+                              {
+                                lightness: 45
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "road",
+                            elementType: "geometry.fill",
+                            stylers: [
+                              {
+                                color: "#eeeeee"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "road",
+                            elementType: "labels.text.fill",
+                            stylers: [
+                              {
+                                color: "#7b7b7b"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "road",
+                            elementType: "labels.text.stroke",
+                            stylers: [
+                              {
+                                color: "#ffffff"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "road.highway",
+                            elementType: "all",
+                            stylers: [
+                              {
+                                visibility: "simplified"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "road.arterial",
+                            elementType: "labels.icon",
+                            stylers: [
+                              {
+                                visibility: "off"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "transit",
+                            elementType: "all",
+                            stylers: [
+                              {
+                                visibility: "off"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "water",
+                            elementType: "all",
+                            stylers: [
+                              {
+                                color: "#46bcec"
+                              },
+                              {
+                                visibility: "on"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "water",
+                            elementType: "geometry.fill",
+                            stylers: [
+                              {
+                                color: "#c8d7d4"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "water",
+                            elementType: "labels.text.fill",
+                            stylers: [
+                              {
+                                color: "#070707"
+                              }
+                            ]
+                          },
+                          {
+                            featureType: "water",
+                            elementType: "labels.text.stroke",
+                            stylers: [
+                              {
+                                color: "#ffffff"
+                              }
+                            ]
+                          }
+                        ]
+                      }}
+                    >
+                      <Marker position={mapCenter} />
+                    </GoogleMap>
+                  </LoadScript>
+
+                  {/* Live indicator */}
+                  <div className="absolute top-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    <span className="text-sm font-medium text-gray-700">Live</span>
+                  </div>
+                </div>
+                
+                {/* Map Controls */}
+                <div className="p-6 bg-white">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="font-bold text-gray-800">Maleesha Tea Factory</h4>
+                    <button className="text-green-600 hover:text-green-700 font-medium transition-colors">
+                      Get Directions
+                    </button>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-4">Maleesha Tea Factory, Omaththa Road, Agalawatta, Mathugama</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-300 text-sm font-medium">
+                      Satellite View
+                    </button>
+                    <button className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all duration-300 text-sm font-medium">
+                      Street View
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Location Info */}
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-6 h-6 bg-green-500 rounded-sm" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800 mb-2">Factory Address</h4>
+                      <p className="text-gray-600">Maleesha Tea Factory, Omaththa Road, Agalawatta, Mathugama, Sri Lanka</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-6 h-6 bg-blue-500 rounded-sm" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800 mb-2">Operating Hours</h4>
+                      <p className="text-gray-600">Monday - Saturday: 8:00 AM - 5:00 PM</p>
+                      <p className="text-gray-600">Sunday: 9:00 AM - 4:00 PM</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-6 h-6 bg-amber-500 rounded-sm" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800 mb-2">Contact Info</h4>
+                      <p className="text-gray-600">+94 XX XXX XXXX</p>
+                      <p className="text-gray-600">info@brewopstea.lk</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button className="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-2xl hover:from-emerald-600 hover:to-green-700 transition-all duration-300 hover:scale-[1.02] shadow-lg">
+                  Schedule Factory Tour
+                </button>
+                <button className="w-full px-6 py-4 border-2 border-green-500 text-green-600 font-bold rounded-2xl hover:bg-green-50 transition-all duration-300">
+                  Download Location Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-20 px-6 bg-gradient-to-br from-green-500 via-emerald-500 to-green-600 relative overflow-hidden">
+        <div className="absolute inset-0">
+          {[...Array(10)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-5xl font-black mb-6 text-white">
+            Ready to Experience
+            <br />
+            <span className="bg-gradient-to-r from-green-100 to-white bg-clip-text text-transparent">
+              Premium Ceylon Tea?
+            </span>
+          </h2>
+          <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of tea lovers who have discovered the perfect cup
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="px-8 py-4 bg-white text-green-700 font-bold rounded-full hover:bg-green-50 transition-all duration-300 hover:scale-105 shadow-xl">
+              Order Now
+            </button>
+            <button className="px-8 py-4 border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-green-700 transition-all duration-300">
+              Schedule Tour
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900/80 text-white py-10 px-6 animate-fade-in-up">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Logo & Socials */}
-          <div>
-            <h4 className="text-3xl font-bold mb-4">BrewOps</h4>
-            <div className="flex space-x-4 text-xl">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fab fa-facebook-f text-white hover:text-green-400 transition" />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fab fa-linkedin-in text-white hover:text-green-400 transition" />
-              </a>
-              <a
-                href="https://youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fab fa-youtube text-white hover:text-green-400 transition" />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fab fa-instagram text-white hover:text-green-400 transition" />
-              </a>
+      <footer className="bg-gray-50 py-16 px-6 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="col-span-2">
+              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                Maleesha Tea Factory
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-md">
+                Crafting premium Ceylon tea with passion, tradition and innovation since 2000.
+              </p>
+              <div className="flex gap-4">
+                {[
+                  { name: 'facebook', icon: Facebook, url: 'https://facebook.com' },
+                  { name: 'instagram', icon: Instagram, url: 'https://instagram.com' },
+                  { name: 'twitter', icon: Twitter, url: 'https://twitter.com' },
+                  { name: 'linkedin', icon: Linkedin, url: 'https://linkedin.com' }
+                ].map((social) => {
+                  const IconComponent = social.icon;
+                  return (
+                    <a
+                      key={social.name}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-green-500 hover:text-white transition-all duration-300 cursor-pointer group hover:scale-110 hover:shadow-lg"
+                    >
+                      <IconComponent className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-bold mb-4 text-gray-800">Quick Links</h4>
+              {['About Us', 'Products', 'Tea Tours', 'Sustainability'].map((link) => (
+                <a key={link} href="#" className="block text-gray-600 hover:text-green-500 mb-2 transition-colors">
+                  {link}
+                </a>
+              ))}
+            </div>
+            
+            <div>
+              <h4 className="font-bold mb-4 text-gray-800">Contact</h4>
+              <p className="text-gray-600 text-sm mb-2">
+                Maleesha Tea Factory, Omaththa Road, Agalawatta<br />
+                Mathugama, Sri Lanka
+              </p>
+              <p className="text-gray-600 text-sm">
+                +94 XX XXX XXXX
+              </p>
             </div>
           </div>
-
-          {/* Links */}
-          <div>
-            <h4 className="font-semibold mb-2">Experiences</h4>
-            <h4 className="font-semibold mb-2">Tea Tours</h4>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">Accommodation</h4>
-            <h4 className="font-semibold mb-2">Who We Are</h4>
-            <h4 className="font-semibold mb-2">Contact Us</h4>
-          </div>
-
-          {/* Address */}
-          <div>
-            <h4 className="font-semibold mb-2">Address</h4>
-            <p className="text-sm">
-              Maleesha Tea Factory, Omaththa Road, Agalawatta, Mathugama.
+          
+          <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-500 text-sm">
+              © 2025 Maleesha Tea Factory. All rights reserved.
+            </p>
+            <p className="text-gray-500 text-sm flex items-center gap-1">
+              Made with <Heart className="w-4 h-4 text-red-500" /> for tea lovers
             </p>
           </div>
         </div>
       </footer>
+
+      {/* Styles */}
+      <style jsx>{`
+        @keyframes slide-up {
+          0% { transform: translateY(100px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fade-in-delayed {
+          0% { transform: translateY(30px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .animate-slide-up {
+          animation: slide-up 1s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+        
+        .animate-fade-in-delayed {
+          animation: fade-in-delayed 1s cubic-bezier(0.23, 1, 0.32, 1) 0.3s both;
+        }
+        
+        .animate-fade-in-delayed-2 {
+          animation: fade-in-delayed 1s cubic-bezier(0.23, 1, 0.32, 1) 0.6s both;
+        }
+        
+        .animate-float {
+          animation: float linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default HomePage;
+// Counter component for stats
+const CountUp = ({ end, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const duration = 2000;
+    const increment = end / (duration / 16);
+    let current = 0;
+    
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [end]);
+
+  return <span>{count}{suffix}</span>;
+};
+
+export default Homepage;
