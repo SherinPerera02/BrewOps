@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import NavigationBar from '../components/navigationBar';
+import axios from 'axios';
 import Footer from '../components/Footer';
 import { Users, DollarSign, Calendar, Download, CreditCard, CheckCircle, XCircle } from 'lucide-react';
 import { 
@@ -38,25 +39,84 @@ const TeaFactoryPayment = () => {
     deliveryRate: 96
   };
 
-  // Sample data initialization
-  useEffect(() => {
+  // Fetch data from local backend (fallbacks to sample data if requests fail)
+  const fetchSuppliers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/suppliers/active', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.data && res.data.success) {
+        // map to frontend shape if necessary
+        const transformed = res.data.data.map(s => ({
+          id: s.id || s.supplier_id || Date.now(),
+          supplierId: s.supplier_id || s.id,
+          name: s.name,
+          phone: s.contact_number || s.phone || '',
+          bankAccount: s.bank_account_number || s.bankAccount || '',
+          bankName: s.bank_name || s.bankName || '',
+          rate: s.rate || 150,
+          monthlyQuantity: s.monthly_quantity || 0
+        }));
+        setSuppliers(transformed);
+        return;
+      }
+    } catch (err) {
+      console.warn('Failed to load suppliers from backend, using sample data.', err.message || err);
+    }
+
+    // fallback sample data
     const sampleSuppliers = [
       { id: 1, name: 'Rajesh Kumar', phone: '077-1234567', bankAccount: '1234567890', bankName: 'Commercial Bank', rate: 150, monthlyQuantity: 120.5 },
-      { id: 2, name: 'Priya Silva', phone: '071-2345678', bankAccount: '2345678901', bankName: 'People\'s Bank', rate: 160, monthlyQuantity: 95.8 },
+      { id: 2, name: 'Priya Silva', phone: '071-2345678', bankAccount: '2345678901', bankName: "People's Bank", rate: 160, monthlyQuantity: 95.8 },
       { id: 3, name: 'Chaminda Perera', phone: '076-3456789', bankAccount: '3456789012', bankName: 'Bank of Ceylon', rate: 155, monthlyQuantity: 78.3 }
     ];
-    
+    setSuppliers(sampleSuppliers);
+  };
+
+  const fetchPayments = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/payments', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data && res.data.success) {
+        setPayments(res.data.data || []);
+        return;
+      }
+    } catch (err) {
+      console.warn('Failed to load payments from backend, using sample payments.', err.message || err);
+    }
+
     const samplePayments = [
       { id: 1, supplierId: 1, month: '2025-07', amount: 15000, date: '2025-08-01', status: 'paid' },
       { id: 2, supplierId: 2, month: '2025-07', amount: 18500, date: '2025-08-01', status: 'paid' },
-      // Mock spot cash payments for today's dashboard table
-      { id: 3, supplierId: 1, month: 'spot-cash-2025-08-31', amount: 2250, date: '2025-08-31', status: 'paid', type: 'spot-cash', paymentMethod: 'Cash' },
-      { id: 4, supplierId: 2, month: 'spot-cash-2025-08-31', amount: 1600, date: '2025-08-31', status: 'paid', type: 'spot-cash', paymentMethod: 'Cash' },
-      { id: 5, supplierId: 3, month: 'spot-cash-2025-08-31', amount: 1850, date: '2025-08-31', status: 'paid', type: 'spot-cash', paymentMethod: 'Cash' }
+      { id: 3, supplierId: 1, month: 'spot-cash-2025-08-31', amount: 2250, date: new Date().toISOString().slice(0,10), status: 'paid', type: 'spot-cash', paymentMethod: 'Cash' }
     ];
+    setPayments(samplePayments);
+  };
 
-    if (suppliers.length === 0) setSuppliers(sampleSuppliers);
-    if (payments.length === 0) setPayments(samplePayments);
+  const fetchPaymentStatistics = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/payments/statistics', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data && res.data.success) {
+        // optionally set local dashboardData if you want dynamic values
+        // currently dashboardData is static in this file; keep it simple
+        console.log('Payment statistics:', res.data.data);
+      }
+    } catch (err) {
+      console.warn('Failed to load payment statistics', err.message || err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSuppliers();
+    fetchPayments();
+    fetchPaymentStatistics();
   }, []);
 
   const [supplierForm, setSupplierForm] = useState({
@@ -65,15 +125,39 @@ const TeaFactoryPayment = () => {
 
   const addSupplier = () => {
     if (supplierForm.name && supplierForm.phone && supplierForm.bankAccount && supplierForm.rate) {
-      const newSupplier = {
+      const newSupplierLocal = {
         id: Date.now(),
         ...supplierForm,
         rate: parseFloat(supplierForm.rate),
         monthlyQuantity: parseFloat(supplierForm.monthlyQuantity) || 0
       };
-      setSuppliers([...suppliers, newSupplier]);
-      setSupplierForm({ name: '', phone: '', bankAccount: '', bankName: '', rate: '', monthlyQuantity: '' });
-      setShowAddSupplier(false);
+
+      // Try backend first
+      (async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const payload = {
+            name: supplierForm.name,
+            contact_number: supplierForm.phone,
+            bank_account_number: supplierForm.bankAccount,
+            bank_name: supplierForm.bankName,
+            rate: parseFloat(supplierForm.rate)
+          };
+          const res = await axios.post('http://localhost:5000/api/suppliers', payload, { headers: { Authorization: `Bearer ${token}` } });
+          if (res.data && res.data.success) {
+            // reload suppliers
+            await fetchSuppliers();
+          } else {
+            throw new Error(res.data?.message || 'Failed to save supplier');
+          }
+        } catch (err) {
+          console.warn('Failed to save supplier to backend, adding locally', err.message || err);
+          setSuppliers(prev => [...prev, newSupplierLocal]);
+        } finally {
+          setSupplierForm({ name: '', phone: '', bankAccount: '', bankName: '', rate: '', monthlyQuantity: '' });
+          setShowAddSupplier(false);
+        }
+      })();
     }
   };
 
@@ -98,17 +182,37 @@ const TeaFactoryPayment = () => {
   };
 
   const processPayment = (supplierId, amount) => {
-    const newPayment = {
-      id: Date.now(),
-      supplierId: supplierId,
-      month: selectedMonth,
-      amount: amount,
-      date: new Date().toISOString().slice(0, 10),
-      status: 'paid'
-    };
-    setPayments([...payments, newPayment]);
-    setShowPaymentModal(false);
-    setSelectedSupplierForPayment(null);
+    (async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const payload = {
+          supplier_id: supplierId,
+          month: selectedMonth,
+          amount: parseFloat(amount),
+          payment_method: 'Bank Transfer'
+        };
+        const res = await axios.post('http://localhost:5000/api/payments/monthly', payload, { headers: { Authorization: `Bearer ${token}` } });
+        if (res.data && res.data.success) {
+          await fetchPayments();
+        } else {
+          throw new Error(res.data?.message || 'Payment failed');
+        }
+      } catch (err) {
+        console.warn('Monthly payment failed, saving locally', err.message || err);
+        const newPayment = {
+          id: Date.now(),
+          supplierId: supplierId,
+          month: selectedMonth,
+          amount: amount,
+          date: new Date().toISOString().slice(0, 10),
+          status: 'paid'
+        };
+        setPayments(prev => [...prev, newPayment]);
+      } finally {
+        setShowPaymentModal(false);
+        setSelectedSupplierForPayment(null);
+      }
+    })();
   };
 
   const openPaymentModal = (supplier, amount) => {
@@ -124,22 +228,46 @@ const TeaFactoryPayment = () => {
 
   const processSpotCashPayment = () => {
     if (selectedSupplierForSpotCash && spotCashAmount && parseFloat(spotCashAmount) > 0 && paymentMethod) {
-      const newPayment = {
-        id: Date.now(),
-        supplierId: selectedSupplierForSpotCash.id,
-        month: 'spot-cash-' + new Date().toISOString().slice(0, 10),
-        amount: parseFloat(spotCashAmount),
-        date: new Date().toISOString().slice(0, 10),
-        status: 'paid',
-        type: 'spot-cash',
-        paymentMethod: paymentMethod
-      };
-      setPayments([...payments, newPayment]);
-      setShowSpotCashModal(false);
-      setSelectedSupplierForSpotCash(null);
-      setSpotCashAmount('');
-      setPaymentMethod('');
-      alert(`Spot cash payment of LKR ${parseFloat(spotCashAmount).toFixed(2)} processed successfully for ${selectedSupplierForSpotCash.name} via ${paymentMethod}`);
+      (async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const supplierRate = selectedSupplierForSpotCash.rate || 150;
+          const quantity = parseFloat(spotCashAmount) / supplierRate;
+          const payload = {
+            supplier_id: selectedSupplierForSpotCash.supplierId || selectedSupplierForSpotCash.id,
+            quantity,
+            rate_per_kg: supplierRate,
+            payment_method: paymentMethod
+          };
+          const res = await axios.post('http://localhost:5000/api/payments/spot-cash', payload, { headers: { Authorization: `Bearer ${token}` } });
+          if (res.data && res.data.success) {
+            await fetchPayments();
+            await fetchPaymentStatistics();
+            alert(res.data.message || 'Spot cash payment processed');
+          } else {
+            throw new Error(res.data?.message || 'Spot cash failed');
+          }
+        } catch (err) {
+          console.warn('Spot cash processing failed, saving locally', err.message || err);
+          const newPayment = {
+            id: Date.now(),
+            supplierId: selectedSupplierForSpotCash.id,
+            month: 'spot-cash-' + new Date().toISOString().slice(0, 10),
+            amount: parseFloat(spotCashAmount),
+            date: new Date().toISOString().slice(0, 10),
+            status: 'paid',
+            type: 'spot-cash',
+            paymentMethod: paymentMethod
+          };
+          setPayments(prev => [...prev, newPayment]);
+          alert(`Spot cash payment of LKR ${parseFloat(spotCashAmount).toFixed(2)} processed locally for ${selectedSupplierForSpotCash.name}`);
+        } finally {
+          setShowSpotCashModal(false);
+          setSelectedSupplierForSpotCash(null);
+          setSpotCashAmount('');
+          setPaymentMethod('');
+        }
+      })();
     }
   };
 

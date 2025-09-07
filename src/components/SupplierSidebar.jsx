@@ -1,21 +1,27 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { FaHome, FaPager, FaUsers, FaBars, FaTimes } from 'react-icons/fa';
 
 export default function SupplierSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const menuItems = [
-    { label: 'Dashboard', icon: <FaHome />, to: '/staff' },
+    { label: 'Dashboard', icon: <FaHome />, to: '/staffdashboard' },
     { label: 'Supplier Management', icon: <FaUsers />, to: '/SupplierHome' },
     { label: 'Supply Record', icon: <FaPager />, to: '/SupplierRecode' },
   ];
+
+  // Auto-close sidebar on route change (mobile)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   return (
     <>
       {/* Hamburger Button for Mobile */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded shadow"
+        className="md:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded shadow hover:bg-gray-700 transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
@@ -31,20 +37,22 @@ export default function SupplierSidebar() {
           md:translate-x-0 md:relative md:block
         `}
       >
-        <h2 className="text-2xl font-bold mb-6">Supplier</h2>
+        <h2 className="text-2xl font-bold mb-6 text-green-400">Supplier</h2>
         <ul className="space-y-4">
           {menuItems.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
                 className={({ isActive }) =>
-                  `flex items-center px-3 py-2 rounded ${
-                    isActive ? 'bg-green-700' : 'hover:bg-gray-700'
+                  `flex items-center px-3 py-2 rounded transition-colors duration-200 ${
+                    isActive 
+                      ? 'bg-green-700 text-white font-semibold' 
+                      : 'hover:bg-gray-700 text-gray-200'
                   }`
                 }
                 onClick={() => setIsOpen(false)} // close sidebar on mobile click
               >
-                <span className="mr-3">{item.icon}</span>
+                <span className="mr-3 text-lg">{item.icon}</span>
                 {item.label}
               </NavLink>
             </li>

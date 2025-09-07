@@ -22,7 +22,8 @@ import {
   FaMoneyBillWave,
   FaLeaf,
   FaUserCircle,
-  FaUser
+  FaUser,
+  FaMoneyBill
 } from 'react-icons/fa';
 import { MdDashboard, MdTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { LineChart, BarChart, PieChart, AreaChart, Line, Bar, Pie, Area, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
@@ -209,6 +210,14 @@ const ModernProductionDashboard = () => {
               >
                 <FaWarehouse className="text-xl" />
                 <span>Inventory Management</span>
+              </Link>
+
+              <Link 
+                to="/suppliers/payments" 
+                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              >
+                <FaMoneyBill className="text-xl" />
+                <span>Supplier Payments</span>
               </Link>
               
               <Link 

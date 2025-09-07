@@ -31,13 +31,13 @@ import EditProfile from './pages/editProfile';
 import PaymentSummary from './pages/paymentSummary';
 import LeavesQuantity from './pages/leavesQuantity';
 import Transaction from './pages/transaction';
-import NavigationBar from "./components/navigationBar";
 import Production from './pages/Production';
 import TeaFactoryPayment from './pages/SupplierPayment';
 import UserManagement from './pages/UserManagement';
 import SystemSecurity from './pages/SystemSecurity';
 import RolePermissions from './pages/RolePermissions';
 import BackupAndRecovery from './pages/BackupAndRecovery';
+import Report from './pages/Report/Report';
 
 
 function AppRoutes() {
@@ -84,6 +84,7 @@ function AppRoutes() {
         <Route path="/systemSecurity" element={<SystemSecurity />} />
         <Route path="/rolePermissions" element={<RolePermissions />} />
         <Route path="/backupRecovery" element={<BackupAndRecovery />} />
+        <Route path="/reports" element={<Report />} />
 
       </Routes>
 

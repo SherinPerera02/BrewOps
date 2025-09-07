@@ -1,155 +1,203 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
 
-import Spinner from '../components/Spinner';
-
-const CreateInventory = () => {
-  const [quantity, setQuantity] = useState('');
+export default function CreateSupplier({ onBack }) {
+  const [supplierId, setSupplierId] = useState("");
+  const [name, setName] = useState("");
+  const [NIC, setNIC] = useState("");
+  const [address, setAddress] = useState("");
+  const [contact, setContact] = useState("");
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [quantityError, setQuantityError] = useState('');
-  const [createdInventoryId, setCreatedInventoryId] = useState('');
-  const [preGeneratedInventoryId, setPreGeneratedInventoryId] = useState('');
-  const navigate = useNavigate();
-  const quantityRef = useRef(null);
 
+  // Generate unique Supplier ID
   useEffect(() => {
-    // pre-generate inventory id in format INV-YYYYMMDD-HHMM using local time
-    const pad = (n) => n.toString().padStart(2, '0');
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = pad(now.getMonth() + 1);
-    const day = pad(now.getDate());
-    const hours = pad(now.getHours());
-    const minutes = pad(now.getMinutes());
-    const generated = `INV-${year}${month}${day}-${hours}${minutes}`;
-    setPreGeneratedInventoryId(generated);
+    const randomNumber = Math.floor(Math.random() * 1000) + 1;
+    const newID = `SID${randomNumber.toString().padStart(4, "0")}`;
+    setSupplierId(newID);
   }, []);
 
-  useEffect(() => {
-    // focus the quantity input when modal finishes loading
-    if (!loading) {
-      setTimeout(() => {
-        quantityRef.current?.focus();
-      }, 0);
-    }
-  }, [loading]);
-
-  const handleSaveInventory = () => {
-    if (quantityError || !quantity) {
-      toast.error('Please fill all fields correctly');
-      return;
-    }
-    if (quantity <= 0) {
-      toast.error('Quantity must be greater than 0');
-      return;
-    }
-    const data = {
-      quantity: parseInt(quantity),
-    };
-    setLoading(true);
-    axios
-      .post('http://localhost:5000/inventory', data)
-      .then((response) => {
-        setLoading(false);
-        // Display the auto-generated inventory ID from backend
-        if (response.data && response.data.data && response.data.data.inventoryid) {
-          setCreatedInventoryId(response.data.data.inventoryid);
-          toast.success(`Inventory created successfully! ID: ${response.data.data.inventoryid}`);
-        } else {
-          // fallback confirmation when server didn't return an id
-          toast.success('Inventory created successfully!');
-        }
-  // Navigate after short delay so user can read the toast
-  setTimeout(() => navigate('/inventories'), );
-      })
-      .catch((error) => {
-        console.error('Error saving inventory:', error);
-        toast.error('An error occurred while saving inventory');
-        setLoading(false);
-      });
+  // Validation functions
+  const validateName = (value) => {
+    if (!value.trim()) return "Name is required";
+    if (value.length < 5 || value.length > 20) return "Name must be 5–20 characters";
+    return "";
+  };
+  const validateNIC = (value) => {
+    if (!value.trim()) return "NIC is required";
+    if (!/^([0-9]{9}[vV]|[0-9]{12})$/.test(value)) return "Invalid NIC format";
+    return "";
+  };
+  const validateAddress = (value) => {
+    if (!value.trim()) return "Address is required";
+    if (value.length < 15 || value.length > 50) return "Address must be 15–50 characters";
+    return "";
+  };
+  const validateContact = (value) => {
+    if (!value.trim()) return "Contact number is required";
+    if (!/^\d{10}$/.test(value)) return "Contact number must be 10 digits";
+    return "";
+  };
+  const validateEmail = (value) => {
+    const emailCheck = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    if (!value.trim()) return "Email is required";
+    if (!emailCheck.test(value)) return "Invalid email format";
+    return "";
   };
 
-  useEffect(() => {
-    // Real-time validation for quantity
-    if (quantity.length > 6) {
-      setQuantityError('Quantity must not exceed 6 digits');
-    } else if (quantity && parseInt(quantity) <= 0) {
-      setQuantityError('Quantity must be greater than 0');
-    } else {
-      setQuantityError('');
-    }
-  }, [quantity]);
+  const handleInputChange = (e, validator) => {
+    const { name, value } = e.target;
+    const error = validator(value);
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
+  };
 
-  const handleQuantityChange = (e) => {
-    const value = e.target.value;
-    if (value.length <= 6) {
-      setQuantity(value);
-    }
+  const handleSaveSupplier = () => {
+    const newErrors = {
+      name: validateName(name),
+      NIC: validateNIC(NIC),
+      address: validateAddress(address),
+      contact: validateContact(contact),
+      email: validateEmail(email),
+    };
+    setErrors(newErrors);
+    const isValid = !Object.values(newErrors).some((err) => err !== "");
+    if (!isValid) return;
+
+    const data = { supplierid: supplierId, name, nic: NIC, address, contact, email };
+    setLoading(true);
+    setTimeout(() => {
+      console.log("Saved data:", data);
+      alert("Supplier saved successfully!");
+      setLoading(false);
+      onBack(); // Call the onBack function to return to the dashboard
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-  {/* Modal backdrop */}
-  <div className='fixed inset-0 bg-black/60 flex items-center justify-center z-50' onClick={() => navigate('/inventories')}>
-        <div className='max-w-2xl w-full mx-4 bg-white p-8 rounded-lg shadow-md' onClick={(e) => e.stopPropagation()}>
-          <h1 className='text-2xl my-2 text-center font-bold text-gray-800'>Create Inventory</h1>
+    <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl bg-white rounded-xl shadow-lg px-6 sm:px-10 py-8 sm:py-12">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">
+        Add New Supplier
+      </h1>
 
-          {loading && <Spinner />}
+      {loading && <div className="text-center">Saving...</div>}
 
-          {!loading && (
-            <div className='space-y-4'>
-              <div>
-                <label className='block text-md mb-2 text-gray-700'>Inventory Number</label>
-                <input
-                  type="text"
-                  value={createdInventoryId || preGeneratedInventoryId || ''}
-                  placeholder={createdInventoryId || preGeneratedInventoryId ? '' : 'Will be generated by server (INV-YYYYMMDD-HHMM)'}
-                  disabled
-                  className='border border-gray-300 bg-gray-100 text-gray-700 px-4 py-2 w-full rounded-md'
-                />
-                <p className='text-xs text-gray-500 mt-1'>Inventory ID is auto-generated by the server.</p>
-              </div>
+      {!loading && (
+        <div className="space-y-4">
+          {/* Supplier ID */}
+          <div>
+            <label className="block font-medium mb-1">Supplier ID</label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              value={supplierId}
+              readOnly
+            />
+          </div>
 
-              <div>
-                <label className='block text-md mb-2 text-gray-700'>Quantity (kg)</label>
-                <input
-                  type="number"
-                  ref={quantityRef}
-                  value={quantity}
-                  onChange={handleQuantityChange}
-                  min="1"
-                  max="999999"
-                  placeholder="Enter quantity in kilograms"
-                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 ${quantityError && 'border-red-500'}`}
-                />
-                {quantityError && <div className="text-red-500 text-sm mt-1">{quantityError}</div>}
-                <p className='text-sm text-gray-500 mt-1'>* Enter the quantity of raw leaves in kilograms (max 6 digits)</p>
-              </div>
+          {/* Supplier Name */}
+          <div>
+            <label className="block font-medium mb-1">Supplier Name</label>
+            <input
+              type="text"
+              name="name"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Supplier Name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                handleInputChange(e, validateName);
+              }}
+            />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+          </div>
 
-              <div className='flex gap-4'>
-                <button 
-                  className='py-2 px-6 bg-green-600 text-white rounded-md hover:bg-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed' 
-                  onClick={handleSaveInventory}
-                  disabled={loading || quantityError || !quantity}
-                >
-                  {loading ? 'Saving...' : 'Save Inventory'}
-                </button>
+          {/* NIC */}
+          <div>
+            <label className="block font-medium mb-1">NIC</label>
+            <input
+              type="text"
+              name="NIC"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter NIC (e.g., 123456789V)"
+              value={NIC}
+              onChange={(e) => {
+                setNIC(e.target.value);
+                handleInputChange(e, validateNIC);
+              }}
+            />
+            {errors.NIC && <p className="text-red-500 text-sm mt-1">{errors.NIC}</p>}
+          </div>
 
-                <button 
-                  className='py-2 px-6 bg-gray-500 text-white rounded-md hover:bg-gray-700 focus:outline-none' 
-                  onClick={() => navigate('/inventories')}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Address */}
+          <div>
+            <label className="block font-medium mb-1">Address</label>
+            <input
+              type="text"
+              name="address"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Address"
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                handleInputChange(e, validateAddress);
+              }}
+            />
+            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+          </div>
+
+          {/* Contact Number */}
+          <div>
+            <label className="block font-medium mb-1">Contact Number</label>
+            <input
+              type="text"
+              name="contact"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Contact Number"
+              value={contact}
+              onChange={(e) => {
+                setContact(e.target.value);
+                handleInputChange(e, validateContact);
+              }}
+            />
+            {errors.contact && <p className="text-red-500 text-sm mt-1">{errors.contact}</p>}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block font-medium mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              className="w-full border border-gray-300 px-4 py-2 rounded"
+              placeholder="Enter Email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                handleInputChange(e, validateEmail);
+              }}
+            />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={onBack}
+              className="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveSupplier}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200"
+            >
+              Save
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
-};
-
-export default CreateInventory;
+}

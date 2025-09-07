@@ -1,99 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import leftArrow from '../../assets/left-arrow.png';
-import NavigationBar from '../../components/navigationBar';
-import Footer from '../../components/Footer';
-import Spinner from '../../components/Spinner';
-import bgImage from '../../assets/supplierBg2.avif';
+import React from "react";
 
-
-export default function ShowSupplier() {
-  const { id } = useParams();
-  const [supplier, setSupplier] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const dummySupplier = {
-    id: id || 'SUP001',
-    name: 'Green Tea Supplies',
-    contact: '+94 77 123 4567',
-    email: 'greentea@example.com',
-    address: '123 Tea Road, Nuwara Eliya, Sri Lanka',
-    createdAt: '2025-08-01T10:00:00Z',
-    updatedAt: '2025-08-10T14:30:00Z',
-    lastSupplyDate: '2025-08-15',
-    totalSupplied: 2500,
-    outstanding: 50000,
-    transactions: [
-      { date: '2025-08-15', quantity: 500, price: 10000, status: 'Paid' },
-      { date: '2025-08-10', quantity: 300, price: 6000, status: 'Pending' },
-      { date: '2025-08-05', quantity: 200, price: 4000, status: 'Paid' },
-    ],
-  };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setSupplier(dummySupplier);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  if (loading) return <Spinner />;
-
-  if (!supplier) {
-    return (
-      <p className="text-center mt-10 text-red-600 font-semibold">
-        Supplier not found.
-      </p>
-    );
-  }
+export default function ShowSupplier({ supplier, onClose }) {
+  if (!supplier) return null; // Don't render if no supplier
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-green-50">
-      <NavigationBar />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 relative transform transition-all duration-300 scale-95 animate-fade-in">
+        
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-900 text-3xl font-bold"
+        >
+          &times;
+        </button>
 
-      {/* Back Arrow */}
-      <div className="absolute top-25 left-4 md:left-6">
-        <Link to="/SupplierHome">
-          <img
-            src={leftArrow}
-            alt="Go Back"
-            className="w-10 h-10 hover:scale-105 transition-transform"/>
-        </Link>
-      </div>
+        {/* Modal Header */}
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800 border-b pb-3">
+          Supplier Details
+        </h2>
 
-      {/* Supplier Details Card */}
-      <div className="flex items-center justify-center py-12 px-2 md:px-6">
-        <div className="bg-white bg-opacity-95 p-6 md:p-10 rounded-xl shadow-lg w-full max-w-5xl">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-800 border-b-2 border-green-500 pb-2 mb-6">
-            Supplier Details
-          </h1>
-
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-base md:text-lg text-gray-700 mb-6">
-            <p><strong>Supplier ID:</strong> {supplier.id}</p>
-            <p><strong>Name:</strong> {supplier.name}</p>
-            <p><strong>Contact:</strong> {supplier.contact}</p>
-            <p><strong>Email:</strong> {supplier.email}</p>
-            <p className="sm:col-span-2"><strong>Address:</strong> {supplier.address}</p>
-            <p><strong>Created At:</strong> {new Date(supplier.createdAt).toLocaleString()}</p>
-            <p><strong>Updated At:</strong> {new Date(supplier.updatedAt).toLocaleString()}</p>
+        {/* Supplier Card */}
+        <div className="bg-gray-50 rounded-xl p-6 shadow-inner space-y-6">
+          {/* General Info */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 font-semibold">Supplier ID</p>
+              <p className="text-gray-800 text-lg">{supplier.id}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 font-semibold">Name</p>
+              <p className="text-gray-800 text-lg">{supplier.name}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 font-semibold">Contact</p>
+              <p className="text-gray-800 text-lg">{supplier.contact}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 font-semibold">Email</p>
+              <p className="text-gray-800 text-lg">{supplier.email}</p>
+            </div>
+            <div className="sm:col-span-2">
+              <p className="text-gray-500 font-semibold">Address</p>
+              <p className="text-gray-800 text-lg">{supplier.address}</p>
+            </div>
           </div>
 
-          {/* Supply Info */}
-          <div className="mb-6">
-            <h3 className="text-lg md:text-xl font-semibold border-b pb-1 mb-2">
-              Supply Info
-            </h3>
-            <p><strong>Last Supply Date:</strong> {supplier.lastSupplyDate}</p>
-            <p><strong>Total Supplied:</strong> {supplier.totalSupplied.toLocaleString()} Kg</p>
-            <p><strong>Outstanding Payment:</strong> Rs. {supplier.outstanding.toLocaleString()}</p>
+          {/* Dates */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 font-semibold">Created At</p>
+              <p className="text-gray-800">
+                {new Date(supplier.createdAt).toLocaleString()}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-500 font-semibold">Updated At</p>
+              <p className="text-gray-800">
+                {new Date(supplier.updatedAt).toLocaleString()}
+              </p>
+            </div>
+            <div className="sm:col-span-2">
+              <p className="text-gray-500 font-semibold">Last Supply Date</p>
+              <p className="text-gray-800">{supplier.lastSupplyDate}</p>
+            </div>
           </div>
 
-          
+          {/* Highlighted Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+            <div className="bg-blue-100 rounded-lg p-5 text-center shadow">
+              <p className="text-gray-500 font-semibold">Total Supplied</p>
+              <p className="text-blue-700 font-bold text-2xl">
+                {supplier.totalSupplied.toLocaleString()} Kg
+              </p>
+            </div>
+            <div className="bg-red-100 rounded-lg p-5 text-center shadow">
+              <p className="text-gray-500 font-semibold">Outstanding Payment</p>
+              <p className="text-red-700 font-bold text-2xl">
+                Rs. {supplier.outstanding.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Close Button */}
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={onClose}
+            className="bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition-all shadow-md"
+          >
+            Close
+          </button>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }
