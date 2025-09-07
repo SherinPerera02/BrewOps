@@ -34,7 +34,7 @@ export default function ShowSupplier() {
           // Fallback to dummy data with correct field structure
           const dummySupplier = {
             id: id,
-            supplier_id: 'SUP-20250907-0001',
+            supplier_id: 'SUP00001',
             name: 'Green Tea Supplies',
             contact_number: '0771234567',
             nic_number: '199512345678',
@@ -53,7 +53,7 @@ export default function ShowSupplier() {
         // Fallback to dummy data with correct field structure
         const dummySupplier = {
           id: id,
-          supplier_id: 'SUP-20250907-0001',
+          supplier_id: 'SUP00001',
           name: 'Green Tea Supplies',
           contact_number: '0771234567',
           nic_number: '199512345678',

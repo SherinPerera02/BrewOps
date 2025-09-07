@@ -56,14 +56,27 @@ export default function SupplierHome() {
       const token = localStorage.getItem('jwtToken');
       console.log('Token available:', !!token);
       
-      const response = await axios.get('http://localhost:5000/api/suppliers/active', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Try to fetch all suppliers first (including inactive)
+      let response;
+      try {
+        response = await axios.get('http://localhost:5000/api/suppliers/all', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (apiError) {
+        console.log('All suppliers endpoint not available, trying default endpoint...');
+        // Fallback to regular suppliers endpoint
+        response = await axios.get('http://localhost:5000/api/suppliers', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
       
       console.log('API Response:', response.data);
       
       if (response.data && response.data.success) {
         const suppliersData = response.data.data || [];
+        console.log('Fetched suppliers count:', suppliersData.length);
+        console.log('Sample supplier data:', suppliersData[0]);
+        
         // Sort newest first by createdAt
         suppliersData.sort((a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0));
         setOriginalSuppliers(suppliersData);
@@ -71,26 +84,83 @@ export default function SupplierHome() {
         setVisibleCount(10);
       } else {
         console.error('Failed to fetch suppliers:', response.data?.message);
-        // Use mock data as fallback
+        // Use mock data with mixed statuses as fallback
         const mockSuppliers = [
           {
             _id: 'mock1',
-            supplier_id: 'SUP-20250907-0001',
-            name: 'Kamal Perera',
-            address: 'Matara',
-            contact_number: '0771234567',
-            email: 'kamal@example.com',
+            supplier_id: 'SUP00001',
+            name: 'Green Valley Tea Suppliers',
+            address: '123 Green Valley Road, Colombo',
+            contact_number: '+94771234567',
+            email: 'greenvally@example.com',
             rate: 150,
+            is_active: true,
             createdAt: new Date().toISOString(),
           },
           {
             _id: 'mock2',
-            supplier_id: 'SUP-20250907-0002',
-            name: 'Nimal Silva',
-            address: 'Galle',
-            contact_number: '0777654321',
-            email: 'nimal@example.com',
-            rate: 145,
+            supplier_id: 'SUP00002',
+            name: 'Highland Tea Gardens',
+            address: 'Highland Estate, Kandy',
+            contact_number: '+94777654321',
+            email: 'highland@example.com',
+            rate: 155,
+            is_active: true,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            _id: 'mock3',
+            supplier_id: 'SUP00003',
+            name: 'Mountain Fresh Tea Co.',
+            address: 'Mountain View, Nuwara Eliya',
+            contact_number: '+94712345678',
+            email: 'mountain@example.com',
+            rate: 148,
+            is_active: false,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            _id: 'mock4',
+            supplier_id: 'SUP17571618746464',
+            name: 'Kamal Perera',
+            address: 'Matara',
+            contact_number: '+94771234567',
+            email: 'kamal@example.com',
+            rate: 150,
+            is_active: false,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            _id: 'mock5',
+            supplier_id: 'SUP-20250907-0930',
+            name: 'Rasika Perera',
+            address: '123/6, 1st lane, Panadura',
+            contact_number: '0715689723',
+            email: 'rasika@example.com',
+            rate: 150,
+            is_active: true,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            _id: 'mock6',
+            supplier_id: 'SUP-20250907-1008',
+            name: 'Sherin Perera',
+            address: 'Pinkella Road, Hirana',
+            contact_number: '0715689723',
+            email: 'sherin@example.com',
+            rate: 150,
+            is_active: false,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            _id: 'mock7',
+            supplier_id: 'SUP-20250907-1009',
+            name: 'Shehan Perera',
+            address: 'Pinkella Road, Hirana',
+            contact_number: '6461359646',
+            email: 'shehan@example.com',
+            rate: 150,
+            is_active: false,
             createdAt: new Date().toISOString(),
           },
         ];
@@ -103,23 +173,36 @@ export default function SupplierHome() {
       // Use mock data as fallback for development
       const mockSuppliers = [
         {
-          _id: 'mock1',
-          supplier_id: 'SUP-20250907-0001',
-          name: 'Kamal Perera',
-          address: 'Matara',
-          contact_number: '0771234567',
-          email: 'kamal@example.com',
+          _id: 'error1',
+          supplier_id: 'SUP00001',
+          name: 'Green Valley Tea Suppliers',
+          address: '123 Green Valley Road, Colombo',
+          contact_number: '+94771234567',
+          email: 'greenvally@example.com',
           rate: 150,
+          is_active: true,
           createdAt: new Date().toISOString(),
         },
         {
-          _id: 'mock2',
-          supplier_id: 'SUP-20250907-0002',
-          name: 'Nimal Silva',
-          address: 'Galle',
-          contact_number: '0777654321',
-          email: 'nimal@example.com',
-          rate: 145,
+          _id: 'error2',
+          supplier_id: 'SUP00002',
+          name: 'Highland Tea Gardens',
+          address: 'Highland Estate, Kandy',
+          contact_number: '+94777654321',
+          email: 'highland@example.com',
+          rate: 155,
+          is_active: false,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          _id: 'error3',
+          supplier_id: 'SUP-20250907-0930',
+          name: 'Rasika Perera',
+          address: '123/6, 1st lane, Panadura',
+          contact_number: '0715689723',
+          email: 'rasika@example.com',
+          rate: 150,
+          is_active: false,
           createdAt: new Date().toISOString(),
         },
       ];
@@ -304,6 +387,7 @@ export default function SupplierHome() {
   useEffect(() => {
     const total = originalSuppliers.length;
     const active = originalSuppliers.filter(supplier => supplier.status !== 'inactive').length;
+    
     setTotalSuppliers(total);
     setActiveSuppliers(active);
   }, [originalSuppliers]);
@@ -367,13 +451,13 @@ export default function SupplierHome() {
           <Link to="/SupplierHome" className="flex items-center gap-2 px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">
             <FaUsers /> Suppliers
           </Link>
-          <Link to="/supplier-records" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
+          <Link to="/SupplierRecode" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
             <FaEdit /> Supply Records
           </Link>
-          <Link to="/supplier-analytics" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
+          <Link to="/SupplierHome" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
             <FaBoxOpen /> Analytics
           </Link>
-          <Link to="/supplier-reports" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
+          <Link to="/SupplierHome" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
             <FaPlusCircle /> Reports
           </Link>
         </aside>

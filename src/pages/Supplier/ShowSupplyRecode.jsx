@@ -1,116 +1,273 @@
-
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-
-import NavigationBar from '../../components/navigationBar';
-import Footer from '../../components/Footer';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import Spinner from '../../components/Spinner';
-import leftArrow from '../../assets/left-arrow.png';
 
 export default function ShowSupplyRecord() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [record, setRecord] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Dummy/mock supply record
-  const dummyRecord = {
-    id: id || 'REC001',
-    supplierName: 'Green Tea Supplies',
-    date: '2025-08-15',
-    quantity: 500,
-    unitPrice: 10000,
-    createdAt: '2025-08-01T10:00:00Z',
-    updatedAt: '2025-08-10T14:30:00Z',
-    transactions: [
-      { date: '2025-08-15', quantity: 200, unitPrice: 10000, status: 'Paid' },
-      { date: '2025-08-10', quantity: 300, unitPrice: 10000, status: 'Pending' },
-    ],
-  };
+  useEffect(() => {
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    // Cleanup function to restore body scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      setRecord(dummyRecord);
-      setLoading(false);
-    }, 1000);
+    const fetchRecord = async () => {
+      try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await axios.get(`http://localhost:5000/api/deliveries/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.data && response.data.success) {
+          setRecord(response.data.data);
+        } else {
+          console.error('Failed to fetch supply record:', response.data?.message);
+          // Fallback to dummy data with correct field structure
+          const dummyRecord = {
+            id: id,
+            record_id: `DEL-${id.toString().padStart(4, '0')}`,
+            supplier_name: 'Green Tea Supplies',
+            supplier_id: 'SUP-20250907-0001',
+            quantity: 25.5,
+            rate_per_kg: 150.00,
+            total_amount: 3825.00,
+            payment_method: 'monthly',
+            payment_status: 'pending',
+            delivery_date: '2024-12-07',
+            notes: 'Good quality tea leaves delivered on time',
+            created_at: '2025-08-01T10:00:00Z',
+            updated_at: '2025-08-01T10:00:00Z',
+          };
+          setRecord(dummyRecord);
+        }
+      } catch (error) {
+        console.error('Error fetching supply record:', error);
+        // Fallback to dummy data with correct field structure
+        const dummyRecord = {
+          id: id,
+          record_id: `DEL-${id.toString().padStart(4, '0')}`,
+          supplier_name: 'Green Tea Supplies',
+          supplier_id: 'SUP-20250907-0001',
+          quantity: 25.5,
+          rate_per_kg: 150.00,
+          total_amount: 3825.00,
+          payment_method: 'monthly',
+          payment_status: 'pending',
+          delivery_date: '2024-12-07',
+          notes: 'Good quality tea leaves delivered on time',
+          created_at: '2025-08-01T10:00:00Z',
+          updated_at: '2025-08-01T10:00:00Z',
+        };
+        setRecord(dummyRecord);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchRecord();
+    }
   }, [id]);
 
-  if (loading) return <Spinner />;
-
-  if (!record)
-    return (
-      <p className="text-center mt-10 text-red-600 font-semibold">
-        Supply record not found.
-      </p>
-    );
-
   return (
-    <div className="min-h-screen bg-green-50">
-      <NavigationBar />
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-hidden" onClick={() => navigate('/SupplierRecode')}>
+      <div className='max-w-4xl w-full max-h-[90vh] bg-white rounded-lg shadow-md flex flex-col' onClick={e => e.stopPropagation()}>
+        <div className='overflow-y-auto flex-1 p-8'>
+          <h1 className='text-3xl my-4 text-center font-bold text-gray-800'>Supply Record Details</h1>
+          
+          {loading ? (
+            <Spinner />
+          ) : record ? (
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Record Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Record ID</label>
+                    <p className="text-lg text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">
+                      {record.record_id || `DEL-${record.id || record._id}` || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Delivery Date</label>
+                    <p className="text-lg text-gray-900">
+                      {record.delivery_date 
+                        ? new Date(record.delivery_date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })
+                        : 'N/A'
+                      }
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Supplier Name</label>
+                    <p className="text-lg text-gray-900">{record.supplier_name || record.supplier?.name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Supplier ID</label>
+                    <p className="text-lg text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">
+                      {record.supplier_id || record.supplier?.supplier_id || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Quantity (kg)</label>
+                    <p className="text-lg text-gray-900 font-bold">
+                      {record.quantity ? parseFloat(record.quantity).toFixed(2) : 'N/A'} kg
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Rate (LKR/kg)</label>
+                    <p className="text-lg text-green-600 font-bold">
+                      LKR {record.rate_per_kg ? parseFloat(record.rate_per_kg).toFixed(2) : 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Payment Method</label>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      record.payment_method === 'spot' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-purple-100 text-purple-800'
+                    }`}>
+                      {record.payment_method === 'spot' ? 'Spot Payment' : 'Monthly Payment'}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Payment Status</label>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      record.payment_status === 'paid' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {record.payment_status === 'paid' ? 'Paid' : 'Pending'}
+                    </span>
+                  </div>
+                  {record.notes && (
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-600">Notes</label>
+                      <p className="text-lg text-gray-900 bg-gray-100 p-3 rounded">
+                        {record.notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-      {/* Back Button */}
-      <div className="absolute top-20 left-4 md:left-6">
-        <Link to="/SupplierRecode">
-          <img
-            src={leftArrow}
-            alt="Go Back"
-            className="w-10 h-10 hover:scale-105 transition-transform"
-          />
-        </Link>
-      </div>
+              {/* Financial Information */}
+              <div className="bg-blue-50 p-6 rounded-lg">
+                <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Financial Information</h2>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Total Amount</label>
+                    <p className="text-2xl text-green-600 font-bold">
+                      LKR {record.total_amount ? parseFloat(record.total_amount).toFixed(2) : 
+                           (record.quantity && record.rate_per_kg ? 
+                            (parseFloat(record.quantity) * parseFloat(record.rate_per_kg)).toFixed(2) : 'N/A')}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-      {/* Record Details */}
-      <div className="flex justify-center px-4 py-16">
-        <div className="bg-white bg-opacity-95 p-6 md:p-10 rounded-xl shadow-lg w-full max-w-4xl">
-          <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 border-b pb-2 text-gray-800">
-            Supply Record Details
-          </h1>
+              {/* System Information */}
+              <div className="bg-green-50 p-6 rounded-lg">
+                <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">System Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Created At</label>
+                    <p className="text-lg text-gray-900">
+                      {record.created_at 
+                        ? new Date(record.created_at).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                          })
+                        : 'N/A'
+                      }
+                    </p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-600">Last Updated</label>
+                    <p className="text-lg text-gray-900">
+                      {record.updated_at 
+                        ? new Date(record.updated_at).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                          })
+                        : 'N/A'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 mb-6 text-sm sm:text-base md:text-lg">
-            <p><strong>Record ID:</strong> {record.id}</p>
-            <p><strong>Supplier Name:</strong> {record.supplierName}</p>
-            <p><strong>Date:</strong> {record.date}</p>
-            <p><strong>Quantity (Kg):</strong> {record.quantity}</p>
-            <p><strong>Unit Price (Rs.):</strong> {record.unitPrice}</p>
-            <p><strong>Total Price (Rs.):</strong> {record.quantity * record.unitPrice}</p>
-            <p><strong>Created At:</strong> {new Date(record.createdAt).toLocaleString()}</p>
-            <p><strong>Updated At:</strong> {new Date(record.updatedAt).toLocaleString()}</p>
-          </div>
-
-          {/* Transaction History */}
-          {record.transactions && record.transactions.length > 0 && (
-            <div className="overflow-x-auto">
-              <h2 className="text-lg md:text-xl font-semibold border-b pb-1 mb-3">
-                Transaction History
-              </h2>
-              <table className="w-full border text-sm md:text-base min-w-[400px] sm:min-w-[600px]">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border px-2 py-1">Date</th>
-                    <th className="border px-2 py-1">Quantity</th>
-                    <th className="border px-2 py-1">Unit Price</th>
-                    <th className="border px-2 py-1">Total</th>
-                    <th className="border px-2 py-1">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {record.transactions.map((t, index) => (
-                    <tr key={index} className="hover:bg-gray-100">
-                      <td className="border px-2 py-1">{t.date}</td>
-                      <td className="border px-2 py-1">{t.quantity} Kg</td>
-                      <td className="border px-2 py-1">Rs. {t.unitPrice}</td>
-                      <td className="border px-2 py-1">Rs. {t.quantity * t.unitPrice}</td>
-                      <td className="border px-2 py-1">{t.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-4 pt-4">
+                <button
+                  onClick={() => navigate('/SupplierRecode')}
+                  className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => navigate(`/supplyRecode/edit/${id}`, { state: { background: location } })}
+                  className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                >
+                  Edit Record
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this supply record? This action cannot be undone.')) {
+                      navigate(`/supplyRecode/delete/${id}`, { state: { background: location } });
+                    }
+                  }}
+                  className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                >
+                  Delete Record
+                </button>
+                {record.payment_method === 'spot' && record.payment_status !== 'paid' && (
+                  <button
+                    onClick={() => navigate(`/suppliers/payments?recordId=${id}&amount=${record.total_amount}&supplier=${record.supplier_id}`)}
+                    className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                  >
+                    Process Payment
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <p className="text-red-600 text-lg mb-2">Supply record not found.</p>
+              <p className="text-gray-600 mb-4">The supply record with ID {id} could not be retrieved.</p>
+              <button
+                onClick={() => navigate('/SupplierRecode')}
+                className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+              >
+                Go Back to Supply Records
+              </button>
             </div>
           )}
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

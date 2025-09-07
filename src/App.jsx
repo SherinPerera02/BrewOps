@@ -101,6 +101,12 @@ function AppRoutes() {
             <Route path="/suppliers/edit/:id" element={<EditSupplier />} />
             <Route path="/suppliers/delete/:id" element={<DeleteSuppliers />} />
           </Routes>
+          <Routes>
+            <Route path="/supplyRecode/create" element={<CreateSupplierRecode />} />
+            <Route path="/supplyRecode/details/:id" element={<ShowSupplyRecode />} />
+            <Route path="/supplyRecode/edit/:id" element={<EditSupplierRecode />} />
+            <Route path="/SupplyRecode/delete/:id" element={<DeleteSupplyRecode />} />
+          </Routes>
         </>
       )}
     </>

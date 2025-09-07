@@ -24,11 +24,11 @@ export default function SupplierSidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white p-6
+          fixed top-0 left-0 min-h-screen w-64 bg-gray-800 text-white p-6
           transform transition-transform duration-300 ease-in-out
           z-40
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
-          md:translate-x-0 md:relative md:block
+          md:translate-x-0 md:relative md:block md:min-h-screen
         `}
       >
         <h2 className="text-2xl font-bold mb-6">Supplier</h2>
