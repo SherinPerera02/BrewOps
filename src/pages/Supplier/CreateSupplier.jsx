@@ -1,29 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import NavigationBar from '../../components/navigationBar';
-import { Link } from 'react-router-dom';
-import leftArrow from '../../assets/left-arrow.png';
+import axios from 'axios';
 import Spinner from '../../components/Spinner';
-import Footer from '../../components/Footer';
+import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
-export default function CreateSupplier() {
-  const [supplierId, setSupplierId] = useState('');
+const CreateSupplier = () => {
   const [name, setName] = useState('');
-  const [NIC, setNIC] = useState('');
-  const [address, setAddress] = useState('');
   const [contact, setContact] = useState('');
-  const [email, setEmail] = useState('');
+  const [nicNumber, setNicNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [bankAccount, setBankAccount] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [rate, setRate] = useState('150');
+  const [createdSupplierId, setCreatedSupplierId] = useState('');
+  const [preGeneratedSupplierId, setPreGeneratedSupplierId] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
-  // Generate unique Supplier ID
-  const generateUniqueSupplierID = () => {
-    const randomNumber = Math.floor(Math.random() * 1000) + 1;
-    const newID = `SID${randomNumber.toString().padStart(4, '0')}`;
-    setSupplierId(newID);
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
-    generateUniqueSupplierID();
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    // Cleanup function to restore body scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  useEffect(() => {
+    // Pre-generate supplier id in format SUP-YYYYMMDD-HHMM using local time
+    const pad = (n) => n.toString().padStart(2, '0');
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = pad(now.getMonth() + 1);
+    const day = pad(now.getDate());
+    const hours = pad(now.getHours());
+    const minutes = pad(now.getMinutes());
+    const generated = `SUP-${year}${month}${day}-${hours}${minutes}`;
+    setPreGeneratedSupplierId(generated);
   }, []);
 
   // Validation functions
@@ -32,25 +47,33 @@ export default function CreateSupplier() {
     if (value.length < 5 || value.length > 20) return 'Name must be 5–20 characters';
     return '';
   };
-  const validateNIC = (value) => {
-    if (!value.trim()) return 'NIC is required';
-    if (!/^([0-9]{9}[vV]|[0-9]{12})$/.test(value)) return 'Invalid NIC format';
-    return '';
-  };
-  const validateAddress = (value) => {
-    if (!value.trim()) return 'Address is required';
-    if (value.length < 15 || value.length > 50) return 'Address must be 15–50 characters';
-    return '';
-  };
   const validateContact = (value) => {
     if (!value.trim()) return 'Contact number is required';
     if (!/^\d{10}$/.test(value)) return 'Contact number must be 10 digits';
     return '';
   };
-  const validateEmail = (value) => {
-    const emailCheck = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-    if (!value.trim()) return 'Email is required';
-    if (!emailCheck.test(value)) return 'Invalid email format';
+  const validateNicNumber = (value) => {
+    if (!value.trim()) return 'NIC number is required';
+    if (!/^(\d{9}[vVxX]|\d{12})$/.test(value)) return 'NIC must be 9 digits + V/X or 12 digits';
+    return '';
+  };
+  const validateAddress = (value) => {
+    if (!value.trim()) return 'Address is required';
+    if (value.length < 10 || value.length > 100) return 'Address must be 10–100 characters';
+    return '';
+  };
+  const validateBankAccount = (value) => {
+    if (!value.trim()) return 'Bank account number is required';
+    if (!/^\d{6,20}$/.test(value)) return 'Bank account number must be 6-20 digits';
+    return '';
+  };
+  const validateBankName = (value) => {
+    if (!value.trim()) return 'Bank name is required';
+    return '';
+  };
+  const validateRate = (value) => {
+    if (!value.trim()) return 'Rate is required';
+    if (isNaN(value) || Number(value) < 1) return 'Rate must be a positive number';
     return '';
   };
 
@@ -60,154 +83,211 @@ export default function CreateSupplier() {
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
   };
 
-  const handleSaveSupplier = () => {
+  const handleSaveSupplier = async () => {
     const newErrors = {
       name: validateName(name),
-      NIC: validateNIC(NIC),
-      address: validateAddress(address),
       contact: validateContact(contact),
-      email: validateEmail(email),
+      nicNumber: validateNicNumber(nicNumber),
+      address: validateAddress(address),
+      bankAccount: validateBankAccount(bankAccount),
+      bankName: validateBankName(bankName),
+      rate: validateRate(rate),
     };
     setErrors(newErrors);
     const isValid = !Object.values(newErrors).some((err) => err !== '');
     if (!isValid) return;
 
-    const data = { supplierid: supplierId, name, nic: NIC, address, contact, email };
+    const data = {
+      name,
+      contact_number: contact,
+      nic_number: nicNumber,
+      address,
+      bank_account_number: bankAccount,
+      bank_name: bankName,
+      rate: Number(rate)
+    };
     setLoading(true);
-    setTimeout(() => {
-      console.log('Saved data:', data);
-      alert('Supplier saved successfully (frontend only)');
+    try {
+      const token = localStorage.getItem('jwtToken'); 
+      const res = await axios.post('http://localhost:5000/api/suppliers', data, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data && res.data.success) {
+        setCreatedSupplierId(res.data.data.supplier_id || '');
+        setName('');
+        setContact('');
+        setNicNumber('');
+        setAddress('');
+        setBankAccount('');
+        setBankName('');
+        setRate('150');
+        
+        toast.success('Supplier created successfully!');
+        
+        // Navigate back to SupplierHome after successful creation with timestamp
+        setTimeout(() => {
+          navigate('/SupplierHome', { 
+            state: { refresh: true, timestamp: Date.now(), message: 'Supplier added successfully!' } 
+          });
+        }, 200);
+      } else {
+        toast.error(res.data?.message || 'Failed to save supplier');
+      }
+    } catch (err) {
+      toast.error('Error saving supplier: ' + (err.response?.data?.message || err.message));
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-green-50">
-      <NavigationBar />
-
-      <div className="flex-1 flex flex-col items-center relative p-4 md:p-8">
-        {/* Back Arrow */}
-        <Link to="/SupplierHome" className="absolute top-4 left-4 md:top-8 md:left-8">
-          <img src={leftArrow} alt="Go Back" className="w-10 h-10 hover:scale-105 transition-transform" />
-        </Link>
-
-        {/* Form Container */}
-        <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6 md:p-10 mt-12 md:mt-16">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-hidden" onClick={() => navigate('/SupplierHome')}>
+      <div className='max-w-2xl w-full max-h-[90vh] bg-white rounded-lg shadow-md flex flex-col' onClick={e => e.stopPropagation()}>
+        <div className='overflow-y-auto flex-1 p-8'>
+          <h1 className='text-2xl my-2 text-center font-bold text-gray-800'>Add New Supplier</h1>
           {loading && <Spinner />}
-
-          <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Add New Supplier</h1>
-
-          <div className="space-y-4">
-            {/* Supplier ID */}
-            <div>
-              <label className="block font-medium mb-1">Supplier ID</label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                value={supplierId}
-                readOnly
-              />
-            </div>
-
-            {/* Supplier Name */}
-            <div>
-              <label className="block font-medium mb-1">Supplier Name</label>
-              <input
-                type="text"
-                name="name"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Supplier Name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  handleInputChange(e, validateName);
-                }}
-              />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-            </div>
-
-            {/* NIC */}
-            <div>
-              <label className="block font-medium mb-1">NIC</label>
-              <input
-                type="text"
-                name="NIC"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter NIC (e.g., 123456789V)"
-                value={NIC}
-                onChange={(e) => {
-                  setNIC(e.target.value);
-                  handleInputChange(e, validateNIC);
-                }}
-              />
-              {errors.NIC && <p className="text-red-500 text-sm mt-1">{errors.NIC}</p>}
-            </div>
-
-            {/* Address */}
-            <div>
-              <label className="block font-medium mb-1">Address</label>
-              <input
-                type="text"
-                name="address"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Address"
-                value={address}
-                onChange={(e) => {
-                  setAddress(e.target.value);
-                  handleInputChange(e, validateAddress);
-                }}
-              />
-              {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
-            </div>
-
-            {/* Contact Number */}
-            <div>
-              <label className="block font-medium mb-1">Contact Number</label>
-              <input
-                type="text"
-                name="contact"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Contact Number"
-                value={contact}
-                onChange={(e) => {
-                  setContact(e.target.value);
-                  handleInputChange(e, validateContact);
-                }}
-              />
-              {errors.contact && <p className="text-red-500 text-sm mt-1">{errors.contact}</p>}
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block font-medium mb-1">Email</label>
-              <input
-                type="email"
-                name="email"
-                className="w-full border border-gray-300 px-4 py-2 rounded"
-                placeholder="Enter Email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  handleInputChange(e, validateEmail);
-                }}
-              />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-            </div>
-
-            {/* Submit Button */}
-            <div className="text-center mt-6">
-              <button
-                onClick={handleSaveSupplier}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded w-full md:w-auto"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
+          {!loading && (
+            <form className='space-y-4' onSubmit={e => { e.preventDefault(); handleSaveSupplier(); }}>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Supplier ID</label>
+                <input
+                  type="text"
+                  value={createdSupplierId || preGeneratedSupplierId || ''}
+                  placeholder={createdSupplierId || preGeneratedSupplierId ? '' : 'Will be generated by server (SUP-YYYYMMDD-HHMM)'}
+                  disabled
+                  className='border border-gray-300 bg-gray-100 text-gray-700 px-4 py-2 w-full rounded-md'
+                />
+                <p className='text-xs text-gray-500 mt-1'>Supplier ID is auto-generated by the server.</p>
+              </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Supplier Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-green-300 ${errors.name && 'border-red-500'}`}
+                  placeholder="Enter Supplier Name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    handleInputChange(e, validateName);
+                  }}
+                />
+                {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name}</div>}
+              </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Contact Number</label>
+                <input
+                  type="text"
+                  name="contact"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-green-300 ${errors.contact && 'border-red-500'}`}
+                  placeholder="Enter Contact Number"
+                  value={contact}
+                  onChange={(e) => {
+                    setContact(e.target.value);
+                    handleInputChange(e, validateContact);
+                  }}
+                />
+                {errors.contact && <div className="text-red-500 text-sm mt-1">{errors.contact}</div>}
+              </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>NIC Number</label>
+                <input
+                  type="text"
+                  name="nicNumber"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-green-300 ${errors.nicNumber && 'border-red-500'}`}
+                  placeholder="Enter NIC Number (e.g., 123456789V or 200012345678)"
+                  value={nicNumber}
+                  onChange={(e) => {
+                    setNicNumber(e.target.value);
+                    handleInputChange(e, validateNicNumber);
+                  }}
+                />
+                {errors.nicNumber && <div className="text-red-500 text-sm mt-1">{errors.nicNumber}</div>}
+              </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Address</label>
+                <textarea
+                  name="address"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-green-300 ${errors.address && 'border-red-500'}`}
+                  placeholder="Enter Full Address"
+                  rows="3"
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value);
+                    handleInputChange(e, validateAddress);
+                  }}
+                />
+                {errors.address && <div className="text-red-500 text-sm mt-1">{errors.address}</div>}
+              </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Bank Account Number</label>
+                <input
+                  type="text"
+                  name="bankAccount"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-green-300 ${errors.bankAccount && 'border-red-500'}`}
+                  placeholder="Enter Bank Account Number"
+                  value={bankAccount}
+                  onChange={(e) => {
+                    setBankAccount(e.target.value);
+                    handleInputChange(e, validateBankAccount);
+                  }}
+                />
+                {errors.bankAccount && <div className="text-red-500 text-sm mt-1">{errors.bankAccount}</div>}
+              </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Bank Name</label>
+                <input
+                  type="text"
+                  name="bankName"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-green-300 ${errors.bankName && 'border-red-500'}`}
+                  placeholder="Enter Bank Name"
+                  value={bankName}
+                  onChange={(e) => {
+                    setBankName(e.target.value);
+                    handleInputChange(e, validateBankName);
+                  }}
+                />
+                {errors.bankName && <div className="text-red-500 text-sm mt-1">{errors.bankName}</div>}
+              </div>
+              <div>
+                <label className='block text-md mb-2 text-gray-700'>Rate (LKR per kg)</label>
+                <input
+                  type="number"
+                  name="rate"
+                  className={`border border-gray-300 px-4 py-2 w-full rounded-md focus:outline-none focus:ring focus:ring-green-300 ${errors.rate && 'border-red-500'}`}
+                  placeholder="Enter Rate"
+                  value={rate}
+                  onChange={(e) => {
+                    setRate(e.target.value);
+                    handleInputChange(e, validateRate);
+                  }}
+                  min="1"
+                />
+                {errors.rate && <div className="text-red-500 text-sm mt-1">{errors.rate}</div>}
+              </div>
+              <div className='flex gap-4'>
+                <button
+                  type='submit'
+                  className='py-2 px-6 bg-green-600 text-white rounded-md hover:bg-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
+                  disabled={loading}
+                >
+                  {loading ? 'Saving...' : 'Save Supplier'}
+                </button>
+                <button
+                  type='button'
+                  className='py-2 px-6 bg-gray-500 text-white rounded-md hover:bg-gray-700 focus:outline-none'
+                  onClick={() => navigate('/SupplierHome')}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
-
-      <Footer />
     </div>
   );
-}
+};
+
+export default CreateSupplier;

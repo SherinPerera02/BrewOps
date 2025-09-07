@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import NavigationBar from '../components/navigationBar';
+import axios from 'axios';
 import Footer from '../components/Footer';
 import { Users, DollarSign, Calendar, Download, CreditCard, CheckCircle, XCircle } from 'lucide-react';
 import { 
@@ -38,25 +39,67 @@ const TeaFactoryPayment = () => {
     deliveryRate: 96
   };
 
-  // Sample data initialization
-  useEffect(() => {
-    const sampleSuppliers = [
-      { id: 1, name: 'Rajesh Kumar', phone: '077-1234567', bankAccount: '1234567890', bankName: 'Commercial Bank', rate: 150, monthlyQuantity: 120.5 },
-      { id: 2, name: 'Priya Silva', phone: '071-2345678', bankAccount: '2345678901', bankName: 'People\'s Bank', rate: 160, monthlyQuantity: 95.8 },
-      { id: 3, name: 'Chaminda Perera', phone: '076-3456789', bankAccount: '3456789012', bankName: 'Bank of Ceylon', rate: 155, monthlyQuantity: 78.3 }
-    ];
-    
-    const samplePayments = [
-      { id: 1, supplierId: 1, month: '2025-07', amount: 15000, date: '2025-08-01', status: 'paid' },
-      { id: 2, supplierId: 2, month: '2025-07', amount: 18500, date: '2025-08-01', status: 'paid' },
-      // Mock spot cash payments for today's dashboard table
-      { id: 3, supplierId: 1, month: 'spot-cash-2025-08-31', amount: 2250, date: '2025-08-31', status: 'paid', type: 'spot-cash', paymentMethod: 'Cash' },
-      { id: 4, supplierId: 2, month: 'spot-cash-2025-08-31', amount: 1600, date: '2025-08-31', status: 'paid', type: 'spot-cash', paymentMethod: 'Cash' },
-      { id: 5, supplierId: 3, month: 'spot-cash-2025-08-31', amount: 1850, date: '2025-08-31', status: 'paid', type: 'spot-cash', paymentMethod: 'Cash' }
-    ];
+  // Fetch data from local backend (fallbacks to sample data if requests fail)
+  const fetchSuppliers = async () => {
+    const token = localStorage.getItem('token');
+    const res = await axios.get('http://localhost:5000/api/suppliers/active', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.data && res.data.success) {
+      const transformed = res.data.data.map(s => ({
+        id: s.id,
+        supplierId: s.supplier_id,
+        name: s.name,
+        phone: s.contact_number,
+        bankAccount: s.bank_account_number,
+        bankName: s.bank_name,
+        rate: s.rate || 150,
+        monthlyQuantity: 0
+      }));
+      setSuppliers(transformed);
+    }
+  };
 
-    if (suppliers.length === 0) setSuppliers(sampleSuppliers);
-    if (payments.length === 0) setPayments(samplePayments);
+  const fetchPayments = async () => {
+    const token = localStorage.getItem('token');
+    const res = await axios.get('http://localhost:5000/api/payments', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.data && res.data.success) {
+      const adaptedPayments = res.data.data.map(p => ({
+        id: p.id,
+        supplierId: p.supplier_id,
+        month: p.payment_month,
+        amount: p.amount,
+        date: p.payment_date,
+        status: p.status,
+        type: p.payment_type === 'spot_cash' ? 'spot-cash' : p.payment_type,
+        paymentMethod: p.payment_method
+      }));
+      setPayments(adaptedPayments);
+    }
+  };
+
+  const fetchPaymentStatistics = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/payments/statistics', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data && res.data.success) {
+        // optionally set local dashboardData if you want dynamic values
+        // currently dashboardData is static in this file; keep it simple
+        console.log('Payment statistics:', res.data.data);
+      }
+    } catch (err) {
+      console.warn('Failed to load payment statistics', err.message || err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSuppliers();
+    fetchPayments();
+    fetchPaymentStatistics();
   }, []);
 
   const [supplierForm, setSupplierForm] = useState({
@@ -65,15 +108,29 @@ const TeaFactoryPayment = () => {
 
   const addSupplier = () => {
     if (supplierForm.name && supplierForm.phone && supplierForm.bankAccount && supplierForm.rate) {
-      const newSupplier = {
-        id: Date.now(),
-        ...supplierForm,
-        rate: parseFloat(supplierForm.rate),
-        monthlyQuantity: parseFloat(supplierForm.monthlyQuantity) || 0
-      };
-      setSuppliers([...suppliers, newSupplier]);
-      setSupplierForm({ name: '', phone: '', bankAccount: '', bankName: '', rate: '', monthlyQuantity: '' });
-      setShowAddSupplier(false);
+      (async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const payload = {
+            name: supplierForm.name,
+            contact_number: supplierForm.phone,
+            bank_account_number: supplierForm.bankAccount,
+            bank_name: supplierForm.bankName,
+            rate: parseFloat(supplierForm.rate)
+          };
+          const res = await axios.post('http://localhost:5000/api/suppliers', payload, { headers: { Authorization: `Bearer ${token}` } });
+          if (res.data && res.data.success) {
+            await fetchSuppliers();
+          } else {
+            throw new Error(res.data?.message || 'Failed to save supplier');
+          }
+        } catch (err) {
+          console.warn('Failed to save supplier to backend', err.message || err);
+        } finally {
+          setSupplierForm({ name: '', phone: '', bankAccount: '', bankName: '', rate: '', monthlyQuantity: '' });
+          setShowAddSupplier(false);
+        }
+      })();
     }
   };
 
@@ -98,17 +155,28 @@ const TeaFactoryPayment = () => {
   };
 
   const processPayment = (supplierId, amount) => {
-    const newPayment = {
-      id: Date.now(),
-      supplierId: supplierId,
-      month: selectedMonth,
-      amount: amount,
-      date: new Date().toISOString().slice(0, 10),
-      status: 'paid'
-    };
-    setPayments([...payments, newPayment]);
-    setShowPaymentModal(false);
-    setSelectedSupplierForPayment(null);
+    (async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const payload = {
+          supplier_id: supplierId,
+          month: selectedMonth,
+          amount: parseFloat(amount),
+          payment_method: 'Bank Transfer'
+        };
+        const res = await axios.post('http://localhost:5000/api/payments/monthly', payload, { headers: { Authorization: `Bearer ${token}` } });
+        if (res.data && res.data.success) {
+          await fetchPayments();
+        } else {
+          throw new Error(res.data?.message || 'Payment failed');
+        }
+      } catch (err) {
+        console.warn('Monthly payment failed', err.message || err);
+      } finally {
+        setShowPaymentModal(false);
+        setSelectedSupplierForPayment(null);
+      }
+    })();
   };
 
   const openPaymentModal = (supplier, amount) => {
@@ -124,22 +192,34 @@ const TeaFactoryPayment = () => {
 
   const processSpotCashPayment = () => {
     if (selectedSupplierForSpotCash && spotCashAmount && parseFloat(spotCashAmount) > 0 && paymentMethod) {
-      const newPayment = {
-        id: Date.now(),
-        supplierId: selectedSupplierForSpotCash.id,
-        month: 'spot-cash-' + new Date().toISOString().slice(0, 10),
-        amount: parseFloat(spotCashAmount),
-        date: new Date().toISOString().slice(0, 10),
-        status: 'paid',
-        type: 'spot-cash',
-        paymentMethod: paymentMethod
-      };
-      setPayments([...payments, newPayment]);
-      setShowSpotCashModal(false);
-      setSelectedSupplierForSpotCash(null);
-      setSpotCashAmount('');
-      setPaymentMethod('');
-      alert(`Spot cash payment of LKR ${parseFloat(spotCashAmount).toFixed(2)} processed successfully for ${selectedSupplierForSpotCash.name} via ${paymentMethod}`);
+      (async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const supplierRate = selectedSupplierForSpotCash.rate || 150;
+          const quantity = parseFloat(spotCashAmount) / supplierRate;
+          const payload = {
+            supplier_id: selectedSupplierForSpotCash.id,
+            quantity,
+            rate_per_kg: supplierRate,
+            payment_method: paymentMethod
+          };
+          const res = await axios.post('http://localhost:5000/api/payments/spot-cash', payload, { headers: { Authorization: `Bearer ${token}` } });
+          if (res.data && res.data.success) {
+            await fetchPayments();
+            await fetchPaymentStatistics();
+            alert(res.data.message || 'Spot cash payment processed');
+          } else {
+            throw new Error(res.data?.message || 'Spot cash failed');
+          }
+        } catch (err) {
+          console.warn('Spot cash processing failed', err.message || err);
+        } finally {
+          setShowSpotCashModal(false);
+          setSelectedSupplierForSpotCash(null);
+          setSpotCashAmount('');
+          setPaymentMethod('');
+        }
+      })();
     }
   };
 
@@ -554,65 +634,77 @@ const TeaFactoryPayment = () => {
               <h3 className="text-lg font-medium mb-4">Spot Cash Payment</h3>
               
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Payment Details</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+                <h4 className="font-medium text-gray-900 mb-3">Enter Payment Details</h4>
+                <div className="space-y-4">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Supplier:</span>
                     <span className="font-medium">{selectedSupplierForSpotCash.name}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Phone:</span>
                     <span className="font-medium">{selectedSupplierForSpotCash.phone}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Quantity:</span>
-                    <span className="font-medium">{getSupplierQuantity(selectedSupplierForSpotCash.id).toFixed(1)} kg</span>
-                  </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Rate:</span>
                     <span className="font-medium">LKR {selectedSupplierForSpotCash.rate}/kg</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-medium text-green-600">LKR {(getSupplierQuantity(selectedSupplierForSpotCash.id) * selectedSupplierForSpotCash.rate).toFixed(2)}</span>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Amount (LKR)
+                    </label>
+                    <input
+                      type="number"
+                      value={spotCashAmount}
+                      onChange={(e) => setSpotCashAmount(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="Enter amount"
+                      min="0"
+                      step="0.01"
+                    />
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Payment Method:</span>
-                    <span className="font-medium text-green-600">Cash</span>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Payment Method
+                    </label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    >
+                      <option value="">Select Payment Method</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Bank Transfer">Bank Transfer</option>
+                      <option value="Check">Check</option>
+                    </select>
                   </div>
+
+                  {spotCashAmount && (
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Calculated Quantity:</span>
+                        <span className="font-medium">{(parseFloat(spotCashAmount) / selectedSupplierForSpotCash.rate).toFixed(2)} kg</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="flex space-x-3">
                 <button
-                  onClick={() => {
-                    const calculatedAmount = getSupplierQuantity(selectedSupplierForSpotCash.id) * selectedSupplierForSpotCash.rate;
-                    if (selectedSupplierForSpotCash && calculatedAmount > 0) {
-                      const newPayment = {
-                        id: Date.now(),
-                        supplierId: selectedSupplierForSpotCash.id,
-                        month: 'spot-cash-' + new Date().toISOString().slice(0, 10),
-                        amount: calculatedAmount,
-                        date: new Date().toISOString().slice(0, 10),
-                        status: 'paid',
-                        type: 'spot-cash',
-                        paymentMethod: 'Cash'
-                      };
-                      setPayments([...payments, newPayment]);
-                      setShowSpotCashModal(false);
-                      setSelectedSupplierForSpotCash(null);
-                      alert(`Spot cash payment of LKR ${calculatedAmount.toFixed(2)} completed successfully for ${selectedSupplierForSpotCash.name}`);
-                    }
-                  }}
-                  disabled={getSupplierQuantity(selectedSupplierForSpotCash.id) <= 0}
+                  onClick={processSpotCashPayment}
+                  disabled={!spotCashAmount || parseFloat(spotCashAmount) <= 0 || !paymentMethod}
                   className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  <span>Done</span>
+                  <span>Process Payment</span>
                 </button>
                 <button
                   onClick={() => {
                     setShowSpotCashModal(false);
                     setSelectedSupplierForSpotCash(null);
+                    setSpotCashAmount('');
+                    setPaymentMethod('');
                   }}
                   className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400"
                 >

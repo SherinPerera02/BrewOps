@@ -22,7 +22,7 @@ import DeleteSuppliers from './pages/Supplier/DeleteSuppliers'
 
 import ShowSupplyRecode from './pages/Supplier/ShowSupplyRecode';
 import EditSupplierRecode from './pages/Supplier/EditSupplierRecode';
-import CreateSupplyRecode1 from './pages/Supplier/CreateSupplyRecode1';
+import CreateSupplierRecode from './pages/Supplier/CreateSupplierRecode';
 import DeleteSupplyRecode from './pages/Supplier/DeleteSupplyRecode';
 
 import StaffProfile from './pages/Supplier/StaffProfile';
@@ -31,7 +31,6 @@ import EditProfile from './pages/editProfile';
 import PaymentSummary from './pages/paymentSummary';
 import LeavesQuantity from './pages/leavesQuantity';
 import Transaction from './pages/transaction';
-import NavigationBar from "./components/navigationBar";
 import Production from './pages/Production';
 import TeaFactoryPayment from './pages/SupplierPayment';
 import UserManagement from './pages/UserManagement';
@@ -66,13 +65,13 @@ function AppRoutes() {
         <Route path="/SupplierHome" element={<SupplierHome />} />
         <Route path ="/suppliers/create" element={<CreateSupplier />} />
         <Route path ="/suppliers/details/:id"  element={<ShowSupplier />} />
-        <Route path ='/SupplierRecodeCreate' element={<CreateSupplyRecode1 />} />
-        <Route path ="/Suppliers/edit/:id" element={<EditSupplier/>}/>
-        <Route path="/Suppliers/delete/:id" element={<DeleteSuppliers/>}/>
+        <Route path ='/SupplierRecodeCreate' element={<CreateSupplierRecode />} />
+        <Route path ="/suppliers/edit/:id" element={<EditSupplier/>}/>
+        <Route path="/suppliers/delete/:id" element={<DeleteSuppliers/>}/>
         <Route path ='/SupplierRecode' element={<SupplierRecode />} />
         <Route path = '/supplyRecode/details/:id' element ={<ShowSupplyRecode/>} />
         <Route path ='/supplyRecode/edit/:id' element={<EditSupplierRecode/>}/>
-        <Route path='/supplyRecode/create' element={<CreateSupplyRecode1/>}/>
+        <Route path='/supplyRecode/create' element={<CreateSupplierRecode/>}/>
         <Route path ='/SupplyRecode/delete/:id' element = {< DeleteSupplyRecode/>}/>  
         <Route path="/SupplierDashboard" element={<SupplierDashboard />} />
         <Route path="/suppliers/editProfile" element={<EditProfile />} />
@@ -89,12 +88,20 @@ function AppRoutes() {
 
       {/* If a background location exists, render modal routes over the background */}
       {background && (
-        <Routes>
-          <Route path="/inventory/creates" element={<CreateInventory />} />
-          <Route path="/inventory/:id" element={<ShowInventory />} />
-          <Route path="/inventory/edit/:id" element={<EditInventory />} />
-          <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
-        </Routes>
+        <>
+          <Routes>
+            <Route path="/inventory/creates" element={<CreateInventory />} />
+            <Route path="/inventory/:id" element={<ShowInventory />} />
+            <Route path="/inventory/edit/:id" element={<EditInventory />} />
+            <Route path="/inventory/delete/:id" element={<DeleteInventory />} />
+          </Routes>
+          <Routes>
+            <Route path="/suppliers/create" element={<CreateSupplier />} />
+            <Route path="/suppliers/details/:id" element={<ShowSupplier />} />
+            <Route path="/suppliers/edit/:id" element={<EditSupplier />} />
+            <Route path="/suppliers/delete/:id" element={<DeleteSuppliers />} />
+          </Routes>
+        </>
       )}
     </>
   );
