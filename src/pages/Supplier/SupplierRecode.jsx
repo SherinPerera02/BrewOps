@@ -15,6 +15,7 @@ import {
   FaEdit,
   FaPlusCircle,
   FaUsers,
+  FaDollarSign,
 } from "react-icons/fa";
 import Spinner from "../../components/Spinner";
 import Footer from "../../components/Footer";
@@ -604,7 +605,7 @@ export default function SupplierRecode() {
                                       className="text-blue-600 text-xl hover:text-blue-800"
                                       title="Process Spot Payment"
                                     >
-                                      💰
+                                      <FaDollarSign />
                                     </Link>
                                   )}
                               </div>

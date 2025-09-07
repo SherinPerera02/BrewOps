@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom';
 const TeaFactoryPayment = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [deliveryRecords, setDeliveryRecords] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showAddSupplier, setShowAddSupplier] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -96,10 +97,27 @@ const TeaFactoryPayment = () => {
     }
   };
 
+  const fetchDeliveryRecords = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken');
+      const res = await axios.get('http://localhost:5000/api/deliveries', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data && res.data.success) {
+        const deliveryData = res.data.data || [];
+        setDeliveryRecords(deliveryData);
+      }
+    } catch (err) {
+      console.warn('Failed to load delivery records', err.message || err);
+      setDeliveryRecords([]);
+    }
+  };
+
   useEffect(() => {
     fetchSuppliers();
     fetchPayments();
     fetchPaymentStatistics();
+    fetchDeliveryRecords();
   }, []);
 
   const [supplierForm, setSupplierForm] = useState({
@@ -154,24 +172,101 @@ const TeaFactoryPayment = () => {
     return payment ? payment.status : 'pending';
   };
 
+  // Get delivery records for a specific supplier and month
+  const getMonthlyDeliveryRecords = (supplierId, month) => {
+    const monthDate = new Date(month + '-01');
+    return deliveryRecords.filter(delivery => {
+      const deliveryDate = new Date(delivery.delivery_date);
+      return delivery.supplier_id === supplierId && 
+             delivery.payment_method === 'monthly' &&
+             deliveryDate.getFullYear() === monthDate.getFullYear() &&
+             deliveryDate.getMonth() === monthDate.getMonth();
+    });
+  };
+
+  // Get spot payment delivery records for a specific supplier
+  const getSpotPaymentDeliveries = (supplierId, month = null) => {
+    let filtered = deliveryRecords.filter(delivery => 
+      delivery.supplier_id === supplierId && 
+      delivery.payment_method === 'spot'
+    );
+    
+    if (month) {
+      const monthDate = new Date(month + '-01');
+      filtered = filtered.filter(delivery => {
+        const deliveryDate = new Date(delivery.delivery_date);
+        return deliveryDate.getFullYear() === monthDate.getFullYear() &&
+               deliveryDate.getMonth() === monthDate.getMonth();
+      });
+    }
+    
+    return filtered;
+  };
+
+  // Calculate total monthly amount for a supplier
+  const getMonthlyTotal = (supplierId, month) => {
+    const monthlyDeliveries = getMonthlyDeliveryRecords(supplierId, month);
+    return monthlyDeliveries.reduce((sum, delivery) => sum + (parseFloat(delivery.total_amount) || 0), 0);
+  };
+
+  // Check if supplier has any deliveries in the month
+  const hasDeliveriesInMonth = (supplierId, month) => {
+    const monthlyDeliveries = getMonthlyDeliveryRecords(supplierId, month);
+    const spotDeliveries = getSpotPaymentDeliveries(supplierId, month);
+    return (monthlyDeliveries.length + spotDeliveries.length) > 0;
+  };
+
   const processPayment = (supplierId, amount) => {
     (async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('jwtToken');
         const payload = {
           supplier_id: supplierId,
           month: selectedMonth,
           amount: parseFloat(amount),
-          payment_method: 'Bank Transfer'
+          payment_method: 'Bank Transfer',
+          payment_status: 'paid'
         };
-        const res = await axios.post('http://localhost:5000/api/payments/monthly', payload, { headers: { Authorization: `Bearer ${token}` } });
-        if (res.data && res.data.success) {
+        
+        let res;
+        try {
+          res = await axios.post('http://localhost:5000/api/payments/monthly', payload, { 
+            headers: { Authorization: `Bearer ${token}` } 
+          });
+        } catch (err) {
+          // Fallback to updating delivery records directly
+          console.warn('Monthly payment endpoint failed, trying delivery update', err);
+          
+          // Update all monthly delivery records for this supplier and month
+          const monthlyDeliveries = getMonthlyDeliveryRecords(supplierId, selectedMonth);
+          const updatePromises = monthlyDeliveries
+            .filter(d => d.payment_status !== 'paid')
+            .map(delivery => 
+              axios.put(`http://localhost:5000/api/deliveries/${delivery.id}`, {
+                ...delivery,
+                payment_status: 'paid',
+                payment_date: new Date().toISOString().split('T')[0]
+              }, { headers: { Authorization: `Bearer ${token}` } })
+            );
+          
+          if (updatePromises.length > 0) {
+            await Promise.all(updatePromises);
+            res = { data: { success: true, message: 'Monthly deliveries updated successfully' } };
+          } else {
+            throw new Error('No deliveries found to update');
+          }
+        }
+        
+        if (res && res.data && res.data.success) {
           await fetchPayments();
+          await fetchDeliveryRecords();
+          alert('Monthly payment processed successfully!');
         } else {
-          throw new Error(res.data?.message || 'Payment failed');
+          throw new Error(res?.data?.message || 'Payment failed');
         }
       } catch (err) {
-        console.warn('Monthly payment failed', err.message || err);
+        console.error('Monthly payment failed:', err);
+        alert(`Payment failed: ${err.message || 'Unknown error'}`);
       } finally {
         setShowPaymentModal(false);
         setSelectedSupplierForPayment(null);
@@ -194,25 +289,61 @@ const TeaFactoryPayment = () => {
     if (selectedSupplierForSpotCash && spotCashAmount && parseFloat(spotCashAmount) > 0 && paymentMethod) {
       (async () => {
         try {
-          const token = localStorage.getItem('token');
-          const supplierRate = selectedSupplierForSpotCash.rate || 150;
-          const quantity = parseFloat(spotCashAmount) / supplierRate;
+          const token = localStorage.getItem('jwtToken');
+          
+          // If we have a pre-filled amount, this is likely from a delivery record
+          // We should update the delivery payment status rather than creating a new payment
           const payload = {
             supplier_id: selectedSupplierForSpotCash.id,
-            quantity,
-            rate_per_kg: supplierRate,
-            payment_method: paymentMethod
+            amount: parseFloat(spotCashAmount),
+            payment_method: paymentMethod,
+            payment_type: 'spot_cash',
+            payment_status: 'paid'
           };
-          const res = await axios.post('http://localhost:5000/api/payments/spot-cash', payload, { headers: { Authorization: `Bearer ${token}` } });
-          if (res.data && res.data.success) {
+          
+          // Try to update delivery payment status if this is a delivery-specific payment
+          let res;
+          try {
+            res = await axios.post('http://localhost:5000/api/payments/spot-cash', payload, { 
+              headers: { Authorization: `Bearer ${token}` } 
+            });
+          } catch (err) {
+            // Fallback to updating delivery records directly
+            console.warn('Spot cash payment endpoint failed, trying delivery update', err);
+            
+            // Find delivery records for this supplier with this amount to update
+            const matchingDeliveries = deliveryRecords.filter(d => 
+              d.supplier_id === selectedSupplierForSpotCash.id && 
+              Math.abs(parseFloat(d.total_amount) - parseFloat(spotCashAmount)) < 0.01 &&
+              d.payment_method === 'spot' &&
+              d.payment_status !== 'paid'
+            );
+            
+            if (matchingDeliveries.length > 0) {
+              // Update the first matching delivery
+              const delivery = matchingDeliveries[0];
+              res = await axios.put(`http://localhost:5000/api/deliveries/${delivery.id}`, {
+                ...delivery,
+                payment_status: 'paid',
+                payment_date: new Date().toISOString().split('T')[0]
+              }, { headers: { Authorization: `Bearer ${token}` } });
+            } else {
+              throw new Error('No matching delivery found to update');
+            }
+          }
+          
+          if (res && res.data && res.data.success) {
+            // Refresh all data
             await fetchPayments();
             await fetchPaymentStatistics();
-            alert(res.data.message || 'Spot cash payment processed');
+            await fetchDeliveryRecords();
+            alert('Spot payment processed successfully!');
           } else {
-            throw new Error(res.data?.message || 'Spot cash failed');
+            throw new Error(res?.data?.message || 'Spot payment failed');
           }
         } catch (err) {
-          console.warn('Spot cash processing failed', err.message || err);
+          console.error('Spot payment processing failed:', err);
+          alert(`Payment failed: ${err.message || 'Unknown error'}`);
         } finally {
           setShowSpotCashModal(false);
           setSelectedSupplierForSpotCash(null);
@@ -225,14 +356,15 @@ const TeaFactoryPayment = () => {
 
   const getTodaysSpotCashPayments = () => {
     const today = new Date().toISOString().slice(0, 10);
-    return payments.filter(payment => 
-      payment.type === 'spot-cash' && 
-      payment.date === today
+    return deliveryRecords.filter(delivery => 
+      delivery.payment_method === 'spot' && 
+      delivery.delivery_date && 
+      delivery.delivery_date.slice(0, 10) === today
     );
   };
 
   const getTodaysSpotCashTotal = () => {
-    return getTodaysSpotCashPayments().reduce((sum, payment) => sum + payment.amount, 0);
+    return getTodaysSpotCashPayments().reduce((sum, delivery) => sum + (parseFloat(delivery.total_amount) || 0), 0);
   };
 
   const exportMonthlyReport = () => {
@@ -312,6 +444,18 @@ const TeaFactoryPayment = () => {
               >
                 <DollarSign className="text-xl" />
                 <span className="font-medium">Monthly Payments</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('deliveries')}
+                className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
+                  activeTab === 'deliveries' 
+                    ? 'bg-gray-700 text-white shadow-md' 
+                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                }`}
+              >
+                <FaTruck className="text-xl" />
+                <span className="font-medium">All Deliveries</span>
               </button>
             </div>
 
@@ -416,36 +560,44 @@ const TeaFactoryPayment = () => {
             {/* Recent Spot Cash Payments */}
             <div className="bg-white rounded-lg shadow">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Today's Spot Cash Payments</h3>
+                <h3 className="text-lg font-medium text-gray-900">Today's Spot Payment Deliveries</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery ID</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity (kg)</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (LKR)</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {getTodaysSpotCashPayments().map(payment => {
-                      const supplier = suppliers.find(s => s.id === payment.supplierId);
+                    {getTodaysSpotCashPayments().map(delivery => {
                       return (
-                        <tr key={payment.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(payment.date + 'T' + new Date().toISOString().slice(11)).toLocaleTimeString()}
+                        <tr key={delivery.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                            DEL-{delivery.id.toString().padStart(4, '0')}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {supplier ? supplier.name : 'Unknown'}
+                            <div className="font-medium">{delivery.supplier_name || 'Unknown'}</div>
+                            <div className="text-gray-500">{delivery.supplier_code || 'N/A'}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {(parseFloat(delivery.quantity) || 0).toFixed(2)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                            {payment.amount.toFixed(2)}
+                            Rs. {(parseFloat(delivery.total_amount) || 0).toFixed(2)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                              <CheckCircle size={12} className="mr-1" />
-                              Paid
+                            <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+                              delivery.payment_status === 'paid' 
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {delivery.payment_status === 'paid' ? <CheckCircle size={12} className="mr-1" /> : <XCircle size={12} className="mr-1" />}
+                              {delivery.payment_status || 'pending'}
                             </span>
                           </td>
                         </tr>
@@ -455,7 +607,7 @@ const TeaFactoryPayment = () => {
                 </table>
                 {getTodaysSpotCashPayments().length === 0 && (
                   <div className="text-center py-8 text-gray-500">
-                    No spot cash payments made today
+                    No spot payment deliveries made today
                   </div>
                 )}
               </div>
@@ -464,97 +616,198 @@ const TeaFactoryPayment = () => {
         )}
 
         {/* Suppliers Tab */}
+        {/* Spot Payments Tab */}
         {activeTab === 'suppliers' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Suppliers</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Spot Payment Deliveries</h2>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
             </div>
 
-            {/* Month Selector for Supplier View */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">View Monthly Totals for:</label>
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="p-2 border border-gray-300 rounded-lg"
-              />
-            </div>
+            {/* Summary Cards for Spot Payments */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <FaMoneyBillWave className="text-3xl text-blue-500 mr-4" />
+                  <div>
+                    <p className="text-gray-600">Spot Deliveries</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                      {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return delivery.payment_method === 'spot' &&
+                               deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <FaTruck className="text-3xl text-green-500 mr-4" />
+                  <div>
+                    <p className="text-gray-600">Total Quantity</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                      {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return delivery.payment_method === 'spot' &&
+                               deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).reduce((sum, delivery) => sum + (parseFloat(delivery.quantity) || 0), 0).toFixed(2)} kg
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <DollarSign className="text-3xl text-orange-500 mr-4" />
+                  <div>
+                    <p className="text-gray-600">Total Value</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                      Rs. {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return delivery.payment_method === 'spot' &&
+                               deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).reduce((sum, delivery) => sum + (parseFloat(delivery.total_amount) || 0), 0).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
             
-            {/* Suppliers List with Monthly Totals */}
+            {/* Spot Payment Deliveries Table */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Details</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rate (LKR/kg)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {suppliers.map(supplier => {
-                    const monthlyData = getMonthlyReport().find(r => r.supplier.id === supplier.id);
-                    const monthlyAmount = monthlyData ? monthlyData.totalAmount : 0;
-                    const supplierQuantity = getSupplierQuantity(supplier.id);
-                    const paymentStatus = getPaymentStatus(supplier.id, selectedMonth);
-                    
-                    return (
-                      <tr key={supplier.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{supplier.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{supplier.phone}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <div>
-                            <div className="font-medium">{supplier.bankAccount}</div>
-                            <div className="text-gray-500 text-xs">{supplier.bankName}</div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{supplier.rate}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                          {getSupplierQuantity(supplier.id).toFixed(1)} kg
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
-                            paymentStatus === 'paid' 
-                              ? 'bg-green-100 text-green-800' 
-                              : supplierQuantity > 0 
-                                ? 'bg-red-100 text-red-800' 
-                                : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {paymentStatus === 'paid' ? (
-                              <>
-                                <CheckCircle size={12} className="mr-1" />
-                                Paid
-                              </>
-                            ) : supplierQuantity > 0 ? (
-                              <>
-                                <XCircle size={12} className="mr-1" />
-                                Pending
-                              </>
-                            ) : (
-                              'No Quantity'
-                            )}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <div className="flex items-center space-x-2">
-                            <button 
-                              onClick={() => openSpotCashModal(supplier)}
-                              className="bg-green-600 text-white px-5 py-1 rounded text-xs hover:bg-green-700"
-                            >
-                              <span>Pay Now</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">Spot Payment Delivery Records - {new Date(selectedMonth + '-01').toLocaleDateString('default', { month: 'long', year: 'numeric' })}</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity (kg)</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rate/kg</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {deliveryRecords
+                      .filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return delivery.payment_method === 'spot' &&
+                               deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      })
+                      .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
+                      .map(delivery => {
+                        const supplier = suppliers.find(s => s.id === delivery.supplier_id);
+                        return (
+                          <tr key={delivery.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                              DEL-{delivery.id.toString().padStart(4, '0')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{delivery.supplier_name || supplier?.name || 'Unknown'}</div>
+                              <div className="text-sm text-gray-500">{delivery.supplier_code || supplier?.supplierId || 'N/A'}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {new Date(delivery.delivery_date).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {(parseFloat(delivery.quantity) || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              Rs. {(parseFloat(delivery.rate_per_kg) || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                              Rs. {(parseFloat(delivery.total_amount) || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+                                delivery.payment_status === 'paid' 
+                                  ? 'bg-green-100 text-green-800'
+                                  : delivery.payment_status === 'overdue'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {delivery.payment_status === 'paid' ? <CheckCircle size={12} className="mr-1" /> : <XCircle size={12} className="mr-1" />}
+                                {delivery.payment_status || 'pending'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {delivery.payment_status !== 'paid' ? (
+                                <button 
+                                  onClick={() => {
+                                    // Find the supplier for this delivery
+                                    const supplier = suppliers.find(s => s.id === delivery.supplier_id);
+                                    const deliverySupplier = supplier ? {
+                                      id: supplier.id,
+                                      name: supplier.name || delivery.supplier_name,
+                                      supplierId: supplier.supplierId || delivery.supplier_code,
+                                      phone: supplier.phone || 'N/A',
+                                      rate: supplier.rate || 150,
+                                      bankAccount: supplier.bankAccount || 'N/A',
+                                      bankName: supplier.bankName || 'N/A'
+                                    } : {
+                                      id: delivery.supplier_id,
+                                      name: delivery.supplier_name || 'Unknown',
+                                      supplierId: delivery.supplier_code || 'N/A',
+                                      phone: 'N/A',
+                                      rate: parseFloat(delivery.rate_per_kg) || 150,
+                                      bankAccount: 'N/A',
+                                      bankName: 'N/A'
+                                    };
+                                    
+                                    // Set the delivery-specific amount for spot payment
+                                    setSelectedSupplierForSpotCash(deliverySupplier);
+                                    setSpotCashAmount(delivery.total_amount);
+                                    setShowSpotCashModal(true);
+                                  }}
+                                  className="bg-blue-600 text-white px-3 py-1 rounded text-xs flex items-center space-x-1 hover:bg-blue-700"
+                                >
+                                  <CreditCard size={12} />
+                                  <span>Pay Now</span>
+                                </button>
+                              ) : (
+                                <span className="text-green-600 text-xs font-medium">Paid</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+              
+              {deliveryRecords.filter(delivery => {
+                const deliveryDate = new Date(delivery.delivery_date);
+                const monthDate = new Date(selectedMonth + '-01');
+                return delivery.payment_method === 'spot' &&
+                       deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                       deliveryDate.getMonth() === monthDate.getMonth();
+              }).length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No spot payment deliveries found for {new Date(selectedMonth + '-01').toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -742,23 +995,41 @@ const TeaFactoryPayment = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Account</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monthly Deliveries</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Spot Deliveries</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {suppliers.map(supplier => {
+                  {suppliers.filter(supplier => hasDeliveriesInMonth(supplier.id, selectedMonth)).map(supplier => {
+                    const monthlyDeliveries = getMonthlyDeliveryRecords(supplier.id, selectedMonth);
+                    const spotDeliveries = getSpotPaymentDeliveries(supplier.id, selectedMonth);
+                    const monthlyTotal = getMonthlyTotal(supplier.id, selectedMonth);
                     const paymentStatus = getPaymentStatus(supplier.id, selectedMonth);
+                    
                     return (
                       <tr key={supplier.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{supplier.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{supplier.phone}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <div>
-                            <div className="font-medium">{supplier.bankAccount}</div>
-                            <div className="text-gray-500 text-xs">{supplier.bankName}</div>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{supplier.name}</div>
+                          <div className="text-sm text-gray-500">{supplier.supplierId}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{monthlyDeliveries.length} deliveries</div>
+                          <div className="text-sm text-gray-500">
+                            {monthlyDeliveries.reduce((sum, d) => sum + parseFloat(d.quantity || 0), 0).toFixed(2)} kg
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{spotDeliveries.length} deliveries</div>
+                          <div className="text-sm text-gray-500">
+                            {spotDeliveries.reduce((sum, d) => sum + parseFloat(d.quantity || 0), 0).toFixed(2)} kg
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-green-600">
+                            Rs. {monthlyTotal.toFixed(2)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -779,9 +1050,9 @@ const TeaFactoryPayment = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {paymentStatus !== 'paid' && (
+                          {paymentStatus !== 'paid' && monthlyTotal > 0 && (
                             <button 
-                              onClick={() => openPaymentModal(supplier, 0)}
+                              onClick={() => openPaymentModal(supplier, monthlyTotal)}
                               className="bg-green-600 text-white px-3 py-1 rounded text-xs flex items-center space-x-1 hover:bg-green-700"
                             >
                               <CreditCard size={12} />
@@ -795,11 +1066,315 @@ const TeaFactoryPayment = () => {
                 </tbody>
               </table>
               
-              {suppliers.length === 0 && (
+              {suppliers.filter(supplier => hasDeliveriesInMonth(supplier.id, selectedMonth)).length === 0 && (
                 <div className="text-center py-8 text-gray-500">
-                  No suppliers found
+                  No deliveries found for {new Date(selectedMonth + '-01').toLocaleDateString('default', { month: 'long', year: 'numeric' })}
                 </div>
               )}
+            </div>
+
+            {/* Detailed Delivery Records */}
+            {suppliers.filter(supplier => hasDeliveriesInMonth(supplier.id, selectedMonth)).length > 0 && (
+              <div className="mt-8 bg-white rounded-lg shadow overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900">Detailed Delivery Records - {new Date(selectedMonth + '-01').toLocaleDateString('default', { month: 'long', year: 'numeric' })}</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).map(delivery => {
+                        const supplier = suppliers.find(s => s.id === delivery.supplier_id);
+                        return (
+                          <tr key={delivery.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                              DEL-{delivery.id.toString().padStart(4, '0')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{delivery.supplier_name || supplier?.name || 'Unknown'}</div>
+                              <div className="text-sm text-gray-500">{delivery.supplier_code || supplier?.supplierId || 'N/A'}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {new Date(delivery.delivery_date).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {(parseFloat(delivery.quantity) || 0).toFixed(2)} kg
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                              Rs. {(parseFloat(delivery.total_amount) || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                delivery.payment_method === 'spot' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                              }`}>
+                                {delivery.payment_method === 'spot' ? 'Spot' : 'Monthly'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+                                delivery.payment_status === 'paid' 
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {delivery.payment_status === 'paid' ? <CheckCircle size={12} className="mr-1" /> : <XCircle size={12} className="mr-1" />}
+                                {delivery.payment_status || 'pending'}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* All Deliveries Tab */}
+        {activeTab === 'deliveries' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">All Delivery Records</h2>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="p-2 border border-gray-300 rounded-lg"
+                />
+                <select 
+                  className="p-2 border border-gray-300 rounded-lg"
+                  onChange={(e) => {/* Filter by payment method */}}
+                >
+                  <option value="">All Payment Methods</option>
+                  <option value="spot">Spot Payments</option>
+                  <option value="monthly">Monthly Payments</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity (kg)</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rate/kg</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {deliveryRecords
+                      .filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      })
+                      .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
+                      .map(delivery => {
+                        const supplier = suppliers.find(s => s.id === delivery.supplier_id);
+                        return (
+                          <tr key={delivery.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                              DEL-{delivery.id.toString().padStart(4, '0')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{delivery.supplier_name || supplier?.name || 'Unknown'}</div>
+                              <div className="text-sm text-gray-500">{delivery.supplier_code || supplier?.supplierId || 'N/A'}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {new Date(delivery.delivery_date).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {(parseFloat(delivery.quantity) || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              Rs. {(parseFloat(delivery.rate_per_kg) || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                              Rs. {(parseFloat(delivery.total_amount) || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                delivery.payment_method === 'spot' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                              }`}>
+                                {delivery.payment_method === 'spot' ? 'Spot Payment' : 'Monthly Payment'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+                                delivery.payment_status === 'paid' 
+                                  ? 'bg-green-100 text-green-800'
+                                  : delivery.payment_status === 'overdue'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {delivery.payment_status === 'paid' ? <CheckCircle size={12} className="mr-1" /> : <XCircle size={12} className="mr-1" />}
+                                {delivery.payment_status || 'pending'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {delivery.payment_status !== 'paid' ? (
+                                <button 
+                                  onClick={() => {
+                                    // Find the supplier for this delivery
+                                    const supplier = suppliers.find(s => s.id === delivery.supplier_id);
+                                    const deliverySupplier = supplier ? {
+                                      id: supplier.id,
+                                      name: supplier.name || delivery.supplier_name,
+                                      supplierId: supplier.supplierId || delivery.supplier_code,
+                                      phone: supplier.phone || 'N/A',
+                                      rate: supplier.rate || parseFloat(delivery.rate_per_kg) || 150,
+                                      bankAccount: supplier.bankAccount || 'N/A',
+                                      bankName: supplier.bankName || 'N/A',
+                                      amount: parseFloat(delivery.total_amount)
+                                    } : {
+                                      id: delivery.supplier_id,
+                                      name: delivery.supplier_name || 'Unknown',
+                                      supplierId: delivery.supplier_code || 'N/A',
+                                      phone: 'N/A',
+                                      rate: parseFloat(delivery.rate_per_kg) || 150,
+                                      bankAccount: 'N/A',
+                                      bankName: 'N/A',
+                                      amount: parseFloat(delivery.total_amount)
+                                    };
+                                    
+                                    // Set the delivery-specific amount for payment
+                                    if (delivery.payment_method === 'spot') {
+                                      setSelectedSupplierForSpotCash(deliverySupplier);
+                                      setSpotCashAmount(delivery.total_amount);
+                                      setShowSpotCashModal(true);
+                                    } else {
+                                      setSelectedSupplierForPayment(deliverySupplier);
+                                      setShowPaymentModal(true);
+                                    }
+                                  }}
+                                  className={`${
+                                    delivery.payment_method === 'spot' 
+                                      ? 'bg-blue-600 hover:bg-blue-700' 
+                                      : 'bg-green-600 hover:bg-green-700'
+                                  } text-white px-3 py-1 rounded text-xs flex items-center space-x-1`}
+                                >
+                                  <CreditCard size={12} />
+                                  <span>Pay Now</span>
+                                </button>
+                              ) : (
+                                <span className="text-green-600 text-xs font-medium">Paid</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+              
+              {deliveryRecords.filter(delivery => {
+                const deliveryDate = new Date(delivery.delivery_date);
+                const monthDate = new Date(selectedMonth + '-01');
+                return deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                       deliveryDate.getMonth() === monthDate.getMonth();
+              }).length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No delivery records found for {new Date(selectedMonth + '-01').toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+                </div>
+              )}
+            </div>
+
+            {/* Summary Cards */}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <FaTruck className="text-3xl text-blue-500 mr-4" />
+                  <div>
+                    <p className="text-gray-600">Total Deliveries</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                      {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <FaMoneyBillWave className="text-3xl text-green-500 mr-4" />
+                  <div>
+                    <p className="text-gray-600">Spot Payments</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                      {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return delivery.payment_method === 'spot' &&
+                               deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <Calendar className="text-3xl text-purple-500 mr-4" />
+                  <div>
+                    <p className="text-gray-600">Monthly Payments</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                      {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return delivery.payment_method === 'monthly' &&
+                               deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <DollarSign className="text-3xl text-orange-500 mr-4" />
+                  <div>
+                    <p className="text-gray-600">Total Value</p>
+                    <p className="text-2xl font-bold text-gray-800">
+                      Rs. {deliveryRecords.filter(delivery => {
+                        const deliveryDate = new Date(delivery.delivery_date);
+                        const monthDate = new Date(selectedMonth + '-01');
+                        return deliveryDate.getFullYear() === monthDate.getFullYear() &&
+                               deliveryDate.getMonth() === monthDate.getMonth();
+                      }).reduce((sum, delivery) => sum + (parseFloat(delivery.total_amount) || 0), 0).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
