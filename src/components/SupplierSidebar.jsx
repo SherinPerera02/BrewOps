@@ -6,7 +6,7 @@ export default function SupplierSidebar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const menuItems = [
-    { label: 'Dashboard', icon: <FaHome />, to: '/staff' },
+    { label: 'Dashboard', icon: <FaHome />, to: '/staffdashboard' },
     { label: 'Supplier Management', icon: <FaUsers />, to: '/SupplierHome' },
     { label: 'Supply Record', icon: <FaPager />, to: '/SupplierRecode' },
   ];
