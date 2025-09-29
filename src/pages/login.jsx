@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
 import loginAnimation from "../assets/login.json";
 import Lottie from "lottie-react";
 import Spinner from "../components/Spinner";
@@ -122,10 +121,7 @@ export default function LoginPage() {
     }
   }
 
-  function handleGoogleSignIn() {
-    toast("Google Sign-In not yet connected!", { icon: "🔗" });
-    // In real setup, redirect to Google OAuth URL
-  }
+
 
   return (
     <>
@@ -213,7 +209,7 @@ export default function LoginPage() {
                 </label>
                 <span
                   className="text-green-800 hover:underline cursor-pointer"
-                  onClick={() => toast("Redirect to Forgot Password")}
+                  onClick={() => navigate("/forgot-password")}
                 >
                   Forgot your password?
                 </span>
@@ -225,21 +221,6 @@ export default function LoginPage() {
                 className="w-[400px] h-[50px] bg-green-800 rounded-[20px] text-[18px] font-bold text-white hover:bg-black hover:text-white cursor-pointer transition"
               >
                 Sign In
-              </button>
-
-              {/* Divider */}
-              <div className="flex items-center w-[400px] my-4">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <span className="text-gray-400 text-sm px-2">or</span>
-                <div className="flex-grow border-t border-gray-300"></div>
-              </div>
-
-              {/* Google Sign In */}
-              <button
-                onClick={handleGoogleSignIn}
-                className="w-[400px] h-[50px] flex items-center justify-center gap-3 border border-gray-300 rounded-[20px] text-green-800 hover:bg-gray-300 hover:text-black transition cursor-pointer"
-              >
-                <FcGoogle size={22} /> Sign in with Google
               </button>
             </div>
           </div>

@@ -7,11 +7,13 @@ import EditInventory from './pages/editInventory';
 import DeleteInventory from './pages/deleteInventory';
 import WhoWeAre from './pages/WhoWeAre';
 import LoginPage from './pages/login';
+import ForgotPasswordPage from './pages/frogetPassword';
 import AdminDashboard from './pages/adminDashboard';
 import RegisterPage from './pages/register';
 import SupplierDashboard from './pages/supplierDashboard';
 import ProductionManagerDashboard from './pages/ProductionManagerDashboard';
 import StaffDashboard from './pages/StaffDashboard';
+import SupplierManagement from './pages/SupplierManagement';
 
 import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier'
@@ -50,6 +52,7 @@ function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/AboutUs" element={<WhoWeAre />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/inventories" element={<Inventories />} />
@@ -60,6 +63,7 @@ function AppRoutes() {
         <Route path="/ProductionManagerDashboard" element={<ProductionManagerDashboard />} />
         <Route path="/Production" element={<Production />} />
         <Route path ="/StaffDashboard" element={<StaffDashboard/>}/>
+        <Route path="/supplier-management" element={<SupplierManagement/>}/>
         <Route path = '/Staff/profile' element = {<StaffProfile/>}/>
         <Route path='/Staff/profile/setting' element={<Setting/>}/>
         <Route path="/SupplierHome" element={<SupplierHome />} />

@@ -125,7 +125,15 @@ const Homepage = () => {
               <a 
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="relative group text-gray-600 hover:text-gray-900 transition-all duration-300 font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById(item.toLowerCase());
+                  element?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                }}
+                className="relative group text-gray-600 hover:text-gray-900 transition-all duration-300 font-medium cursor-pointer"
               >
                 {item}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-green-500 group-hover:w-full transition-all duration-300" />
@@ -154,8 +162,16 @@ const Homepage = () => {
                 <a 
                   key={item}
                   href={`#${item.toLowerCase()}`}
-                  className="block text-gray-600 hover:text-gray-900 transition-colors font-medium py-2"
-                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-gray-600 hover:text-gray-900 transition-colors font-medium py-2 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMenuOpen(false);
+                    const element = document.getElementById(item.toLowerCase());
+                    element?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                  }}
                 >
                   {item}
                 </a>
@@ -174,6 +190,7 @@ const Homepage = () => {
 
       {/* Hero Section */}
       <section 
+        id="home"
         ref={heroRef}
         className="relative h-screen flex items-center justify-center overflow-hidden"
       >
@@ -293,16 +310,16 @@ const Homepage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-gray-50 to-green-50">
+      <section id="about" className="py-20 px-6 bg-gradient-to-br from-gray-50 to-green-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-black mb-6">
               <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                Why Choose
+                About Us
               </span>
               <br />
               <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
-                Maleesha
+                Maleesha Tea
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -332,8 +349,70 @@ const Homepage = () => {
         </div>
       </section>
 
+      {/* Products Section */}
+      <section id="products" className="py-20 px-6 bg-gradient-to-br from-white to-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black mb-6">
+              <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Our Premium
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                Tea Collection
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Discover our range of handcrafted Ceylon teas, each telling a unique story
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Ceylon Black Tea",
+                description: "Rich, full-bodied flavor with hints of citrus and spice",
+                image: "/tea_1.jpg",
+                price: "$25"
+              },
+              {
+                name: "Green Tea Blend",
+                description: "Delicate and refreshing with natural antioxidants",
+                image: "/tea.jpg",
+                price: "$22"
+              },
+              {
+                name: "Premium Earl Grey",
+                description: "Classic blend with bergamot oil and cornflower petals",
+                image: "/pic_01.jpg",
+                price: "$28"
+              }
+            ].map((product, idx) => (
+              <div
+                key={idx}
+                className="group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+              >
+                <div className="aspect-square bg-cover bg-center relative overflow-hidden"
+                     style={{ backgroundImage: `url('${product.image}')` }}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-2xl font-bold mb-2">{product.name}</h3>
+                    <p className="text-lg font-semibold">{product.price}</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-gray-600 leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Live Map Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-gray-50 to-white">
+      <section id="tours" className="py-20 px-6 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-black mb-6">
@@ -616,6 +695,101 @@ const Homepage = () => {
                   Download Location Details
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 px-6 bg-gradient-to-br from-white to-green-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black mb-6">
+              <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Get in
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                Touch
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <div className="p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+                  <h3 className="font-bold text-gray-800 mb-4 text-xl">Contact Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <div className="w-4 h-4 bg-green-500 rounded-sm" />
+                      </div>
+                      <span className="text-gray-600">+94 XX XXX XXXX</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div className="w-4 h-4 bg-blue-500 rounded-sm" />
+                      </div>
+                      <span className="text-gray-600">info@brewopstea.lk</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                        <div className="w-4 h-4 bg-amber-500 rounded-sm" />
+                      </div>
+                      <span className="text-gray-600">Maleesha Tea Factory, Omaththa Road, Agalawatta, Mathugama, Sri Lanka</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+              <form className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Your Name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="How can we help you?"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                  <textarea
+                    rows={5}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                    placeholder="Tell us more about your inquiry..."
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 hover:scale-[1.02]"
+                >
+                  Send Message
+                </button>
+              </form>
             </div>
           </div>
         </div>
