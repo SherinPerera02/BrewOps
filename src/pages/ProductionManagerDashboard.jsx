@@ -253,11 +253,11 @@ const ModernProductionDashboard = () => {
               
               <div className="space-y-3">
                 <Link 
-                  to="/supplier/create-supply-recode" 
+                  to="/supplyRecode/create" 
                   className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-green-600 to-emerald-700 text-white hover:from-green-700 hover:to-emerald-800 transition-all duration-200 shadow-lg"
                 >
                   <FaPlus className="text-lg" />
-                  <span className="font-medium">New Supply Record</span>
+                  <span className="font-medium">New Supplier Record</span>
                 </Link>
                 
                 <button className="w-full flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg">
@@ -382,12 +382,14 @@ const ModernProductionDashboard = () => {
 
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-4 mb-8">
-            <QuickActionButton
-              icon={FaPlus}
-              label="Add Supplier"
-              color="bg-gradient-to-r from-green-500 to-green-600"
-              onClick={() => console.log('Add supplier')}
-            />
+            <Link to="/supplyRecode/create">
+              <QuickActionButton
+                icon={FaPlus}
+                label="Add Supplier Record"
+                color="bg-gradient-to-r from-green-500 to-green-600"
+                onClick={() => {}}
+              />
+            </Link>
             <QuickActionButton
               icon={FaBoxOpen}
               label="Update Inventory"
