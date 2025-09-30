@@ -3,8 +3,12 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import NavigationBar from '../../components/navigationBar';
-import SupplierSidebar from '../../components/SupplierSidebar';
 import { Link, useLocation } from 'react-router-dom';
+import { 
+  FaHome,
+  FaSignOutAlt,
+  FaUserCheck
+} from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
 import { AiOutlineEdit } from 'react-icons/ai';
@@ -35,6 +39,59 @@ ChartJS.register(
   Tooltip, 
   Legend
 );
+
+// Enhanced Supplier Management Sidebar Component
+const SupplierManagementSidebar = () => {
+  const location = useLocation();
+
+  const isActiveLink = (path) => {
+    if (path === '/supplier-management' || path === '/SupplierHome') {
+      return location.pathname === '/supplier-management' || location.pathname === '/SupplierHome';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  const getLinkClasses = (path) => {
+    const baseClasses = "flex items-center px-3 py-2 rounded transition-colors";
+    const activeClasses = "bg-blue-600 text-white";
+    const hoverClasses = "hover:bg-blue-600 hover:text-white";
+    
+    return isActiveLink(path) 
+      ? `${baseClasses} ${activeClasses}` 
+      : `${baseClasses} ${hoverClasses}`;
+  };
+
+  return (
+    <div className="w-64 h-screen bg-gray-800 text-white p-5 sticky top-0">
+      {/* Header */}
+      <div className="flex items-center mb-6 pb-4 border-b border-gray-700">
+        <FaUsers className="w-8 h-8 mr-2 text-blue-500" />
+        <span className="font-bold text-lg">Supplier Hub</span>
+      </div>
+      
+      {/* Navigation */}
+      <nav className="space-y-2 flex-1">
+        <Link to="/StaffDashboard" className={getLinkClasses('/StaffDashboard')}>
+          <FaHome className="mr-3" />
+          <span>Dashboard</span>
+        </Link>
+        
+        <Link to="/supplier-management" className={getLinkClasses('/supplier-management')}>
+          <FaUsers className="mr-3" />
+          <span>Supplier Management</span>
+        </Link>
+      </nav>
+
+      {/* Logout Button */}
+      <div className="mt-auto pt-4 border-t border-gray-700">
+        <Link to="/login" className="flex items-center px-3 py-2 rounded hover:bg-red-600 transition-colors text-white">
+          <FaSignOutAlt className="mr-3" />
+          <span>Logout</span>
+        </Link>
+      </div>
+    </div>
+  );
+};
 
 export default function SupplierHome() {
   const [originalSuppliers, setOriginalSuppliers] = useState([]);
@@ -84,130 +141,15 @@ export default function SupplierHome() {
         setVisibleCount(10);
       } else {
         console.error('Failed to fetch suppliers:', response.data?.message);
-        // Use mock data with mixed statuses as fallback
-        const mockSuppliers = [
-          {
-            _id: 'mock1',
-            supplier_id: 'SUP00001',
-            name: 'Green Valley Tea Suppliers',
-            address: '123 Green Valley Road, Colombo',
-            contact_number: '+94771234567',
-            email: 'greenvally@example.com',
-            rate: 150,
-            is_active: true,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            _id: 'mock2',
-            supplier_id: 'SUP00002',
-            name: 'Highland Tea Gardens',
-            address: 'Highland Estate, Kandy',
-            contact_number: '+94777654321',
-            email: 'highland@example.com',
-            rate: 155,
-            is_active: true,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            _id: 'mock3',
-            supplier_id: 'SUP00003',
-            name: 'Mountain Fresh Tea Co.',
-            address: 'Mountain View, Nuwara Eliya',
-            contact_number: '+94712345678',
-            email: 'mountain@example.com',
-            rate: 148,
-            is_active: false,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            _id: 'mock4',
-            supplier_id: 'SUP17571618746464',
-            name: 'Kamal Perera',
-            address: 'Matara',
-            contact_number: '+94771234567',
-            email: 'kamal@example.com',
-            rate: 150,
-            is_active: false,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            _id: 'mock5',
-            supplier_id: 'SUP-20250907-0930',
-            name: 'Rasika Perera',
-            address: '123/6, 1st lane, Panadura',
-            contact_number: '0715689723',
-            email: 'rasika@example.com',
-            rate: 150,
-            is_active: true,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            _id: 'mock6',
-            supplier_id: 'SUP-20250907-1008',
-            name: 'Sherin Perera',
-            address: 'Pinkella Road, Hirana',
-            contact_number: '0715689723',
-            email: 'sherin@example.com',
-            rate: 150,
-            is_active: false,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            _id: 'mock7',
-            supplier_id: 'SUP-20250907-1009',
-            name: 'Shehan Perera',
-            address: 'Pinkella Road, Hirana',
-            contact_number: '6461359646',
-            email: 'shehan@example.com',
-            rate: 150,
-            is_active: false,
-            createdAt: new Date().toISOString(),
-          },
-        ];
-        setOriginalSuppliers(mockSuppliers);
-        setSuppliers(mockSuppliers);
-        setVisibleCount(10);
+        toast.error('Failed to fetch suppliers data');
+        setOriginalSuppliers([]);
+        setSuppliers([]);
       }
     } catch (error) {
       console.error('Error fetching suppliers:', error);
-      // Use mock data as fallback for development
-      const mockSuppliers = [
-        {
-          _id: 'error1',
-          supplier_id: 'SUP00001',
-          name: 'Green Valley Tea Suppliers',
-          address: '123 Green Valley Road, Colombo',
-          contact_number: '+94771234567',
-          email: 'greenvally@example.com',
-          rate: 150,
-          is_active: true,
-          createdAt: new Date().toISOString(),
-        },
-        {
-          _id: 'error2',
-          supplier_id: 'SUP00002',
-          name: 'Highland Tea Gardens',
-          address: 'Highland Estate, Kandy',
-          contact_number: '+94777654321',
-          email: 'highland@example.com',
-          rate: 155,
-          is_active: false,
-          createdAt: new Date().toISOString(),
-        },
-        {
-          _id: 'error3',
-          supplier_id: 'SUP-20250907-0930',
-          name: 'Rasika Perera',
-          address: '123/6, 1st lane, Panadura',
-          contact_number: '0715689723',
-          email: 'rasika@example.com',
-          rate: 150,
-          is_active: false,
-          createdAt: new Date().toISOString(),
-        },
-      ];
-      setOriginalSuppliers(mockSuppliers);
-      setSuppliers(mockSuppliers);
+      toast.error('Failed to connect to server. Please check your connection.');
+      setOriginalSuppliers([]);
+      setSuppliers([]);
       setVisibleCount(10);
     } finally {
       setLoading(false);
@@ -447,20 +389,7 @@ export default function SupplierHome() {
       {/* Layout with Sidebar */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="bg-gray-800 text-white w-64 h-screen p-6 space-y-4 sticky top-0">
-          <Link to="/SupplierHome" className="flex items-center gap-2 px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">
-            <FaUsers /> Suppliers
-          </Link>
-          <Link to="/SupplierRecode" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            <FaEdit /> Supply Records
-          </Link>
-          <Link to="/SupplierHome" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            <FaBoxOpen /> Analytics
-          </Link>
-          <Link to="/SupplierHome" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            <FaPlusCircle /> Reports
-          </Link>
-        </aside>
+        <SupplierManagementSidebar />
 
         {/* Main Content */}
         <main className="flex-1 p-8 overflow-auto">

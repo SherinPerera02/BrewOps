@@ -280,10 +280,13 @@ export default function StaffDashboard() {
                   <span className="font-medium">Add Inventory</span>
                 </Link>
                 
-                <button className="w-full flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg">
+                <Link 
+                  to="/reports" 
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg"
+                >
                   <FaFileAlt className="text-lg" />
-                  <span className="font-medium">Generate Report</span>
-                </button>
+                  <span className="font-medium">Reports & Analytics</span>
+                </Link>
               </div>
             </div>
 

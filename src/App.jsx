@@ -13,7 +13,6 @@ import RegisterPage from './pages/register';
 import SupplierDashboard from './pages/supplierDashboard';
 import ProductionManagerDashboard from './pages/ProductionManagerDashboard';
 import StaffDashboard from './pages/StaffDashboard';
-import SupplierManagement from './pages/SupplierManagement';
 
 import SupplierHome from './pages/Supplier/SupplierHome'
 import CreateSupplier from './pages/Supplier/CreateSupplier'
@@ -39,6 +38,7 @@ import UserManagement from './pages/UserManagement';
 import SystemSecurity from './pages/SystemSecurity';
 import RolePermissions from './pages/RolePermissions';
 import BackupAndRecovery from './pages/BackupAndRecovery';
+import Reports from './pages/Reports';
 
 
 function AppRoutes() {
@@ -63,7 +63,7 @@ function AppRoutes() {
         <Route path="/ProductionManagerDashboard" element={<ProductionManagerDashboard />} />
         <Route path="/Production" element={<Production />} />
         <Route path ="/StaffDashboard" element={<StaffDashboard/>}/>
-        <Route path="/supplier-management" element={<SupplierManagement/>}/>
+        <Route path="/supplier-management" element={<SupplierHome />}/>
         <Route path = '/Staff/profile' element = {<StaffProfile/>}/>
         <Route path='/Staff/profile/setting' element={<Setting/>}/>
         <Route path="/SupplierHome" element={<SupplierHome />} />
@@ -87,6 +87,7 @@ function AppRoutes() {
         <Route path="/systemSecurity" element={<SystemSecurity />} />
         <Route path="/rolePermissions" element={<RolePermissions />} />
         <Route path="/backupRecovery" element={<BackupAndRecovery />} />
+        <Route path="/reports" element={<Reports />} />
 
       </Routes>
 

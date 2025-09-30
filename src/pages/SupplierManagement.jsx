@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import StaffDashboardNav from '../components/StaffDashboardNav';
-import StaffDashboardSlidebar from '../components/StaffDashboardSlidebar';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import NavigationBar from '../components/navigationBar';
 import { 
   FaUsers, 
   FaPlus, 
@@ -24,6 +23,86 @@ import {
 } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
 import Spinner from '../components/Spinner';
+import { 
+  FaHome,
+  FaWarehouse,
+  FaFileAlt,
+  FaDollarSign,
+  FaSignOutAlt
+} from 'react-icons/fa';
+
+// Supplier Management Sidebar Component
+const SupplierManagementSidebar = () => {
+  const location = useLocation();
+
+  const isActiveLink = (path) => {
+    if (path === '/supplier-management') {
+      return location.pathname === '/supplier-management';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  const getLinkClasses = (path) => {
+    const baseClasses = "flex items-center px-3 py-2 rounded transition-colors";
+    const activeClasses = "bg-blue-600 text-white";
+    const hoverClasses = "hover:bg-blue-600 hover:text-white";
+    
+    return isActiveLink(path) 
+      ? `${baseClasses} ${activeClasses}` 
+      : `${baseClasses} ${hoverClasses}`;
+  };
+
+  return (
+    <div className="w-64 h-screen bg-gray-800 text-white p-5 sticky top-0">
+      {/* Header */}
+      <div className="flex items-center mb-6 pb-4 border-b border-gray-700">
+        <FaUsers className="w-8 h-8 mr-2 text-blue-500" />
+        <span className="font-bold text-lg">Supplier Hub</span>
+      </div>
+      
+      {/* Navigation */}
+      <nav className="space-y-2 flex-1">
+        <Link to="/StaffDashboard" className={getLinkClasses('/StaffDashboard')}>
+          <FaHome className="mr-3" />
+          <span>Dashboard</span>
+        </Link>
+        
+        <Link to="/supplier-management" className={getLinkClasses('/supplier-management')}>
+          <FaUsers className="mr-3" />
+          <span>Supplier Overview</span>
+        </Link>
+        
+        <Link to="/SupplierHome" className={getLinkClasses('/SupplierHome')}>
+          <FaUserCheck className="mr-3" />
+          <span>Manage Suppliers</span>
+        </Link>
+        
+        <Link to="/inventories" className={getLinkClasses('/inventories')}>
+          <FaWarehouse className="mr-3" />
+          <span>Inventory Management</span>
+        </Link>
+        
+        <Link to="/reports" className={getLinkClasses('/reports')}>
+          <FaFileAlt className="mr-3" />
+          <span>Reports</span>
+        </Link>
+        
+        <Link to="/suppliers/payments" className={getLinkClasses('/suppliers/payments')}>
+          <FaDollarSign className="mr-3" />
+          <span>Payments</span>
+        </Link>
+      </nav>
+
+      {/* Logout Button */}
+      <div className="mt-auto pt-4 border-t border-gray-700">
+        <Link to="/login" className="flex items-center px-3 py-2 rounded hover:bg-red-600 transition-colors text-white">
+          <FaSignOutAlt className="mr-3" />
+          <span>Logout</span>
+        </Link>
+      </div>
+    </div>
+  );
+};
 
 export default function SupplierManagement() {
   const navigate = useNavigate();
@@ -234,11 +313,11 @@ export default function SupplierManagement() {
       <Toaster position="top-right" />
       <div className="min-h-screen bg-gray-50">
         {/* Navigation */}
-        <StaffDashboardNav />
+        <NavigationBar />
         
         <div className="flex">
           {/* Sidebar */}
-          <StaffDashboardSlidebar />
+          <SupplierManagementSidebar />
           
           {/* Main Content */}
           <div className="flex-1 p-6">

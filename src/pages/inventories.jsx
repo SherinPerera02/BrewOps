@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
-import { FaBoxOpen, FaTrashAlt, FaEdit, FaPlusCircle } from 'react-icons/fa';
+import { FaBoxOpen, FaEdit, FaHome } from 'react-icons/fa';
 import Spinner from '../components/Spinner';
 import NavigationBar from '../components/navigationBar';
 import { Bar, Line } from 'react-chartjs-2';
@@ -42,7 +42,6 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [totalRawLeaves, setTotalRawLeaves] = useState(0);
   const [previousTotal, setPreviousTotal] = useState(null);
   const [chartType, setChartType] = useState('line');
   const lowInventoryToastShown = useRef(false);
@@ -59,21 +58,7 @@ const Home = () => {
     };
   }, [chartType]);
 
-  // Send a notification to the server (will be picked up by production manager)
-  const sendLowInventoryNotification = async (total) => {
-    try {
-      const token = localStorage.getItem('jwtToken');
-      await axios.post('http://localhost:5000/api/notifications', {
-        title: 'Low Raw Leaves Inventory',
-        body: `Raw leaves inventory is below 10,000 kg. Current total: ${total} kg.`,
-        // backend may accept additional fields like recipientRole or meta; adjust if needed
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    } catch (error) {
-      console.error('Failed to send low inventory notification:', error);
-    }
-  };
+
 
   useEffect(() => {
     setLoading(true);
@@ -342,30 +327,7 @@ const handleReportGeneration = () => {
     setVisibleCount(10);
   };
 
-  useEffect(() => {
-    // Calculate total raw leaves inventory
-    const total = originalInventory.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    setTotalRawLeaves(total);
 
-    // Check if inventory is below threshold and avoid duplicate notifications
-    if (total < 10000 && previousTotal !== null && total !== previousTotal) {
-      // Send notification to production manager via backend
-      sendLowInventoryNotification(total);
-      // Show a local toast once for this low-inventory event
-      if (!lowInventoryToastShown.current) {
-        toast.error('Warning: Raw leaves inventory is below 10,000 kg! Notify the production manager.');
-        lowInventoryToastShown.current = true;
-      }
-    }
-
-    // Reset the local-toast flag if inventory recovers above threshold
-    if (total >= 10000 && lowInventoryToastShown.current) {
-      lowInventoryToastShown.current = false;
-    }
-
-    // Update previous total after all checks
-    setPreviousTotal(total);
-  }, [originalInventory]);
 
   const chartData = {
     labels: inventory.map(item => item.inventoryid),
@@ -418,17 +380,14 @@ const handleReportGeneration = () => {
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside className="bg-gray-800 text-white w-64 h-screen p-6 space-y-4 sticky top-0">
+          <Link to="/StaffDashboard" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
+            <FaHome /> Dashboard
+          </Link>
           <Link to="/inventories" className="flex items-center gap-2 px-4 py-2 rounded bg-green-600 bg-opacity-40 text-sm font-medium">
             <FaBoxOpen /> Inventory
           </Link>
-          <Link to="/waste-management" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            <FaTrashAlt /> Waste Management
-          </Link>
           <Link to="/Production" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
             <FaEdit /> Production
-          </Link>
-          <Link to="/rawleaves" className="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-700 text-sm font-medium">
-            <FaPlusCircle /> Raw Leaves Management
           </Link>
         </aside>
 
@@ -477,17 +436,6 @@ const handleReportGeneration = () => {
               </select>
             </div>
 
-            {/* Display for current total raw leaves inventory */}
-            <div className="bg-green-100 p-4 rounded-lg w-auto shadow-md mb-2">
-              <h2 className="text-lg font-bold text-green-800">Current Raw Leaves Inventory</h2>
-              <p className="text-green-700 text-xl">{totalRawLeaves} kg</p>
-            </div>
-
-            {/* Minimum required inventory display */}
-            <div className="bg-yellow-100 p-4 rounded-lg w-auto shadow-md mb-2">
-              <h2 className="text-lg font-bold text-yellow-800">Minimum Required to Reach Full Inventory</h2>
-              <p className="text-yellow-700 text-xl">{Math.max(10000 - totalRawLeaves, 0)} kg</p>
-            </div>
           </div>
 
           {loading ? (

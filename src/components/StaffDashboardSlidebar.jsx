@@ -1,10 +1,30 @@
 import React, { useState } from 'react';
 import { FaHome, FaUsers, FaBox, FaChartBar, FaDollarSign, FaSignOutAlt, FaBars } from 'react-icons/fa';
 import profile from '../assets/profile.png';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function StaffDashboardSlidebar() {
   const [isOpen, setIsOpen] = useState(false); // For mobile toggle
+  const location = useLocation();
+
+  // Function to check if current path matches the link
+  const isActiveLink = (path) => {
+    if (path === '/StaffDashboard') {
+      return location.pathname === '/StaffDashboard';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  // Function to get link classes based on active state
+  const getLinkClasses = (path) => {
+    const baseClasses = "flex items-center px-3 py-2 rounded transition-colors";
+    const activeClasses = "bg-green-600 text-white";
+    const hoverClasses = "hover:bg-green-600 hover:text-white";
+    
+    return isActiveLink(path) 
+      ? `${baseClasses} ${activeClasses}` 
+      : `${baseClasses} ${hoverClasses}`;
+  };
 
   return (
     <>
@@ -20,29 +40,23 @@ export default function StaffDashboardSlidebar() {
       <div className={`fixed md:relative z-50 h-screen w-64 bg-gray-800 text-white flex flex-col justify-between transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0`}>
         <div>
           {/* Profile Image */}
-          <div className="flex items-center p-4 border-b ">
-            <img src={profile} alt="User" className="w-12 h-12 rounded-full mr-3 border"/>
-            <div>
-              <p className="font-semibold text-white">Staff Name</p>
-              <p className="text-sm text-white">Staff Role</p>
-            </div>
-          </div>
+          
 
           {/* Navigation Links */}
           <nav className="flex flex-col px-4 py-6 space-y-4 text-white">
-            <Link to="/StaffDashboard" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
+            <Link to="/StaffDashboard" className={getLinkClasses('/StaffDashboard')}>
               <FaHome className="mr-3" /> Dashboard
             </Link>
-            <Link to="/supplier-management" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
+            <Link to="/supplier-management" className={getLinkClasses('/supplier-management')}>
               <FaUsers className="mr-3" /> Supplier Management
             </Link>
-            <Link to="/inventories" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
+            <Link to="/inventories" className={getLinkClasses('/inventories')}>
               <FaBox className="mr-3" /> Inventory
             </Link>
-            <Link to="#" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
+            <Link to="/reports" className={getLinkClasses('/reports')}>
               <FaChartBar className="mr-3" /> Reports
             </Link>
-            <Link to="#" className="flex items-center px-3 py-2 rounded hover:bg-green-600 transition-colors">
+            <Link to="/suppliers/payments" className={getLinkClasses('/suppliers/payments')}>
               <FaDollarSign className="mr-3" /> Payments
             </Link>
           </nav>

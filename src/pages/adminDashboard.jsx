@@ -243,6 +243,14 @@ const AdminDashboard = () => {
               
               <div className="space-y-3">
                 <Link 
+                  to="/reports" 
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg"
+                >
+                  <FaFileAlt className="text-lg" />
+                  <span className="font-medium">Reports & Analytics</span>
+                </Link>
+              
+                <Link 
                   to="/admin/create-user" 
                   className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg"
                 >

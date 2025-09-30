@@ -253,6 +253,14 @@ const ModernProductionDashboard = () => {
               
               <div className="space-y-3">
                 <Link 
+                  to="/reports" 
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg"
+                >
+                  <FaFileAlt className="text-lg" />
+                  <span className="font-medium">Reports & Analytics</span>
+                </Link>
+              
+                <Link 
                   to="/supplier/create-supply-recode" 
                   className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-green-600 to-emerald-700 text-white hover:from-green-700 hover:to-emerald-800 transition-all duration-200 shadow-lg"
                 >
