@@ -5,7 +5,7 @@ import { User, Mail, Phone, MapPin, CreditCard, Lock, Eye, EyeOff, Save, Home, P
 import NavigationBar from "../components/navigationBar";
 import Footer from "../components/Footer";
 import { Link } from 'react-router-dom';
-import { FaUserCircle, FaUser as FaUserIcon, FaFileAlt, FaMoneyBillWave, FaCog, FaPlus, FaSearch, FaLeaf, FaChartBar, FaTruck } from 'react-icons/fa';
+import { FaUserCircle, FaUser as FaUserIcon, FaFileAlt, FaMoneyBillWave, FaCog, FaPlus, FaSearch, FaLeaf, FaChartBar, FaTruck, FaBell, FaSave } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 
 const EditProfile = () => {
@@ -14,6 +14,26 @@ const EditProfile = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('profile');
+  
+  // Settings state
+  const [settings, setSettings] = useState({
+    notifications: {
+      email: true,
+      sms: false,
+      paymentAlerts: true,
+      deliveryReminders: true
+    },
+    preferences: {
+      language: 'english',
+      currency: 'LKR',
+      theme: 'light'
+    },
+    teaGrades: {
+      primaryGrade: 'PEKOE',
+      secondaryGrades: ['OP', 'OPA', 'FBOP']
+    }
+  });
   
   const [formData, setFormData] = useState({
     supplierId: '',
@@ -390,8 +410,39 @@ const EditProfile = () => {
           <div className="max-w-4xl mx-auto p-6">
             <div className="bg-white rounded-lg shadow-md">
               <div className="px-8 py-6 border-b border-gray-200">
-                <h2 className="text-3xl font-bold text-green-700">Edit Profile</h2>
-                <p className="text-gray-600 mt-2">Update your account information and settings</p>
+                <h2 className="text-3xl font-bold text-green-700 flex items-center gap-3">
+                  <FaLeaf className="text-green-600" />
+                  Tea Supplier Profile & Settings
+                </h2>
+                <p className="text-gray-600 mt-2">Manage your supplier profile, preferences, and account settings</p>
+                
+                {/* Tab Navigation */}
+                <div className="mt-6 border-b border-gray-200">
+                  <nav className="flex space-x-8">
+                    <button
+                      onClick={() => setActiveTab('profile')}
+                      className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                        activeTab === 'profile'
+                          ? 'border-green-500 text-green-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      <FaUserIcon className="inline mr-2" />
+                      Profile Information
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('settings')}
+                      className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                        activeTab === 'settings'
+                          ? 'border-green-500 text-green-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      <FaCog className="inline mr-2" />
+                      Supplier Settings
+                    </button>
+                  </nav>
+                </div>
               </div>
               
               {profileLoading ? (
@@ -402,7 +453,9 @@ const EditProfile = () => {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <div>
+                  {activeTab === 'profile' && (
+                    <form onSubmit={handleSubmit} className="p-8 space-y-6">
                 {/* Basic Information Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -647,6 +700,216 @@ const EditProfile = () => {
                   </button>
                 </div>
               </form>
+                  )}
+                  
+                  {activeTab === 'settings' && (
+                    <div className="p-8 space-y-6">
+                      {/* Notification Settings */}
+                      <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                          <FaBell className="mr-2 text-green-600" />
+                          Notification Preferences
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <label className="font-medium text-gray-700">Email Notifications</label>
+                              <p className="text-sm text-gray-500">Receive notifications via email</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={settings.notifications.email}
+                                onChange={(e) => setSettings(prev => ({
+                                  ...prev,
+                                  notifications: { ...prev.notifications, email: e.target.checked }
+                                }))}
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <label className="font-medium text-gray-700">SMS Notifications</label>
+                              <p className="text-sm text-gray-500">Receive notifications via SMS</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={settings.notifications.sms}
+                                onChange={(e) => setSettings(prev => ({
+                                  ...prev,
+                                  notifications: { ...prev.notifications, sms: e.target.checked }
+                                }))}
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <label className="font-medium text-gray-700">Payment Alerts</label>
+                              <p className="text-sm text-gray-500">Get notified about payment updates</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={settings.notifications.paymentAlerts}
+                                onChange={(e) => setSettings(prev => ({
+                                  ...prev,
+                                  notifications: { ...prev.notifications, paymentAlerts: e.target.checked }
+                                }))}
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <label className="font-medium text-gray-700">Delivery Reminders</label>
+                              <p className="text-sm text-gray-500">Reminders about upcoming deliveries</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={settings.notifications.deliveryReminders}
+                                onChange={(e) => setSettings(prev => ({
+                                  ...prev,
+                                  notifications: { ...prev.notifications, deliveryReminders: e.target.checked }
+                                }))}
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* General Preferences */}
+                      <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                          <FaCog className="mr-2 text-green-600" />
+                          General Preferences
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                            <select
+                              value={settings.preferences.language}
+                              onChange={(e) => setSettings(prev => ({
+                                ...prev,
+                                preferences: { ...prev.preferences, language: e.target.value }
+                              }))}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                              <option value="english">English</option>
+                              <option value="sinhala">Sinhala</option>
+                              <option value="tamil">Tamil</option>
+                            </select>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+                            <select
+                              value={settings.preferences.currency}
+                              onChange={(e) => setSettings(prev => ({
+                                ...prev,
+                                preferences: { ...prev.preferences, currency: e.target.value }
+                              }))}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                              <option value="LKR">Sri Lankan Rupee (LKR)</option>
+                              <option value="USD">US Dollar (USD)</option>
+                              <option value="EUR">Euro (EUR)</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tea Grade Preferences */}
+                      <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                          <FaLeaf className="mr-2 text-green-600" />
+                          Tea Grade Preferences
+                        </h3>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Primary Tea Grade</label>
+                            <select
+                              value={settings.teaGrades.primaryGrade}
+                              onChange={(e) => setSettings(prev => ({
+                                ...prev,
+                                teaGrades: { ...prev.teaGrades, primaryGrade: e.target.value }
+                              }))}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                            >
+                              <option value="PEKOE">Pekoe</option>
+                              <option value="OP">Orange Pekoe (OP)</option>
+                              <option value="OPA">Orange Pekoe A (OPA)</option>
+                              <option value="FBOP">Flowery Broken Orange Pekoe (FBOP)</option>
+                              <option value="BOP">Broken Orange Pekoe (BOP)</option>
+                              <option value="BOPF">Broken Orange Pekoe Fannings (BOPF)</option>
+                            </select>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Specialty Grades</label>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                              {['OP', 'OPA', 'FBOP', 'BOP', 'BOPF', 'PEKOE'].map((grade) => (
+                                <label key={grade} className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={settings.teaGrades.secondaryGrades.includes(grade)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setSettings(prev => ({
+                                          ...prev,
+                                          teaGrades: {
+                                            ...prev.teaGrades,
+                                            secondaryGrades: [...prev.teaGrades.secondaryGrades, grade]
+                                          }
+                                        }));
+                                      } else {
+                                        setSettings(prev => ({
+                                          ...prev,
+                                          teaGrades: {
+                                            ...prev.teaGrades,
+                                            secondaryGrades: prev.teaGrades.secondaryGrades.filter(g => g !== grade)
+                                          }
+                                        }));
+                                      }
+                                    }}
+                                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                  />
+                                  <span className="ml-2 text-sm text-gray-700">{grade}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Save Settings Button */}
+                      <div className="flex justify-center pt-6">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            // Handle settings save
+                            toast.success('Settings updated successfully!');
+                          }}
+                          className="flex items-center px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+                        >
+                          <FaSave className="h-5 w-5 mr-2" />
+                          Save Settings
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>

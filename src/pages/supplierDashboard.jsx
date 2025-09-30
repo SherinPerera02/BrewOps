@@ -178,13 +178,14 @@ export default function SupplierDashboard() {
         <div className="w-80 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 shadow-2xl border-r border-gray-700">
           <div className="p-6">
             {/* User Profile Section */}
-            <div className="flex items-center space-x-4 mb-8 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                <FaUserCircle className="text-white text-2xl" />
+            <div className="flex items-center space-x-4 mb-8 p-4 bg-gradient-to-r from-green-700/20 to-emerald-600/20 rounded-xl border border-green-600/30">
+              <div className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+                <FaLeaf className="text-white text-2xl" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Supplier Portal</h3>
-                <p className="text-gray-400 text-sm">Tea Leaf Supplier</p>
+                <h3 className="text-white font-semibold text-lg">Tea Supplier Portal</h3>
+                <p className="text-green-300 text-sm font-medium">BrewOps Tea Factory</p>
+                <p className="text-gray-400 text-xs">Premium Tea Leaf Supplier</p>
               </div>
             </div>
 
@@ -227,15 +228,7 @@ export default function SupplierDashboard() {
                 className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
               >
                 <FaUser className="text-xl" />
-                <span>Edit Profile</span>
-              </Link>
-              
-              <Link 
-                to="/supplier/settings" 
-                className="flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
-              >
-                <FaCog className="text-xl" />
-                <span>Settings</span>
+                <span>Profile & Settings</span>
               </Link>
             </div>
 
